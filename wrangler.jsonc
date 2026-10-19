@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "thehummingbirdnest",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-13",
+  "upload_source_maps": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": true
+  },
+  "observability": {
+    "enabled": true
+  },
+  // Plain settings. Secrets (RESEND_API_KEY, TURNSTILE_SECRET_KEY) are set with
+  // `npx wrangler secret put NAME` or in the Cloudflare dashboard, never here.
+  "vars": {
+    "CONTACT_TO": "info@thehummingbirdnest.org",
+    "CONTACT_FROM": "The Hummingbird Nest <website@forms.thehummingbirdnest.org>",
+    "CANONICAL_HOST": "www.thehummingbirdnest.org",
+    "ALLOWED_ORIGINS": "https://www.thehummingbirdnest.org,https://thehummingbirdnest.org"
+  },
+  // Five contact form messages per minute per visitor.
+  "ratelimits": [
+    {
+      "name": "CONTACT_LIMITER",
+      "namespace_id": "1311",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ]
+}

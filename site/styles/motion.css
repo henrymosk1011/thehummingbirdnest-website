@@ -1,0 +1,133 @@
+/*
+ * Motion. Elements are only hidden before they animate when
+ * 1) scripting is on, and 2) the visitor has not asked for reduced motion.
+ * If the script never loads, a short CSS fallback reveals everything anyway.
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  html:not(.reduce-motion) [data-reveal]:not(.is-in) {
+    opacity: 0;
+    transform: translate3d(0, 48px, 0);
+  }
+  html:not(.reduce-motion) [data-reveal='scale']:not(.is-in) {
+    transform: scale(0.9);
+  }
+  html:not(.reduce-motion) [data-clip]:not(.is-in) {
+    clip-path: inset(18% 8% 18% 8% round var(--radius-l));
+  }
+  html:not(.reduce-motion) [data-clip]:not(.is-in) img {
+    transform: scale(1.25);
+  }
+  html:not(.reduce-motion) [data-hero-reveal]:not(.is-in) .page-hero__frame,
+  html:not(.reduce-motion) [data-hero-reveal]:not(.is-in) .article__frame {
+    clip-path: inset(12% 6% 0 6% round var(--radius-l));
+  }
+  html:not(.reduce-motion) [data-split]:not(.is-split) {
+    opacity: 0;
+  }
+  /* Fallback: reveal after a moment if JavaScript did not start. */
+  html:not(.js-ready) [data-reveal],
+  html:not(.js-ready) [data-clip],
+  html:not(.js-ready) [data-split],
+  html:not(.js-ready) [data-hero-reveal] .page-hero__frame,
+  html:not(.js-ready) [data-hero-reveal] .article__frame {
+    animation: reveal-fallback 0.6s 2.5s forwards;
+  }
+}
+@keyframes reveal-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+}
+
+[data-reveal] {
+  transition: opacity 1.1s var(--ease), transform 1.2s var(--ease);
+  transition-delay: var(--delay, 0s);
+}
+[data-clip] {
+  transition: clip-path 1.4s var(--ease);
+}
+[data-clip] img {
+  transition: transform 1.6s var(--ease);
+}
+[data-hero-reveal] .page-hero__frame,
+[data-hero-reveal] .article__frame {
+  transition: clip-path 1.6s var(--ease) 0.2s;
+}
+
+/* Split headings: each word rises out of a mask. Words stay real text for screen readers. */
+[data-split] .w {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.1em;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+[data-split] .w > span {
+  display: inline-block;
+  transform: translate3d(0, 105%, 0);
+  transition: transform 1.2s var(--ease);
+  transition-delay: calc(var(--i, 0) * 0.06s + var(--delay, 0s));
+}
+[data-split].is-in .w > span {
+  transform: none;
+}
+
+/* Smooth page to page transitions in supporting browsers */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 0.35s var(--ease-in-out) both vt-out;
+}
+::view-transition-new(root) {
+  animation: 0.6s var(--ease) both vt-in;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* Lenis smooth scrolling */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Reduced motion: everything is visible and still. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  @view-transition {
+    navigation: none;
+  }
+  [data-split] .w > span {
+    transform: none;
+  }
+}
+html.reduce-motion [data-split] .w > span {
+  transform: none;
+}

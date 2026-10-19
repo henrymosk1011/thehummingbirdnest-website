@@ -1,0 +1,513 @@
+{
+  "blog-header": {
+    "width": 1280,
+    "height": 853,
+    "widths": [
+      480,
+      800,
+      1200,
+      1280
+    ],
+    "alpha": false
+  },
+  "cardboard-house-play": {
+    "width": 1600,
+    "height": 1066,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600
+    ],
+    "alpha": false
+  },
+  "dir-floortime-greenspan": {
+    "width": 650,
+    "height": 439,
+    "widths": [
+      480,
+      650
+    ],
+    "alpha": false
+  },
+  "family-session-table": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "family-sibling-session": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "floortime-dollhouse": {
+    "width": 1800,
+    "height": 1200,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1800
+    ],
+    "alpha": false
+  },
+  "floortime-school-bus": {
+    "width": 1800,
+    "height": 1200,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1800
+    ],
+    "alpha": false
+  },
+  "group-play-session": {
+    "width": 1800,
+    "height": 1200,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1800
+    ],
+    "alpha": false
+  },
+  "hero-poster": {
+    "width": 1280,
+    "height": 720,
+    "widths": [
+      480,
+      800,
+      1200,
+      1280
+    ],
+    "alpha": false
+  },
+  "in-school-classroom": {
+    "width": 2400,
+    "height": 1602,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "intake-session": {
+    "width": 1800,
+    "height": 1200,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1800
+    ],
+    "alpha": false
+  },
+  "juliana-facilitated-playdate": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "juliana-one-on-one": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "juliana-reyes": {
+    "width": 1400,
+    "height": 1400,
+    "widths": [
+      320,
+      560,
+      900
+    ],
+    "alpha": true
+  },
+  "kids-on-grass": {
+    "width": 1000,
+    "height": 667,
+    "widths": [
+      480,
+      800,
+      1000
+    ],
+    "alpha": false
+  },
+  "office-door-sign": {
+    "width": 1901,
+    "height": 1267,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1901
+    ],
+    "alpha": false
+  },
+  "office-lets-just-play": {
+    "width": 1886,
+    "height": 1257,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1886
+    ],
+    "alpha": false
+  },
+  "parent-coaching-goals": {
+    "width": 1901,
+    "height": 1267,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      1901
+    ],
+    "alpha": false
+  },
+  "parent-support": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "playdate-clay": {
+    "width": 1280,
+    "height": 853,
+    "widths": [
+      480,
+      800,
+      1200,
+      1280
+    ],
+    "alpha": false
+  },
+  "post-attachment-theory": {
+    "width": 759,
+    "height": 506,
+    "widths": [
+      480,
+      759
+    ],
+    "alpha": false
+  },
+  "post-caregiver-burnout": {
+    "width": 2400,
+    "height": 1491,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "post-feeling-big-feelings": {
+    "width": 1600,
+    "height": 2400,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600
+    ],
+    "alpha": false
+  },
+  "post-from-awareness-to-acceptance": {
+    "width": 708,
+    "height": 641,
+    "widths": [
+      480,
+      708
+    ],
+    "alpha": false
+  },
+  "post-get-my-kid-to-start-talking": {
+    "width": 500,
+    "height": 747,
+    "widths": [
+      480,
+      500
+    ],
+    "alpha": false
+  },
+  "post-high-affect-in-conversations": {
+    "width": 1024,
+    "height": 683,
+    "widths": [
+      480,
+      800,
+      1024
+    ],
+    "alpha": false
+  },
+  "post-how-the-brain-learns-regulation": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "post-power-of-high-affect": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "post-small-steps-meaningful-growth": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "post-supporting-emotional-expression": {
+    "width": 1600,
+    "height": 2400,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600
+    ],
+    "alpha": false
+  },
+  "post-time-out": {
+    "width": 1066,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1066
+    ],
+    "alpha": false
+  },
+  "post-transitions-can-be-hard": {
+    "width": 554,
+    "height": 1052,
+    "widths": [
+      480,
+      554
+    ],
+    "alpha": false
+  },
+  "post-unique-nervous-system": {
+    "width": 618,
+    "height": 520,
+    "widths": [
+      480,
+      618
+    ],
+    "alpha": false
+  },
+  "post-why-is-my-kid-hitting": {
+    "width": 1080,
+    "height": 1080,
+    "widths": [
+      480,
+      800,
+      1080
+    ],
+    "alpha": false
+  },
+  "post-why-relationships-matter": {
+    "width": 522,
+    "height": 570,
+    "widths": [
+      480,
+      522
+    ],
+    "alpha": false
+  },
+  "selena-santana": {
+    "width": 1030,
+    "height": 1030,
+    "widths": [
+      320,
+      560,
+      900
+    ],
+    "alpha": true
+  },
+  "staff-training-classroom": {
+    "width": 2400,
+    "height": 1031,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "staff-training-notebook": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "tamar-facilitated-playdate": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "tamar-matossian": {
+    "width": 1200,
+    "height": 1800,
+    "widths": [
+      480,
+      800,
+      1200
+    ],
+    "alpha": false
+  },
+  "tamar-one-on-one": {
+    "width": 2400,
+    "height": 1600,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "tamar-outdoor-circle": {
+    "width": 876,
+    "height": 876,
+    "widths": [
+      320,
+      560,
+      876
+    ],
+    "alpha": true
+  },
+  "tamar-portrait-circle": {
+    "width": 876,
+    "height": 876,
+    "widths": [
+      320,
+      560,
+      876
+    ],
+    "alpha": true
+  },
+  "toy-animals": {
+    "width": 1600,
+    "height": 1066,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600
+    ],
+    "alpha": false
+  },
+  "toy-train-play": {
+    "width": 1600,
+    "height": 1066,
+    "widths": [
+      480,
+      800,
+      1200,
+      1600
+    ],
+    "alpha": false
+  },
+  "logo-dark": {
+    "width": 1955,
+    "height": 484,
+    "widths": [
+      280,
+      560
+    ],
+    "alpha": true
+  },
+  "logo-light": {
+    "width": 2020,
+    "height": 477,
+    "widths": [
+      280,
+      560
+    ],
+    "alpha": true
+  }
+}
