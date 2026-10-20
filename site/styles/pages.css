@@ -125,10 +125,10 @@
   background: var(--mint);
   z-index: -1;
 }
-.member:nth-child(2) .member__media::before {
+.member:nth-child(3n + 2) .member__media::before {
   background: var(--blue-pale);
 }
-.member:nth-child(3) .member__media::before {
+.member:nth-child(3n) .member__media::before {
   background: var(--blue);
 }
 .member__portrait {

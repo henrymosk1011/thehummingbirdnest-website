@@ -3,7 +3,7 @@ title: "Caregiver Burnout: When “Doing Your Best” Feels Like Too Much"
 slug: caregiver-burnout-when-doing-your-best-feels-like-too-much
 category: adults
 date: 2026-09-14
-image: post-caregiver-burnout
+image: /images/post-caregiver-burnout.jpg
 imageAlt: "A tired parent resting her head in her hand while her child plays nearby"
 description: "Caregiver burnout is real. Learn the signs, why you do not have to do everything perfectly, and how self compassion helps you care for your child and yourself."
 ---

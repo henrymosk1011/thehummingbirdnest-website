@@ -3,7 +3,7 @@ title: "How Can You Use High Affect in Conversations?"
 slug: how-can-you-use-high-affect-in-coversations
 category: adults
 date: 2024-07-31
-image: post-high-affect-in-conversations
+image: /images/post-high-affect-in-conversations.jpg
 imageAlt: "Two parents laughing with their baby on a sunny porch"
 description: "Practical ways to use high affect in everyday conversations with children, from expressive body language and tone to empathy and eye contact."
 ---

@@ -14,29 +14,34 @@ Deployment and DNS steps are in **[DEPLOY.md](DEPLOY.md)**.
 
 ```bash
 npm install          # once
-npm run build        # build dist/ (also checks for dashes, missing alt text and broken links)
+npm run build        # process any new photos, then build dist/ (also checks for dashes, missing alt text and broken links)
 npm run dev          # build, then run the site and Worker locally at http://localhost:8787
-npm run images       # regenerate responsive images after adding or replacing a photo
+npm run images       # only the photo step (add -- --force to re-encode every photo)
 npm run deploy       # build and deploy from your machine (normally Cloudflare does this on push)
 ```
 
 ## Project layout
 
 ```
+.pages.yml            Pages CMS editing screens (blog, team, testimonials, FAQ)
 site/
   config.mjs          Phone, email, address, social links, booking link, analytics switches
   build.mjs           The build (pages, sitemap.xml, robots.txt, manifest, output checks)
   images.mjs          Responsive image generator (AVIF + WebP, social share cards, icons)
+  content/
+    posts/            Blog posts, one Markdown file each
+    team.json         Team members (About page)
+    testimonials.json Testimonials (home and service pages)
+    faq.json          FAQ (About and service pages)
   data/
     services.mjs      The five service pages (titles, copy, photos)
-    content.mjs       Team bios, testimonials, FAQ, home page blocks, gallery
-    images.json       Image sizes, written by npm run images
-  content/posts/      Blog posts, one Markdown file each
+    content.mjs       Loads the content files above; home page blocks and gallery
+    images.json       Image sizes, written by the photo step
   pages/              Page templates (home, about, services, blog, contact, legal, 404)
-  lib/                Layout (header, menus, footer), shared sections, SEO helpers
+  lib/                Layout (header, menus, footer), shared sections, SEO and CMS helpers
   styles/             CSS (base tokens, layout, sections, pages, motion)
   scripts/            Browser JavaScript (motion, menus, carousel, contact form, Instagram feed)
-  images/             Master photos (the source for npm run images)
+  images/             Master photos (uploads from the CMS land here too)
   static/             Copied as is into dist/ (generated images, video, favicon)
 src/worker.js         Cloudflare Worker
 wrangler.jsonc        Worker configuration
@@ -44,18 +49,18 @@ wrangler.jsonc        Worker configuration
 
 ## Editing content
 
+* **The practice edits in Pages CMS:** blog posts, team, testimonials and FAQ. See DEPLOY.md, section 7. Every save publishes in about two minutes.
 * **Contact details, links, analytics:** `site/config.mjs`.
 * **Services:** `site/data/services.mjs`. Each entry is one page; URLs match the old site so search rankings carry over.
-* **Team, testimonials, FAQ:** `site/data/content.mjs`.
-* **Blog posts:** add a Markdown file to `site/content/posts/`:
+* **Blog posts by hand:** add a Markdown file to `site/content/posts/`. The file name becomes the address (`my-post.md` is `/post/my-post`).
 
   ```markdown
   ---
   title: "Post title"
-  slug: post-url-slug
-  category: children        # children, teens or adults
+  draft: false                # true keeps the post off the site
+  category: children          # children, teens or adults
   date: 2026-11-01
-  image: post-my-photo      # a file in site/images (without extension)
+  image: /images/post-my-photo.jpg
   imageAlt: "Describe the photo for screen reader users"
   description: "One or two sentences for Google and social sharing, under 160 characters."
   ---
@@ -63,11 +68,13 @@ wrangler.jsonc        Worker configuration
   Your post, in Markdown. Use ## for section headings.
   ```
 
-  Put the photo in `site/images/` (named like `post-my-photo.jpg`), run `npm run images`, then `npm run build`.
+  Put the photo in `site/images/`. The build creates every size automatically.
+
+Content from the CMS is made safe automatically: dashes become commas, spaces or "to" ("ages 3-7" reads "ages 3 to 7"), a missing photo falls back to the blog header photo, and a mistyped link or broken post is reported as a warning instead of stopping the site from publishing.
 
 ## House rules (enforced by the build)
 
-* **No dashes or em dashes in visible text.** The build fails if a hyphen, en dash or em dash appears in page text, alt text or meta descriptions. Phone numbers are written as `(626) 765 1724`.
+* **No dashes or em dashes in visible text.** The build fails if a hyphen, en dash or em dash appears in page text, alt text or meta descriptions (web and email addresses are exempt). Phone numbers are written as `(626) 765 1724`. Content edited in the CMS is fixed automatically instead.
 * **Every image needs alt text** (or `alt=""` when purely decorative).
 * **Internal links must resolve** to a real page or file.
 * No dot or pulse graphics, and no lines or hyphens next to headings.

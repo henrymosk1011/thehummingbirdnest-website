@@ -3,7 +3,7 @@ title: "How Do I Get My Kid to Start Talking?"
 slug: how-do-i-get-my-kid-to-start-talking
 category: children
 date: 2023-04-07
-image: post-get-my-kid-to-start-talking
+image: /images/post-get-my-kid-to-start-talking.jpg
 imageAlt: "A young boy in a hat sitting on a bench in a garden"
 description: "Helping a late talker find their words: simplify your language, use play and high affect, and handle tantrums with calm narration and patience."
 ---

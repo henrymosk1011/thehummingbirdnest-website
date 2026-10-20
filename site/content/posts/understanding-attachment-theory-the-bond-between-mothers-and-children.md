@@ -3,7 +3,7 @@ title: "Understanding Attachment Theory: The Bond Between Mothers and Children"
 slug: understanding-attachment-theory-the-bond-between-mothers-and-children
 category: teens
 date: 2024-07-31
-image: post-attachment-theory
+image: /images/post-attachment-theory.jpg
 imageAlt: "A mother and child laughing together on a bed"
 description: "An introduction to attachment theory, the benefits of secure attachment, and everyday ways parents can cultivate a strong, secure bond with their child."
 ---

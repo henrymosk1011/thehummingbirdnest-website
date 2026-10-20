@@ -1,0 +1,171 @@
+# Pages CMS (https://app.pagescms.org): the editing screens for the practice.
+# Every save is a commit; Cloudflare rebuilds and publishes in about two minutes.
+# Setup and invite steps are in DEPLOY.md, section 7.
+
+media:
+  input: site/images
+  output: /images
+  rename: safe
+  extensions: [jpg, jpeg, png, webp]
+
+settings:
+  content:
+    # Keep settings the forms do not show (such as an older post's web address).
+    merge: true
+  commit:
+    identity: user
+
+content:
+  - name: posts
+    label: Blog posts
+    type: collection
+    path: site/content/posts
+    format: yaml-frontmatter
+    filename:
+      template: "{primary}.md"
+      field: false
+    view:
+      primary: title
+      fields: [title, date, category, draft]
+      sort: [date, title]
+      search: [title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        description: The headline of the article. It also becomes the web address of a new post.
+      - name: draft
+        label: Draft (hide from the website)
+        type: boolean
+        default: false
+        description: Turn this on to save an unfinished post without publishing it. Turn it off to publish.
+      - name: category
+        label: Category
+        type: select
+        required: true
+        default: children
+        options:
+          values:
+            - { name: children, label: Children }
+            - { name: teens, label: Teens }
+            - { name: adults, label: Adults }
+      - name: date
+        label: Date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+        description: Newest posts appear first on the blog and home page.
+      - name: image
+        label: Cover photo
+        type: image
+        required: true
+        description: A wide photo works best. It is resized for every screen automatically.
+      - name: imageAlt
+        label: Photo description
+        type: string
+        required: true
+        description: "Describe what is in the photo for people who cannot see it, for example: A therapist and a young boy playing with a toy school bus."
+      - name: description
+        label: Short summary
+        type: text
+        required: true
+        options:
+          maxlength: 220
+        description: One or two sentences shown in Google results and when the post is shared. About 150 characters is ideal.
+      - name: body
+        label: Article
+        type: rich-text
+        options:
+          format: markdown
+          switcher: false
+        description: Use Heading 2 for section titles. Photos added here are resized automatically; give each one a description.
+
+  - name: team
+    label: Team
+    type: file
+    path: site/content/team.json
+    format: json
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{name}"
+    fields:
+      - name: name
+        label: Name
+        type: string
+        required: true
+      - name: role
+        label: Role
+        type: string
+        required: true
+        description: "For example: DIR Floortime® Developmental Specialist"
+      - name: title
+        label: Second title (optional)
+        type: string
+      - name: photo
+        label: Photo
+        type: image
+        required: true
+        description: A head and shoulders photo. It is cropped to a circle, so keep the face centered.
+      - name: photoAlt
+        label: Photo description
+        type: string
+        required: true
+        description: "For example: Juliana Reyes, DIR Floortime developmental specialist"
+      - name: bio
+        label: Bio
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          switcher: false
+          media: false
+        description: Type {years} anywhere to show the practice's years of experience, which updates automatically each year.
+
+  - name: testimonials
+    label: Testimonials
+    type: file
+    path: site/content/testimonials.json
+    format: json
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{name}"
+    fields:
+      - name: quote
+        label: Quote
+        type: text
+        required: true
+      - name: name
+        label: Name
+        type: string
+        required: true
+        description: "First name and last initial is fine, for example: Megan B."
+
+  - name: faq
+    label: FAQ
+    type: file
+    path: site/content/faq.json
+    format: json
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{question}"
+    fields:
+      - name: question
+        label: Question
+        type: string
+        required: true
+      - name: answer
+        label: Answer
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          switcher: false
+          media: false

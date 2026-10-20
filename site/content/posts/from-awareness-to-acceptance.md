@@ -3,7 +3,7 @@ title: "From Awareness to Acceptance"
 slug: from-awareness-to-acceptance
 category: adults
 date: 2026-04-23
-image: post-from-awareness-to-acceptance
+image: /images/post-from-awareness-to-acceptance.jpg
 imageAlt: "A puzzle piece beside colorful letters that spell Embrace Differences"
 description: "Moving from autism awareness to acceptance means seeing your child as they are, leading with connection, and meeting them where they are developmentally."
 ---

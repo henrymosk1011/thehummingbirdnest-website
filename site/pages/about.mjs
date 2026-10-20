@@ -1,5 +1,5 @@
 import { team, gallery, faqs } from '../data/content.mjs';
-import { picture, button, link, kicker, withYears, icon, preloadImage } from '../lib/html.mjs';
+import { picture, button, link, kicker, withYears, icon, preloadImage, esc } from '../lib/html.mjs';
 import { pageHero, faqSection, sectionHead } from '../lib/partials.mjs';
 import { webPage, personNode, faqNode } from '../lib/seo.mjs';
 
@@ -15,9 +15,9 @@ export default function about() {
         <div class="member__portrait">${picture(m.image, { alt: m.alt, sizes: '(min-width: 900px) 30vw, 70vw' })}</div>
       </div>
       <div class="member__copy">
-        <div class="member__role">${m.role}${m.title ? `<span>${m.title}</span>` : ''}</div>
-        <h3 class="member__name" id="${m.id}-name" data-split>${m.name}</h3>
-        <div class="member__bio" data-reveal>${m.bio.map((p) => `<p>${withYears(p)}</p>`).join('')}</div>
+        <div class="member__role">${esc(m.role)}${m.title ? `<span>${esc(m.title)}</span>` : ''}</div>
+        <h3 class="member__name" id="${m.id}-name" data-split>${esc(m.name)}</h3>
+        <div class="member__bio" data-reveal>${withYears(m.bio)}</div>
       </div>
     </article>`
     )

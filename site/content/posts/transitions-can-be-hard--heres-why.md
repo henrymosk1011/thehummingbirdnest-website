@@ -3,7 +3,7 @@ title: "Transitions Can Be Hard: Here’s Why"
 slug: transitions-can-be-hard--heres-why
 category: children
 date: 2026-07-14
-image: post-transitions-can-be-hard
+image: /images/post-transitions-can-be-hard.jpg
 imageAlt: "A happy toddler standing on a ride on toy car"
 description: "Why transitions are so hard for many children, and practical ways parents can prepare, connect, and support kids as they move from one activity to the next."
 ---

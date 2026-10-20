@@ -13,12 +13,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import * as esbuild from 'esbuild';
-import { Marked } from 'marked';
+import { parse as parseYaml } from 'yaml';
 
 import { site } from './config.mjs';
 import { services } from './data/services.mjs';
 import { renderPage } from './lib/layout.mjs';
-import { readingTime } from './lib/html.mjs';
+import { readingTime, hasImage } from './lib/html.mjs';
+import { markdown, softenDashes, plainText, mediaName } from './lib/cms.mjs';
 import home from './pages/home.mjs';
 import about from './pages/about.mjs';
 import contact from './pages/contact.mjs';
@@ -155,41 +156,87 @@ function leadParagraph(html) {
   return html.replace(/^<p>([\s\S]*?)<\/p>/, (whole, inner) => (inner.replace(/<[^>]+>/g, '').trim().length >= 50 ? `<p class="lede">${inner}</p>` : whole));
 }
 
+// Blog posts are Markdown files with a YAML settings block at the top, written by hand
+// or by Pages CMS. Problems in a post never stop the build: the post is fixed up or
+// skipped with a warning, so the rest of the site always publishes.
 async function loadPosts() {
   const dir = path.join(SITE, 'content', 'posts');
-  const marked = new Marked({ gfm: true, breaks: false });
-  marked.use({
-    renderer: {
-      link({ href, title, tokens }) {
-        const text = this.parser.parseInline(tokens);
-        const ext = /^https?:\/\//.test(href) && !href.startsWith(site.url);
-        return `<a href="${href}"${title ? ` title="${title}"` : ''}${ext ? ' target="_blank" rel="noopener"' : ''}>${text}${ext ? '<span class="visually-hidden"> (opens in a new tab)</span>' : ''}</a>`;
-      },
-    },
-  });
-  const files = (await fs.readdir(dir)).filter((f) => f.endsWith('.md'));
+  const files = (await fs.readdir(dir)).filter((f) => f.endsWith('.md')).sort();
   const list = [];
+  let drafts = 0;
   for (const f of files) {
-    const raw = await fs.readFile(path.join(dir, f), 'utf8');
-    const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-    if (!m) throw new Error(`Missing front matter in ${f}`);
-    const data = Object.fromEntries(
-      m[1].split('\n').map((line) => {
-        const i = line.indexOf(':');
-        return [line.slice(0, i).trim(), line.slice(i + 1).trim().replace(/^"(.*)"$/, '$1')];
-      })
-    );
-    const words = m[2].split(/\s+/).filter(Boolean).length;
-    if (!categoryById[data.category]) throw new Error(`Unknown category "${data.category}" in ${f}`);
+    const warn = (msg) => console.warn(`Blog post ${f}: ${msg}`);
+    const raw = (await fs.readFile(path.join(dir, f), 'utf8')).replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    const m = raw.match(/^---\n([\s\S]*?)\n---[^\n]*\n?([\s\S]*)$/);
+    if (!m) {
+      warn('skipped, the settings block at the top is missing.');
+      continue;
+    }
+    let data;
+    try {
+      data = parseYaml(m[1]) || {};
+    } catch (err) {
+      warn(`skipped, the settings block could not be read (${err.message.split('\n')[0]}).`);
+      continue;
+    }
+    if (data.draft === true || String(data.draft).toLowerCase() === 'true') {
+      drafts++;
+      continue;
+    }
+    const body = m[2];
+    const title = softenDashes(data.title);
+    if (!title) {
+      warn('skipped, it has no title.');
+      continue;
+    }
+    const fileSlug = f.replace(/\.md$/, '');
+    const slug = /^[a-z0-9-]+$/.test(String(data.slug || '')) ? String(data.slug) : /^[a-z0-9-]+$/.test(fileSlug) ? fileSlug : mediaName(fileSlug);
+    let category = String(data.category || '').toLowerCase();
+    if (!categoryById[category]) {
+      warn(`unknown category "${data.category}", filed under ${categories[0].name}.`);
+      category = categories[0].id;
+    }
+    const date = postDate(data.date) || (warn('no valid date, using today.'), new Date().toISOString().slice(0, 10));
+    let image = mediaName(data.image);
+    if (!hasImage(image)) {
+      if (data.image) warn(`photo "${data.image}" not found, using the blog header photo.`);
+      image = 'blog-header';
+    }
+    const html = leadParagraph(markdown(body));
+    const text = plainText(html);
     list.push({
-      ...data,
-      categoryName: categoryById[data.category].name,
-      html: leadParagraph(marked.parse(m[2])),
-      words,
-      minutes: readingTime(m[2]),
+      title,
+      slug,
+      category,
+      categoryName: categoryById[category].name,
+      date,
+      image,
+      imageAlt: softenDashes(data.imageAlt),
+      description: softenDashes(data.description) || summarize(text, 155),
+      html,
+      words: text.split(/\s+/).filter(Boolean).length,
+      minutes: readingTime(text),
     });
   }
-  return list.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+  const seen = new Set();
+  const unique = list.filter((p) => (seen.has(p.slug) ? (console.warn(`Blog post ${p.slug}: skipped, another post already uses this address.`), false) : seen.add(p.slug)));
+  if (drafts) console.log(`Blog: ${unique.length} published, ${drafts} draft${drafts === 1 ? '' : 's'} hidden.`);
+  return unique.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+}
+
+// Accepts 2026-01-27, 2026-01-27T09:00:00Z, a Date, or anything Date can read.
+function postDate(value) {
+  if (!value) return '';
+  if (value instanceof Date) return isNaN(value) ? '' : value.toISOString().slice(0, 10);
+  const s = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const d = new Date(s);
+  return isNaN(d) ? '' : d.toISOString().slice(0, 10);
+}
+
+function summarize(text, max) {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max).replace(/\s+\S*$/, '')}…`;
 }
 
 async function check(pages) {
@@ -210,7 +257,12 @@ async function check(pages) {
       .replace(/<!--[\s\S]*?-->/g, ' ')
       .replace(/<[^>]+>/g, ' ');
     for (const chunk of [text, ...attrText]) {
-      const decoded = chunk.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+      // Web and email addresses keep their hyphens; everything else must not show a dash.
+      const decoded = chunk
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\S*(?::\/\/|www\.|@)\S*/g, ' ');
       const hit = decoded.match(/.{0,30}[-‐‑‒–—―−].{0,30}/);
       if (hit) issues.push(`${file}: dash in visible text: "${hit[0].trim()}"`);
     }
@@ -219,8 +271,15 @@ async function check(pages) {
       if (!/\salt="/.test(img[0])) issues.push(`${file}: image without alt: ${img[0].slice(0, 80)}`);
     }
 
-    for (const a of html.matchAll(/\shref="(\/[^"#?]*)/g)) {
+    for (const tag of html.matchAll(/<(?:a|link)\b[^>]*>/g)) {
+      const a = tag[0].match(/\shref="(\/[^"#?]*)/);
+      if (!a) continue;
       const href = a[1];
+      // Links typed into CMS content: warn, but keep publishing.
+      if (/\sdata-cms\b/.test(tag[0])) {
+        if (!href.startsWith('/assets/') && !routes.has(href)) console.warn(`${file}: link to a page that does not exist: ${href}`);
+        continue;
+      }
       if (href.startsWith('/assets/') || href === '/favicon.ico' || href === '/site.webmanifest') {
         try {
           await fs.access(path.join(DIST, href));

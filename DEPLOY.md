@@ -131,6 +131,34 @@ The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Be
 
   The security policy already allows Google Analytics, so nothing else needs to change. The Privacy Policy already covers analytics cookies.
 
+## 7. Let the practice edit the blog, team, testimonials and FAQ (Pages CMS)
+
+Pages CMS (free) gives the practice simple forms for **Blog posts**, **Team**, **Testimonials** and **FAQ**. The screens are defined in `.pages.yml`. Each save is a commit to GitHub, and Cloudflare publishes it in about two minutes. Photos are resized automatically, dashes are fixed automatically, and a post with **Draft** turned on stays off the site.
+
+Do this after launch, once `main` is the live branch. Edits are saved to whichever branch is open in Pages CMS, and only `main` publishes to the real site.
+
+**One time setup (you):**
+
+1. In GitHub, open **Settings > General > Default branch** and make sure it is **`main`**. Pages CMS opens the default branch.
+2. Go to **https://app.pagescms.org** and click **Sign in with GitHub**.
+3. When asked, install the **Pages CMS** GitHub App on **henrymosk1011**. Choose **Only select repositories** and pick **thehummingbirdnest-website**.
+4. Open **thehummingbirdnest-website** in Pages CMS. You should see **Blog posts, Team, Testimonials, FAQ** in the sidebar.
+5. Open **Collaborators**, enter the client's email address, and send the invite.
+
+**The client:**
+
+1. Opens the invite email and clicks the **Join** link.
+2. Enters their email and types in the **6 digit code** Pages CMS emails them. They never need a password or a GitHub account.
+3. Next time: go to **https://app.pagescms.org**, sign in with their email, and enter the new code.
+
+**Tips to pass on:**
+
+* **New post:** open **Blog posts** and add a new entry. Fill in every field and click **Save**. Turn on **Draft** to save without publishing.
+* **Photos:** JPG, PNG or WebP. On an iPhone, choose **Settings > Camera > Formats > Most Compatible** so photos are saved as JPG.
+* **Photo description:** one sentence about what is in the photo, for people who cannot see it.
+* **Team members** appear on the About page in the order they are listed. Typing **{years}** in a bio shows the practice's years of experience, updated every year.
+* **Mistakes are recoverable:** every save is in the GitHub history, so any earlier version can be restored.
+
 ## Local development
 
 ```bash

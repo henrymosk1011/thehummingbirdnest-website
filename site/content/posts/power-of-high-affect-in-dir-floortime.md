@@ -3,7 +3,7 @@ title: "The Power of High Affect in DIR® Floortime"
 slug: power-of-high-affect-in-dir-floortime
 category: children
 date: 2026-02-23
-image: post-power-of-high-affect
+image: /images/post-power-of-high-affect.jpg
 imageAlt: "A father playing outdoors with his young child and a toy truck"
 description: "What high affect is, why it matters in DIR® Floortime, and how warm, animated emotional expression helps children engage, connect, and grow."
 ---

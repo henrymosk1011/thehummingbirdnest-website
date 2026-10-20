@@ -1,5 +1,5 @@
 import { site } from '../config.mjs';
-import { picture, button, link, kicker, icon, preloadImage } from '../lib/html.mjs';
+import { picture, button, link, kicker, icon, preloadImage, esc } from '../lib/html.mjs';
 import { pageHero, postCard, postDate, sectionHead } from '../lib/partials.mjs';
 import { webPage, articleNode } from '../lib/seo.mjs';
 
@@ -91,7 +91,7 @@ export function postPage(post, posts) {
 <article class="article" aria-labelledby="article-title">
   <header class="article__header container">
     <p class="article__meta" data-reveal><span class="tag">${cat.name}</span><span>${postDate(post.date)}</span><span>${post.minutes} min read</span></p>
-    <h1 class="article__title" id="article-title" data-split>${post.title}</h1>
+    <h1 class="article__title" id="article-title" data-split>${esc(post.title)}</h1>
     <p class="article__dek" data-reveal>${post.description}</p>
   </header>
   <figure class="article__media" data-hero-reveal>

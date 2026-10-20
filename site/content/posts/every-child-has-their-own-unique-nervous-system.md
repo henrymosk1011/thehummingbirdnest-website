@@ -3,7 +3,7 @@ title: "Every Child Has Their Own Unique Nervous System"
 slug: every-child-has-their-own-unique-nervous-system
 category: children
 date: 2026-03-16
-image: post-unique-nervous-system
+image: /images/post-unique-nervous-system.jpg
 imageAlt: "A boy sitting calmly while a younger girl beside him cries"
 description: "Every child experiences the world through a unique nervous system. Learn how temperament and sensory needs shape behavior and how parents can help."
 ---

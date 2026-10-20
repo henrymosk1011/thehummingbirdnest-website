@@ -3,7 +3,7 @@ title: "Is Your Child Feeling Big Feelings?"
 slug: feeling-big-feelings
 category: children
 date: 2026-01-27
-image: post-feeling-big-feelings
+image: /images/post-feeling-big-feelings.jpg
 imageAlt: "A frustrated young boy holding his head and shouting"
 description: "Big feelings are a normal part of emotional development. Understand why they feel so intense and how to support your child in the moment."
 ---

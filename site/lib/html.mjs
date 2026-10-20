@@ -24,6 +24,8 @@ export const yearsOfExperience = () => new Date().getFullYear() - site.experienc
 export const withYears = (html) =>
   html.replace(/\{years\}/g, `<span data-years-since="${site.experienceSince}">${yearsOfExperience()}</span>+`);
 
+export const hasImage = (name) => Boolean(name && images[name]);
+
 export const imageMeta = (name) => {
   const m = images[name];
   if (!m) throw new Error(`Unknown image "${name}". Add it to site/images and run npm run images.`);

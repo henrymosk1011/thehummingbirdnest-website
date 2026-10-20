@@ -568,6 +568,15 @@ main:focus {
   color: var(--sage-deep);
   font-variant-numeric: tabular-nums;
 }
+.prose__image,
+.prose__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.prose__image img {
+  border-radius: var(--radius);
+}
 .prose blockquote {
   padding: 1.2em 1.4em;
   border-radius: var(--radius);

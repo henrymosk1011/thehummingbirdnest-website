@@ -1,16 +1,18 @@
 // Generates responsive images from the masters in site/images/.
 //
-//   npm run images
+//   npm run images            (also runs automatically at the start of npm run build)
+//   npm run images -- --force (re-encode everything)
 //
-// Output goes to site/static/img/ (copied into dist/ by the build) and a manifest
-// at site/data/images.json that the templates use to write width, height and
-// srcset attributes. Run this whenever you add or replace a master image, then
-// commit the results. The normal build does not re-encode images, which keeps
-// Cloudflare builds fast.
+// Output goes to site/static/assets/img/ (copied into dist/ by the build) and a manifest
+// at site/data/images.json that the templates use to write width, height and srcset
+// attributes. Only new or replaced photos are encoded, so a photo uploaded through the
+// CMS is ready on the next Cloudflare build without anyone running anything by hand.
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import sharp from 'sharp';
+import { mediaName } from './lib/cms.mjs';
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
 const SRC = path.join(ROOT, 'images');
@@ -24,41 +26,63 @@ const force = process.argv.includes('--force');
 await fs.mkdir(OUT, { recursive: true });
 await fs.mkdir(path.dirname(MANIFEST), { recursive: true });
 
+const previous = await fs.readFile(MANIFEST, 'utf8').then(JSON.parse).catch(() => ({}));
 const manifest = {};
-const files = (await fs.readdir(SRC)).filter((f) => /\.(jpe?g|png)$/i.test(f)).sort();
+const files = (await fs.readdir(SRC)).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).sort();
+let encoded = 0;
 
 for (const file of files) {
-  const name = file.replace(/\.(jpe?g|png)$/i, '');
-  if (name.startsWith('logo-')) continue;
+  const name = mediaName(file);
+  if (!name || name.startsWith('logo-')) continue;
+  if (manifest[name]) {
+    console.warn(`Skipping ${file}: another photo already uses the name "${name}".`);
+    continue;
+  }
   const input = path.join(SRC, file);
-  const meta = await sharp(input).metadata();
+  const hash = crypto.createHash('sha1').update(await fs.readFile(input)).digest('hex').slice(0, 12);
+  const before = previous[name];
+  // Photos from before hashes were recorded count as unchanged.
+  const changed = force || !before || (before.hash && before.hash !== hash);
+
+  let meta;
+  try {
+    meta = await sharp(input).metadata();
+  } catch (err) {
+    console.warn(`Skipping ${file}: not a readable image (${err.message}).`);
+    continue;
+  }
+  // Phone photos store their rotation separately; width and height are for the upright photo.
+  const rotated = meta.orientation >= 5;
+  const width = rotated ? meta.height : meta.width;
+  const height = rotated ? meta.width : meta.height;
   const alpha = Boolean(meta.hasAlpha);
-  const widths = (alpha ? PORTRAIT_WIDTHS : WIDTHS).filter((w) => w <= meta.width);
-  if (!widths.length || widths[widths.length - 1] < Math.min(meta.width, alpha ? 900 : 2000)) {
-    widths.push(Math.min(meta.width, alpha ? 900 : 2000));
+  const widths = (alpha ? PORTRAIT_WIDTHS : WIDTHS).filter((w) => w <= width);
+  if (!widths.length || widths[widths.length - 1] < Math.min(width, alpha ? 900 : 2000)) {
+    widths.push(Math.min(width, alpha ? 900 : 2000));
   }
   const unique = [...new Set(widths)].sort((a, b) => a - b);
 
+  let wrote = false;
   for (const w of unique) {
     const base = path.join(OUT, `${name}-${w}`);
-    if (!force && (await exists(`${base}.webp`)) && (await exists(`${base}.avif`))) continue;
-    const pipeline = sharp(input).resize({ width: w, withoutEnlargement: true });
+    if (!changed && (await exists(`${base}.webp`)) && (await exists(`${base}.avif`))) continue;
+    const pipeline = sharp(input).rotate().resize({ width: w, withoutEnlargement: true });
     await pipeline.clone().webp({ quality: alpha ? 82 : 74, effort: 5, alphaQuality: 90 }).toFile(`${base}.webp`);
     await pipeline.clone().avif({ quality: alpha ? 58 : 50, effort: 4 }).toFile(`${base}.avif`);
+    wrote = true;
   }
 
   // 1200 x 630 JPEG for social sharing (Open Graph and Twitter cards prefer JPEG).
-  if (!alpha && (force || !(await exists(path.join(OUT, `${name}-og.jpg`))))) {
-    await sharp(input).resize(1200, 630, { fit: 'cover', position: 'attention' }).jpeg({ quality: 80, mozjpeg: true }).toFile(path.join(OUT, `${name}-og.jpg`));
+  if (!alpha && (changed || !(await exists(path.join(OUT, `${name}-og.jpg`))))) {
+    await sharp(input).rotate().resize(1200, 630, { fit: 'cover', position: 'attention' }).jpeg({ quality: 80, mozjpeg: true }).toFile(path.join(OUT, `${name}-og.jpg`));
+    wrote = true;
   }
 
-  manifest[name] = {
-    width: meta.width,
-    height: meta.height,
-    widths: unique,
-    alpha,
-  };
-  console.log(`${name.padEnd(42)} ${meta.width}x${meta.height} -> ${unique.join(', ')}`);
+  manifest[name] = { width, height, widths: unique, alpha, hash };
+  if (wrote) {
+    encoded++;
+    console.log(`${name.padEnd(42)} ${width}x${height} -> ${unique.join(', ')}`);
+  }
 }
 
 // Logos: crisp WebP at 1x and 2x header sizes, plus a PNG for structured data.
@@ -107,7 +131,7 @@ await sharp(path.join(SRC, 'hero-poster.jpg'))
   .toFile(path.join(OUT, 'og-default.jpg'));
 
 await fs.writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
-console.log(`\nWrote ${Object.keys(manifest).length} entries to ${path.relative(process.cwd(), MANIFEST)}`);
+console.log(`Images ready: ${Object.keys(manifest).length} photos, ${encoded} newly encoded.`);
 
 // Crop transparent margins by scanning the alpha channel.
 async function trimAlpha(buf) {

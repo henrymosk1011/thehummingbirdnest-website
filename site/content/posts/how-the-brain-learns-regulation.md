@@ -3,7 +3,7 @@ title: "How the Brain Learns Regulation"
 slug: how-the-brain-learns-regulation
 category: adults
 date: 2026-06-11
-image: post-how-the-brain-learns-regulation
+image: /images/post-how-the-brain-learns-regulation.jpg
 imageAlt: "A parent holding and comforting a crying toddler"
 description: "Regulation is learned through relationships. Discover how coregulation with a calm adult builds the brain pathways children need to manage emotions."
 ---

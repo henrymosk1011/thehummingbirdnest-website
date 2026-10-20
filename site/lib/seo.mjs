@@ -2,6 +2,7 @@
 // nodes; pages add their own nodes (WebPage, Service, BlogPosting, FAQPage...).
 
 import { site } from '../config.mjs';
+import { plainText } from './cms.mjs';
 
 export const ORG_ID = `${site.url}/#organization`;
 export const SITE_ID = `${site.url}/#website`;
@@ -84,7 +85,7 @@ export const faqNode = (faqs, path) => ({
   mainEntity: faqs.map((f) => ({
     '@type': 'Question',
     name: f.q,
-    acceptedAnswer: { '@type': 'Answer', text: f.a.join(' ') },
+    acceptedAnswer: { '@type': 'Answer', text: plainText(f.html) },
   })),
 });
 

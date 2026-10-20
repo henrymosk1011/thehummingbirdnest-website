@@ -3,7 +3,7 @@ title: "Supporting Emotional Expression in Children"
 slug: supporting-emotional-expression-in-children
 category: children
 date: 2026-05-20
-image: post-supporting-emotional-expression
+image: /images/post-supporting-emotional-expression.jpg
 imageAlt: "A boy resting his head on his arm at a table while a sibling looks on"
 description: "Behavior is communication. Simple ways to model emotional language, validate feelings, and create space for children to express what they feel at home."
 ---

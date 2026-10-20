@@ -3,7 +3,7 @@ title: "To Time Out or Not to Time Out"
 slug: to-time-out-or-not-to-time-out
 category: children
 date: 2023-04-07
-image: post-time-out
+image: /images/post-time-out.jpg
 imageAlt: "A young child standing with their face to the wall in a hallway"
 description: "Rethinking the time out as a calm, supportive break. How to create a regulating space at home and help children learn to process big feelings."
 ---

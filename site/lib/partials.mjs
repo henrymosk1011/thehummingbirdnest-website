@@ -29,7 +29,7 @@ export function postCard(post, { featured = false, headingLevel = 3 } = {}) {
     <div class="post-card__media">${picture(post.image, { alt: '', sizes: featured ? '(min-width: 900px) 60vw, 100vw' : '(min-width: 1100px) 30vw, (min-width: 700px) 45vw, 100vw', maxWidth: 1200 })}</div>
     <div class="post-card__body">
       <p class="post-card__meta"><span class="tag">${post.categoryName}</span><span>${post.minutes} min read</span></p>
-      <${h} class="post-card__title">${post.title}</${h}>
+      <${h} class="post-card__title">${esc(post.title)}</${h}>
       ${featured ? `<p class="post-card__excerpt">${esc(post.description)}</p>` : ''}
       <span class="post-card__cta">Read article ${icon('arrow')}</span>
     </div>
@@ -59,8 +59,8 @@ export function testimonialsSection({ title = 'Words from our <em>families</em>'
           (t, i) => `<div class="quote-card" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${testimonials.length}" data-carousel-slide>
         <figure>
           ${icon('quote', { className: 'quote-card__mark' })}
-          <blockquote><p>${t.quote}</p></blockquote>
-          <figcaption>${t.name}<span>Parent</span></figcaption>
+          <blockquote>${esc(t.quote)}</blockquote>
+          <figcaption>${esc(t.name)}<span>Parent</span></figcaption>
         </figure>
       </div>`
         )
@@ -83,8 +83,8 @@ export function faqSection({ id = 'faq' } = {}) {
       ${faqs
         .map(
           (f) => `<details class="faq__item" data-accordion>
-        <summary><span>${f.q}</span><span class="faq__icon" aria-hidden="true">${icon('plus')}</span></summary>
-        <div class="faq__answer"><div>${f.a.map((p) => `<p>${p}</p>`).join('')}</div></div>
+        <summary><span>${esc(f.q)}</span><span class="faq__icon" aria-hidden="true">${icon('plus')}</span></summary>
+        <div class="faq__answer"><div>${f.html}</div></div>
       </details>`
         )
         .join('')}

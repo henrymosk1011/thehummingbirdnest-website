@@ -3,7 +3,7 @@ title: "Small Steps, Meaningful Growth"
 slug: small-steps-meaningful-growth
 category: children
 date: 2026-09-22
-image: post-small-steps-meaningful-growth
+image: /images/post-small-steps-meaningful-growth.jpg
 imageAlt: "A young child laughing and lifting their arms while playing with a toy car"
 description: "Every child grows at their own pace. Learn how to notice the small steps, stop comparing, and support meaningful progress in your child’s development."
 ---

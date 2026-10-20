@@ -3,7 +3,7 @@ title: "Why Is My Kid Hitting?"
 slug: why-is-my-kid-hitting
 category: children
 date: 2023-04-07
-image: post-why-is-my-kid-hitting
+image: /images/post-why-is-my-kid-hitting.jpg
 imageAlt: "A toddler crying while walking outside"
 description: "Hitting is a form of communication. Learn what may be happening inside your child, what to do in the moment, and what to avoid."
 ---

@@ -2,13 +2,13 @@
   "name": "thehummingbirdnest-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Website for The Hummingbird Nest, La Cañada Flintridge, CA.",
+  "description": "Website for The Hummingbird Nest, La Ca\u00f1ada Flintridge, CA.",
   "type": "module",
   "scripts": {
-    "build": "node site/build.mjs",
+    "build": "node site/images.mjs && node site/build.mjs",
     "images": "node site/images.mjs",
-    "dev": "node site/build.mjs && npx wrangler dev",
-    "deploy": "node site/build.mjs && npx wrangler deploy"
+    "dev": "npm run build && npx wrangler dev",
+    "deploy": "npm run build && npx wrangler deploy"
   },
   "engines": {
     "node": ">=20"
@@ -21,6 +21,7 @@
     "lenis": "^1.3.27",
     "marked": "^18.1.1",
     "sharp": "^0.35.5",
-    "wrangler": "^4.151.2"
+    "wrangler": "^4.151.2",
+    "yaml": "^2.9.1"
   }
 }

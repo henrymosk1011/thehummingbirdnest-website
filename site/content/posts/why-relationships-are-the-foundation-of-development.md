@@ -3,7 +3,7 @@ title: "Why Relationships Are the Foundation of Development"
 slug: why-relationships-are-the-foundation-of-development
 category: children
 date: 2026-02-15
-image: post-why-relationships-matter
+image: /images/post-why-relationships-matter.jpg
 imageAlt: "A mother and young child cuddling and smiling while drawing together"
 description: "Children learn, regulate, and communicate best when they feel safe and connected. Why relationships are the true foundation of child development."
 ---
