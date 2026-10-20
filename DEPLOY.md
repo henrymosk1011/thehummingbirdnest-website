@@ -89,15 +89,34 @@ The home page has an Instagram section. Until the feed is connected it shows the
 
 The old site used an Elfsight widget, which is now disabled on Elfsight's side. This site uses **Behold** instead: no third party script runs on the page, the photos load fast, and the grid stays fully keyboard and screen reader friendly.
 
-1. Create an account at **https://behold.so**. The free plan works: it shows the 6 newest posts and refreshes once a day. A paid plan adds more posts (the grid then shows 10) and hourly updates.
-2. Click **Add source** and log in with the client's Instagram account. Instagram requires a **Business** or **Creator** account for this; switching a personal account is free in the Instagram app under **Settings > Account type and tools**.
-3. Click **Add feed**, choose **JSON feed**, and select that Instagram source. Set **Max posts** to 6 on the free plan, or 10 on a paid plan.
-4. Copy the feed ID, which is the last part of the feed URL (for `https://feeds.behold.so/AbCdEf123456`, the ID is `AbCdEf123456`).
-5. Paste it into `wrangler.jsonc` and push to GitHub:
+**A. Make sure the Instagram account is a professional account.** Instagram only shares posts with outside services for **Business** or **Creator** accounts. In the Instagram app, open the profile, tap the menu (three lines, top right), then **Account type and tools**. If it offers **Switch to professional account**, tap it, choose **Business**, and pick whichever category fits best. Switching is free and can be undone. Behold also offers this switch during step B if needed.
 
-   ```jsonc
-   "BEHOLD_FEED_ID": "AbCdEf123456"
-   ```
+**B. Create a Behold account and connect Instagram.**
+
+1. Sign up at **https://app.behold.so/register** (the free plan is enough).
+2. Go to **Sources** (https://app.behold.so/sources), click **+ Add source**, and choose **Basic source**.
+3. If you can log in to @thehummingbirdnestlcf: click **Connect**, log in to Instagram, and click **Allow**. Leave every permission turned on, including the ones marked optional; Behold needs all of them.
+   If only the client can log in: copy the **auth link** shown next to **Open link** and send it to them. They open it, log in to Instagram, and click **Allow**. They do not need a Behold login.
+4. The account appears on the Sources page.
+
+**C. Create the feed.**
+
+1. Go to **Feeds** (https://app.behold.so/feeds) and click **Add feed**.
+2. Choose **User feed**, pick the @thehummingbirdnestlcf source, then choose **JSON** (not Widget).
+3. Name it (for example "Website") and click **Create feed**.
+4. On the feed page that opens, in the settings:
+   * **Max posts:** 6 on the free plan, 10 on a paid plan.
+   * Leave any domain or website restriction **empty**. The website's server reads the feed, not the visitor's browser, so a domain restriction would block it.
+5. Copy the **JSON Feed URL**. It looks like `https://feeds.behold.so/AbCdEf123456`. The feed ID is the part after the last slash (`AbCdEf123456`).
+
+**D. Put the feed ID on the site.** Either send the ID to whoever maintains the site, or edit it yourself on GitHub:
+
+1. Open https://github.com/henrymosk1011/thehummingbirdnest-website and select the branch that is live (`main` once the site has launched).
+2. Click `wrangler.jsonc`, then the pencil icon.
+3. Change `"BEHOLD_FEED_ID": ""` to `"BEHOLD_FEED_ID": "AbCdEf123456"` (your ID between the quotes).
+4. Click **Commit changes**. Cloudflare rebuilds and deploys in about two minutes.
+
+**E. Check it.** Open `/api/instagram` on the site (for example `https://www.thehummingbirdnest.org/api/instagram`). It should show `"configured":true` and a list of posts. The home page then shows the real posts instead of the practice photos.
 
 The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Behold or Instagram image addresses, and keeps the result in Cloudflare's cache for two hours. That keeps Behold requests well under the free plan's 1,200 feed loads a month, even in a busy month. Alt text comes from the post's Instagram alt text (add it in Instagram under **Advanced settings > Write alt text**), or from the caption when there is none.
 
