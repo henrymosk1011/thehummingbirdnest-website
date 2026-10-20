@@ -149,6 +149,12 @@ console.log('Checks passed: no dashes in visible text, alt text present, interna
 
 // Helpers
 
+// The opening paragraph of an article is set larger as a lead in, but only when it is a
+// full paragraph. A short opening line at that size would read like a heading.
+function leadParagraph(html) {
+  return html.replace(/^<p>([\s\S]*?)<\/p>/, (whole, inner) => (inner.replace(/<[^>]+>/g, '').trim().length >= 50 ? `<p class="lede">${inner}</p>` : whole));
+}
+
 async function loadPosts() {
   const dir = path.join(SITE, 'content', 'posts');
   const marked = new Marked({ gfm: true, breaks: false });
@@ -178,7 +184,7 @@ async function loadPosts() {
     list.push({
       ...data,
       categoryName: categoryById[data.category].name,
-      html: marked.parse(m[2]),
+      html: leadParagraph(marked.parse(m[2])),
       words,
       minutes: readingTime(m[2]),
     });

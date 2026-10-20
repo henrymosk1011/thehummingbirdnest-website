@@ -15,10 +15,9 @@ export default function about() {
         <div class="member__portrait">${picture(m.image, { alt: m.alt, sizes: '(min-width: 900px) 30vw, 70vw' })}</div>
       </div>
       <div class="member__copy">
-        <p class="member__role">${m.role}${m.title ? `<span>${m.title}</span>` : ''}</p>
+        <div class="member__role">${m.role}${m.title ? `<span>${m.title}</span>` : ''}</div>
         <h3 class="member__name" id="${m.id}-name" data-split>${m.name}</h3>
         <div class="member__bio" data-reveal>${m.bio.map((p) => `<p>${withYears(p)}</p>`).join('')}</div>
-        <div data-reveal>${button('/contact', 'Schedule a call', { variant: i === 0 ? 'ink' : 'ghost', size: 'sm' })}</div>
       </div>
     </article>`
     )
@@ -77,6 +76,10 @@ ${pageHero({
   <div class="container">
     ${sectionHead({ eyebrow: 'Our team', title: 'The people behind <em>the Nest</em>', id: 'team-title', text: 'A compassionate group of specialists who love to integrate strategies across all of your family’s therapeutic disciplines.' })}
     <div class="team__list">${members}</div>
+    <div class="team__cta" data-reveal>
+      <p>Ready to meet the team in person?</p>
+      ${button('/contact', 'Schedule a call', { variant: 'ink' })}
+    </div>
   </div>
 </section>
 
@@ -87,7 +90,7 @@ ${pageHero({
         ${kicker('Inside the Nest')}
         <h2 class="h2" id="gallery-title" data-split>A space made <em>for play</em></h2>
       </div>
-      <p class="hscroll__count" aria-hidden="true"><span data-hscroll-current>01</span> / ${String(gallery.length).padStart(2, '0')}</p>
+      <div class="hscroll__count" aria-hidden="true"><span data-hscroll-current>01</span> / ${String(gallery.length).padStart(2, '0')}</div>
     </div>
     <div class="hscroll__viewport" data-hscroll-viewport data-lenis-prevent-horizontal tabindex="0" role="region" aria-label="Office photos, scroll sideways to see more">
       <ul class="hscroll__track" role="list" data-hscroll-track>

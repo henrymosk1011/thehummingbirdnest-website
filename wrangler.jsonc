@@ -20,7 +20,9 @@
     "CONTACT_TO": "info@thehummingbirdnest.org",
     "CONTACT_FROM": "The Hummingbird Nest <website@forms.thehummingbirdnest.org>",
     "CANONICAL_HOST": "www.thehummingbirdnest.org",
-    "ALLOWED_ORIGINS": "https://www.thehummingbirdnest.org,https://thehummingbirdnest.org"
+    "ALLOWED_ORIGINS": "https://www.thehummingbirdnest.org,https://thehummingbirdnest.org",
+    // Instagram section on the home page: paste the Behold JSON feed ID here (see DEPLOY.md).
+    "BEHOLD_FEED_ID": ""
   },
   // Five contact form messages per minute per visitor.
   "ratelimits": [

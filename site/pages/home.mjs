@@ -1,6 +1,6 @@
 import { site } from '../config.mjs';
 import { services } from '../data/services.mjs';
-import { pillars, supportCards } from '../data/content.mjs';
+import { pillars, supportCards, instagramFallback } from '../data/content.mjs';
 import { picture, button, link, icon, kicker, withYears, imageUrl } from '../lib/html.mjs';
 import { testimonialsSection, postCard, contactForm, contactDetails, sectionHead } from '../lib/partials.mjs';
 import { webPage, personNode } from '../lib/seo.mjs';
@@ -9,6 +9,8 @@ import { team } from '../data/content.mjs';
 export default function home({ posts }) {
   const description = site.description;
   const tamar = team[0];
+  const instagram = site.social.find((s) => s.name === 'Instagram');
+  const instagramHandle = instagram.url.split('/').filter(Boolean).pop();
 
   const body = `
 <section class="hero" data-hero aria-labelledby="hero-title">
@@ -31,7 +33,7 @@ export default function home({ posts }) {
         <source src="/assets/media/hero-1280.mp4" type="video/mp4">
       </video>
       <div class="hero__shade" aria-hidden="true"></div>
-      <p class="hero__statement" data-hero-statement>Meeting every child <em>where they are.</em></p>
+      <div class="hero__statement" data-hero-statement>Meeting every child <em>where they are.</em></div>
       <button class="video-toggle" type="button" data-video-toggle>
         <span class="video-toggle__icon" aria-hidden="true">${icon('pause', { className: 'icon icon--pause' })}${icon('play', { className: 'icon icon--play' })}</span>
         <span class="video-toggle__label">Pause video</span>
@@ -158,7 +160,7 @@ export default function home({ posts }) {
         ${kicker('What we do')}
         <h2 class="h2" id="services-title" data-split>Services that grow <em>with your family</em></h2>
       </div>
-      <p class="hscroll__count" aria-hidden="true"><span data-hscroll-current>01</span> / ${String(services.length).padStart(2, '0')}</p>
+      <div class="hscroll__count" aria-hidden="true"><span data-hscroll-current>01</span> / ${String(services.length).padStart(2, '0')}</div>
     </div>
     <div class="hscroll__viewport" data-hscroll-viewport data-lenis-prevent-horizontal>
       <ul class="hscroll__track" role="list" data-hscroll-track>
@@ -179,9 +181,9 @@ export default function home({ posts }) {
           .join('')}
         <li class="hscroll__item hscroll__item--end" data-hscroll-item>
           <div class="svc-end">
-            <p class="svc-end__title">Not sure which service is right for your child?</p>
+            <h3 class="svc-end__title">Not sure which service is right for your child?</h3>
             <p>Start with a short call. We will listen, answer your questions, and recommend a next step.</p>
-            ${button('/contact', 'Book a call', { variant: 'light' })}
+            ${button('/contact', 'Book a call', { variant: 'dark' })}
           </div>
         </li>
       </ul>
@@ -200,6 +202,24 @@ ${testimonialsSection()}
     <div class="post-grid">
       ${posts.slice(0, 3).map((p) => postCard(p)).join('')}
     </div>
+  </div>
+</section>
+
+<section class="insta" aria-labelledby="insta-title" data-insta>
+  <div class="container">
+    <div class="insta__head">
+      ${sectionHead({ eyebrow: 'Instagram', title: 'Follow along <em>at the Nest</em>', id: 'insta-title', text: 'Moments from sessions, playdates, and everyday life in our playroom, straight from our Instagram.' })}
+      <div data-reveal>${button(instagram.url, `Follow @${instagramHandle}`, { variant: 'ghost', iconName: 'instagram' })}</div>
+    </div>
+    <ul class="insta__grid" role="list" data-insta-grid>
+      ${instagramFallback
+        .map(
+          (p) => `<li class="insta__item">
+        <div class="insta__tile">${picture(p.image, { alt: p.alt, sizes: '(min-width: 900px) 18vw, (min-width: 600px) 30vw, 46vw', maxWidth: 800 })}</div>
+      </li>`
+        )
+        .join('')}
+    </ul>
   </div>
 </section>
 

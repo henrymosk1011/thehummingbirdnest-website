@@ -173,3 +173,17 @@ export const gallery = [
   { image: 'floortime-school-bus', alt: 'A therapist and a young boy playing with a toy school bus', caption: 'Play with purpose' },
   { image: 'office-lets-just-play', alt: 'A framed sign reading Let’s just play on a white brick wall', caption: 'Let’s just play' },
 ];
+
+// Shown in the home page Instagram section until the live feed loads (or if it is not set up yet).
+export const instagramFallback = [
+  { image: 'toy-train-play', alt: 'An adult and a young girl playing together with a wooden toy train on the floor' },
+  { image: 'playdate-clay', alt: 'Two children playing with colorful clay together at a table' },
+  { image: 'office-lets-just-play', alt: 'A framed sign reading Let’s just play on a white brick wall' },
+  { image: 'kids-on-grass', alt: 'A group of children sitting in a circle on the grass, talking and playing' },
+  { image: 'floortime-dollhouse', alt: 'A therapist and a young boy playing at a wooden dollhouse' },
+  { image: 'cardboard-house-play', alt: 'A parent and child playing together inside a painted cardboard house' },
+  { image: 'tamar-facilitated-playdate', alt: 'Tamar supporting two children building with colorful blocks during a facilitated playdate' },
+  { image: 'group-play-session', alt: 'Therapists playing on the floor with children in the playroom' },
+  { image: 'family-sibling-session', alt: 'Tamar leading a family session with a parent and two children on a play mat' },
+  { image: 'office-door-sign', alt: 'The Hummingbird Nest sign on the office wall' },
+];

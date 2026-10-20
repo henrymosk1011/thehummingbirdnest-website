@@ -6,6 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { initForms } from './form.js';
+import { initInstagram } from './instagram.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -324,13 +325,19 @@ videos.forEach((v) => {
 });
 syncToggles();
 
-/* Hero: the video window opens up to full screen while the headline lifts away */
+/* Hero: the video window opens up to full screen while the headline lifts away.
+ * Only when the headline and buttons fit comfortably above the window (wide screens).
+ * On phones and short screens the video sits below the copy as a card, so nothing overlaps. */
 const hero = $('[data-hero]');
 if (hero && !reduce) {
-  hero.classList.add('is-enhanced');
   const media = $('[data-hero-media]', hero);
   const copy = $('[data-hero-copy]', hero);
   let state = {};
+  let st = null;
+  const fits = () => {
+    const content = [...copy.children].reduce((sum, el) => sum + el.offsetHeight, 0) + 70;
+    return window.innerWidth >= 900 && content + headerOffset() < window.innerHeight * 0.66;
+  };
   const measure = () => {
     const vh = window.innerHeight;
     const gutter = parseFloat(getComputedStyle(copy).paddingLeft) || 24;
@@ -358,28 +365,54 @@ if (hero && !reduce) {
     copy.style.visibility = k > 0.62 ? 'hidden' : '';
     setHeaderDark('hero', k > 0.9);
   };
-  measure();
-  const st = ScrollTrigger.create({
-    trigger: hero,
-    start: 'top top',
-    end: 'bottom bottom',
-    onUpdate: (self) => apply(self.progress),
-    onRefresh: (self) => {
-      measure();
-      apply(self.progress);
-    },
+  const enable = () => {
+    hero.classList.add('is-enhanced');
+    measure();
+    st = ScrollTrigger.create({
+      trigger: hero,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: (self) => apply(self.progress),
+      onRefresh: (self) => {
+        measure();
+        apply(self.progress);
+      },
+    });
+    apply(st.progress || 0);
+  };
+  const disable = () => {
+    st?.kill();
+    st = null;
+    hero.classList.remove('is-enhanced');
+    media.removeAttribute('style');
+    copy.removeAttribute('style');
+    setHeaderDark('hero', false);
+  };
+  const decide = () => {
+    const want = fits();
+    if (want && !st) enable();
+    else if (!want && st) disable();
+  };
+  decide();
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      decide();
+      ScrollTrigger.refresh();
+    }, 200);
   });
-  apply(st.progress || 0);
-  // Re measure when the headline reflows (web fonts arriving, resizing).
+  // Re measure when the headline reflows (web fonts arriving).
   if ('ResizeObserver' in window) {
     new ResizeObserver(() => {
+      if (!st) return decide();
       measure();
       apply(st.progress || 0);
     }).observe(copy);
   }
   // If someone tabs into the headline after it has faded, bring it back into view.
   copy.addEventListener('focusin', () => {
-    if (st.progress > 0.05) scrollToY(0, true);
+    if (st && st.progress > 0.05) scrollToY(0, true);
   });
 }
 
@@ -504,12 +537,6 @@ if (finaleTitle && !reduce) {
   );
 }
 
-/* Footer wordmark rises in */
-const wordmark = $('[data-wordmark]');
-if (wordmark && !reduce) {
-  gsap.fromTo(wordmark, { yPercent: 60 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: wordmark, start: 'top bottom', end: 'bottom bottom', scrub: true } });
-}
-
 /* Testimonials carousel */
 $$('[data-carousel]').forEach((carousel) => {
   const track = $('[data-carousel-track]', carousel);
@@ -554,6 +581,9 @@ $$('[data-accordion]').forEach((details) => {
     }
   });
 });
+
+/* Instagram feed on the home page */
+initInstagram({ reduce });
 
 /* Forms */
 initForms();

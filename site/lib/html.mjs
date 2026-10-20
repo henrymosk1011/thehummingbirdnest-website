@@ -91,6 +91,7 @@ const ICONS = {
   users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
   sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  instagram: '<rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/>',
 };
 
 export function icon(name, { className = 'icon', label } = {}) {
@@ -111,7 +112,7 @@ export function button(href, text, { variant = 'ink', size = '', iconName, class
   return link(href, btnInner(text, ico), { className: cls });
 }
 
-export const kicker = (text, extra = '') => `<p class="kicker${extra ? ' ' + extra : ''}">${text}</p>`;
+export const kicker = (text, extra = '') => `<div class="kicker${extra ? ' ' + extra : ''}">${text}</div>`;
 
 export const readingTime = (text) => Math.max(1, Math.round(text.split(/\s+/).length / 220));
 

@@ -12,7 +12,7 @@ export const categories = [
 export const categoryById = Object.fromEntries(categories.map((c) => [c.id, c]));
 
 function filters(active) {
-  const items = [{ name: 'All articles', path: '/blog', id: 'all' }, ...categories];
+  const items = [{ name: 'All articles', path: '/blog#articles', id: 'all' }, ...categories];
   return `<nav class="filters" aria-label="Blog categories">
     <ul role="list">
       ${items.map((c) => `<li><a class="filter${c.id === active ? ' is-active' : ''}" href="${c.path}"${c.id === active ? ' aria-current="page"' : ''}>${c.name}</a></li>`).join('')}
@@ -36,7 +36,7 @@ ${pageHero({
   lead: 'Free articles on development, regulation, connection, and caring for yourself along the way.',
   variant: 'plain',
 })}
-<section class="blog-list" aria-label="Articles">
+<section class="blog-list" id="articles" aria-label="Articles">
   <div class="container">
     ${filters('all')}
     ${listing(posts)}
@@ -90,7 +90,7 @@ export function postPage(post, posts) {
   const body = `
 <article class="article" aria-labelledby="article-title">
   <header class="article__header container">
-    <p class="article__meta" data-reveal><a class="tag" href="${cat.path}">${cat.name}</a><span>${postDate(post.date)}</span><span>${post.minutes} min read</span></p>
+    <p class="article__meta" data-reveal><span class="tag">${cat.name}</span><span>${postDate(post.date)}</span><span>${post.minutes} min read</span></p>
     <h1 class="article__title" id="article-title" data-split>${post.title}</h1>
     <p class="article__dek" data-reveal>${post.description}</p>
   </header>
@@ -107,7 +107,7 @@ export function postPage(post, posts) {
         <p><strong>${site.name}</strong>Written by our team of DIR Floortime® developmental specialists.</p>
       </div>
       <div class="aside-cta">
-        <p>Have questions about your child’s development?</p>
+        <h2 class="aside-cta__title">Have questions about your child’s development?</h2>
         ${button('/contact', 'Talk with us', { variant: 'ink', size: 'sm' })}
       </div>
     </aside>

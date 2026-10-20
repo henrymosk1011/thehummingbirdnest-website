@@ -83,7 +83,25 @@ Spam protection already included: same origin check, 5 messages per minute per v
 
 The form loads the check automatically once both are set.
 
-## 5. Google Search Console and Analytics
+## 5. Turn on the live Instagram feed (Behold)
+
+The home page has an Instagram section. Until the feed is connected it shows the practice's own photos, so nothing looks broken. Once connected, it shows the latest posts from **@thehummingbirdnestlcf** and updates on its own whenever the client posts.
+
+The old site used an Elfsight widget, which is now disabled on Elfsight's side. This site uses **Behold** instead: no third party script runs on the page, the photos load fast, and the grid stays fully keyboard and screen reader friendly.
+
+1. Create an account at **https://behold.so**. The free plan works: it shows the 6 newest posts and refreshes once a day. A paid plan adds more posts (the grid then shows 10) and hourly updates.
+2. Click **Add source** and log in with the client's Instagram account. Instagram requires a **Business** or **Creator** account for this; switching a personal account is free in the Instagram app under **Settings > Account type and tools**.
+3. Click **Add feed**, choose **JSON feed**, and select that Instagram source. Set **Max posts** to 6 on the free plan, or 10 on a paid plan.
+4. Copy the feed ID, which is the last part of the feed URL (for `https://feeds.behold.so/AbCdEf123456`, the ID is `AbCdEf123456`).
+5. Paste it into `wrangler.jsonc` and push to GitHub:
+
+   ```jsonc
+   "BEHOLD_FEED_ID": "AbCdEf123456"
+   ```
+
+The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Behold or Instagram image addresses, and keeps the result in Cloudflare's cache for two hours. That keeps Behold requests well under the free plan's 1,200 feed loads a month, even in a busy month. Alt text comes from the post's Instagram alt text (add it in Instagram under **Advanced settings > Write alt text**), or from the caption when there is none.
+
+## 6. Google Search Console and Analytics
 
 * **Search Console:** the domain is already verified through the DNS TXT record above. After launch, submit `https://www.thehummingbirdnest.org/sitemap.xml` under **Sitemaps**, and use **URL Inspection** on the home page to request indexing.
 * **Google Analytics 4:** put the Measurement ID in `site/config.mjs`:

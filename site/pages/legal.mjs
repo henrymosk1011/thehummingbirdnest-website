@@ -2,8 +2,8 @@ import { site } from '../config.mjs';
 import { link, kicker } from '../lib/html.mjs';
 import { webPage } from '../lib/seo.mjs';
 
-const EFFECTIVE = 'October 19, 2026';
-const EFFECTIVE_ISO = '2026-10-19';
+const EFFECTIVE = 'October 20, 2026';
+const EFFECTIVE_ISO = '2026-10-20';
 
 function legalPage({ path, title, intro, sections, description, updatedLabel = 'Effective' }) {
   const toc = sections.map((s) => `<li><a href="#${s.id}">${s.title}</a></li>`).join('');
@@ -73,7 +73,7 @@ export function privacyPage() {
         title: 'How we share information',
         html: `<p>We share personal information only as needed to run the Site and respond to you, including with:</p>
 <ul>
-<li><strong>Service providers</strong> that help us operate, such as our website hosting and security provider (Cloudflare), our email delivery provider (Resend), our online scheduling provider (Calendly), and, if enabled, our analytics provider (Google). These providers may only use the information to perform services for us.</li>
+<li><strong>Service providers</strong> that help us operate, such as our website hosting and security provider (Cloudflare), our email delivery provider (Resend), our online scheduling provider (Calendly), our Instagram feed provider (Behold), and, if enabled, our analytics provider (Google). These providers may only use the information to perform services for us.</li>
 <li><strong>Legal and safety reasons</strong>, when we believe disclosure is required by law, legal process, or a government request, or is needed to protect the rights, property, or safety of our clients, our team, or others.</li>
 <li><strong>Business transfers</strong>, if our practice is involved in a merger, acquisition, or sale of assets, subject to this policy.</li>
 </ul>
@@ -82,7 +82,8 @@ export function privacyPage() {
       {
         id: 'third-party-links',
         title: 'Third party links and services',
-        html: `<p>The Site links to websites and services we do not control, such as The Social Club, Calendly, Amazon, ICDL, Profectum, Google Maps, Instagram, Facebook, and LinkedIn. Their privacy practices are governed by their own policies, and we encourage you to review them.</p>`,
+        html: `<p>The Site links to websites and services we do not control, such as The Social Club, Calendly, Amazon, ICDL, Profectum, Google Maps, Instagram, Facebook, and LinkedIn. Their privacy practices are governed by their own policies, and we encourage you to review them.</p>
+<p>Our home page shows recent photos from our public Instagram account. They are delivered by Behold, an Instagram feed service, so your browser loads them from Behold and Instagram image servers, which receive standard technical information such as your IP address and browser type. Selecting a photo opens Instagram, where Instagram’s own privacy policy applies.</p>`,
       },
       {
         id: 'retention',

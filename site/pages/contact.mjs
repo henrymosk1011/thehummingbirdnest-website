@@ -47,6 +47,7 @@ export default function contact() {
     description,
     body,
     footerCta: false,
+    bodyClass: 'page-contact',
     image: 'office-door-sign',
     imageAlt: 'The Hummingbird Nest office sign',
     crumbs: [{ name: 'Contact', path }],

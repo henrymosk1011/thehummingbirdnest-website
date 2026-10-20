@@ -71,7 +71,7 @@
   --shadow: 0 30px 60px -30px rgba(13, 32, 36, 0.35);
   --shadow-l: 0 50px 100px -40px rgba(13, 32, 36, 0.45);
 
-  --step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.9rem);
+  --step--1: clamp(0.9375rem, 0.92rem + 0.1vw, 1rem);
   --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
   --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.35rem);
   --step-2: clamp(1.35rem, 1.2rem + 0.75vw, 1.85rem);
@@ -192,7 +192,7 @@ strong {
   font-weight: 700;
 }
 ::selection {
-  background: var(--lime);
+  background: var(--sage);
   color: var(--ink);
 }
 main:focus {
@@ -208,7 +208,7 @@ main:focus {
 [data-header-theme='dark'] :focus-visible,
 .site-footer :focus-visible,
 .mobile-menu :focus-visible {
-  outline-color: var(--lime);
+  outline-color: var(--sage);
 }
 
 /* Decorative text is drawn with generated content, so it stays out of the accessibility tree. */
@@ -270,7 +270,7 @@ main:focus {
   color: var(--sage-deep);
 }
 .kicker--light {
-  color: var(--sage-light);
+  color: var(--sage);
 }
 .h2 {
   font-size: var(--step-4);
@@ -306,10 +306,9 @@ main:focus {
   border-radius: 999px;
   background: var(--mint);
   color: var(--ink);
-  font-size: 0.78rem;
+  font-size: 0.9375rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   text-decoration: none;
   line-height: 1.4;
 }
@@ -323,7 +322,7 @@ main:focus {
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--white);
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -334,14 +333,23 @@ main:focus {
   gap: 12px 16px;
 }
 
-/* Buttons */
+/* Buttons
+ * Primary: brand green (#74B996) with ink text (7.3:1). On hover an ink fill sweeps up.
+ * Ghost: ink outline. Dark: ink pill, used on green surfaces. Light: green on dark sections, paper sweep.
+ */
 .btn {
-  --btn-bg: var(--ink);
-  --btn-fg: var(--paper);
-  --btn-hover: var(--sage-deep);
+  --btn-bg: var(--sage);
+  --btn-fg: var(--ink);
+  --btn-fill: var(--ink);
+  --btn-fill-fg: var(--paper);
+  --btn-icon-bg: var(--ink);
+  --btn-icon-fg: var(--sage);
+  --btn-icon-hover-bg: var(--sage);
+  --btn-icon-hover-fg: var(--ink);
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 14px;
   min-height: 56px;
   padding: 8px 8px 8px 26px;
@@ -361,10 +369,13 @@ main:focus {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--btn-hover);
+  background: var(--btn-fill);
   border-radius: inherit;
   transform: translateY(101%);
   transition: transform 0.55s var(--ease);
+}
+.btn:hover {
+  color: var(--btn-fill-fg);
 }
 .btn:hover::before {
   transform: none;
@@ -379,8 +390,8 @@ main:focus {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--btn-fg);
-  color: var(--btn-bg);
+  background: var(--btn-icon-bg);
+  color: var(--btn-icon-fg);
   overflow: hidden;
   flex: none;
   transition: background 0.4s var(--ease), color 0.4s var(--ease);
@@ -401,36 +412,28 @@ main:focus {
   transform: none;
 }
 .btn:hover .btn__icon {
-  color: var(--btn-hover);
+  background: var(--btn-icon-hover-bg);
+  color: var(--btn-icon-hover-fg);
 }
 .btn--ghost {
   --btn-bg: transparent;
   --btn-fg: var(--ink);
-  --btn-hover: var(--ink);
+  --btn-icon-fg: var(--paper);
   box-shadow: inset 0 0 0 1.5px var(--ink);
 }
-.btn--ghost .btn__icon {
-  background: var(--ink);
-  color: var(--paper);
-}
-.btn--ghost:hover {
-  color: var(--paper);
-}
-.btn--ghost:hover .btn__icon {
-  background: var(--paper);
-  color: var(--ink);
-}
 .btn--light {
-  --btn-bg: var(--paper);
-  --btn-fg: var(--ink);
-  --btn-hover: var(--lime);
+  --btn-fill: var(--paper);
+  --btn-fill-fg: var(--ink);
 }
-.btn--light .btn__icon {
-  background: var(--ink);
-  color: var(--paper);
-}
-.btn--light:hover .btn__icon {
-  color: var(--lime);
+.btn--dark {
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+  --btn-fill: var(--paper);
+  --btn-fill-fg: var(--ink);
+  --btn-icon-bg: var(--sage);
+  --btn-icon-fg: var(--ink);
+  --btn-icon-hover-bg: var(--ink);
+  --btn-icon-hover-fg: var(--sage);
 }
 .btn--sm {
   min-height: 46px;
@@ -441,6 +444,15 @@ main:focus {
 .btn--sm .btn__icon {
   width: 36px;
   height: 36px;
+}
+/* Phones: buttons in a group stack at full, equal width. */
+@media (max-width: 560px) {
+  .actions {
+    align-items: stretch;
+  }
+  .actions > .btn {
+    flex: 1 1 100%;
+  }
 }
 .round-btn {
   display: grid;
@@ -510,12 +522,12 @@ main:focus {
 .prose h3 + * {
   margin-top: 0.7em;
 }
-.prose a {
+.prose a:not(.btn) {
   color: var(--sage-deep);
   font-weight: 600;
   text-decoration-thickness: 1.5px;
 }
-.prose a:hover {
+.prose a:not(.btn):hover {
   color: var(--ink);
 }
 .prose ul,
@@ -569,7 +581,7 @@ main:focus {
   gap: 22px;
 }
 .form__note {
-  font-size: 0.92rem;
+  font-size: 0.9375rem;
   color: var(--ink-2);
 }
 .form__grid {
@@ -630,7 +642,7 @@ main:focus {
   box-shadow: 0 0 0 3px rgba(168, 69, 107, 0.18);
 }
 .field__hint {
-  font-size: 0.88rem;
+  font-size: 0.9375rem;
   color: var(--ink-2);
   line-height: 1.5;
 }
@@ -638,7 +650,7 @@ main:focus {
   display: flex;
   gap: 6px;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--rose-deep);
 }
@@ -671,7 +683,7 @@ main:focus {
   gap: 14px 20px;
 }
 .form__legal {
-  font-size: 0.88rem;
+  font-size: 0.9375rem;
   color: var(--ink-2);
   max-width: 34ch;
 }

@@ -7,6 +7,7 @@
  *   Redirect thehummingbirdnest.org to www.thehummingbirdnest.org (CANONICAL_HOST).
  *   POST /api/contact   Validate the contact form and email it through Resend.
  *   GET  /api/config    Public client config (the optional Turnstile site key).
+ *   GET  /api/instagram Latest Instagram posts for the home page, read from a Behold JSON feed and cached.
  *   Add security headers and cache rules to every page and file.
  *
  * Configuration (Cloudflare dashboard: Workers and Pages > thehummingbirdnest > Settings > Variables and Secrets):
@@ -17,6 +18,7 @@
  *   ALLOWED_ORIGINS       var, optional comma separated list of extra allowed origins
  *   TURNSTILE_SITE_KEY    var, optional, turns on Cloudflare Turnstile on the form
  *   TURNSTILE_SECRET_KEY  secret, optional, required when TURNSTILE_SITE_KEY is set
+ *   BEHOLD_FEED_ID        var, optional, the Behold JSON feed ID that powers the Instagram section
  */
 
 const MAX_BODY_BYTES = 32 * 1024;
@@ -42,7 +44,7 @@ const CSP = [
   "default-src 'self'",
   "script-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com",
   "style-src 'self'",
-  "img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com",
+  "img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://behold.pictures https://*.behold.pictures https://*.cdninstagram.com https://*.fbcdn.net",
   "font-src 'self'",
   "media-src 'self'",
   "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com",
@@ -65,7 +67,7 @@ const SECURITY_HEADERS = {
 };
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     // thehummingbirdnest.org -> www.thehummingbirdnest.org
@@ -89,6 +91,10 @@ export default {
       return json(200, { turnstileSiteKey: env.TURNSTILE_SITE_KEY || null }, { 'Cache-Control': 'public, max-age=300' });
     }
 
+    if (url.pathname === '/api/instagram') {
+      return instagram(env, ctx);
+    }
+
     if (url.pathname.startsWith('/api/')) {
       return json(404, { ok: false, error: 'Not found.' });
     }
@@ -102,6 +108,82 @@ export default {
     return withSiteHeaders(response, url);
   },
 };
+
+// Instagram: Behold keeps the Instagram connection alive and hosts resized images.
+// The response is trimmed to what the page needs, validated, and cached at the edge.
+const INSTAGRAM_FALLBACK = { ok: true, configured: false, username: 'thehummingbirdnestlcf', posts: [] };
+const SAFE_IMAGE_HOST = /(^|\.)behold\.pictures$|\.cdninstagram\.com$|\.fbcdn\.net$/;
+
+// Behold's free plan allows 1,200 feed loads a month and refreshes once a day, so the
+// tidied feed is kept in Cloudflare's cache for two hours and Behold is asked rarely.
+const INSTAGRAM_CACHE_SECONDS = 7200;
+
+async function instagram(env, ctx) {
+  const id = String(env.BEHOLD_FEED_ID || '').trim();
+  if (!/^[A-Za-z0-9_]{8,64}$/.test(id)) {
+    return json(200, INSTAGRAM_FALLBACK, { 'Cache-Control': 'public, max-age=300' });
+  }
+  const cache = typeof caches !== 'undefined' ? caches.default : null;
+  const key = new Request(`https://instagram-feed.cache/${id}`);
+  const hit = cache && (await cache.match(key).catch(() => null));
+  if (hit) return hit;
+  try {
+    const res = await fetch(`https://feeds.behold.so/${id}`, {
+      headers: { Accept: 'application/json' },
+      cf: { cacheTtl: INSTAGRAM_CACHE_SECONDS, cacheEverything: true },
+    });
+    if (!res.ok) throw new Error(`behold responded ${res.status}`);
+    const feed = await res.json();
+    const posts = (Array.isArray(feed.posts) ? feed.posts : [])
+      .map((p) => {
+        const size = p.sizes && (p.sizes.medium || p.sizes.large || p.sizes.small);
+        const image = (size && size.mediaUrl) || (p.mediaType === 'VIDEO' ? p.thumbnailUrl : p.mediaUrl);
+        return {
+          id: String(p.id || ''),
+          url: safeUrl(p.permalink, /(^|\.)instagram\.com$/),
+          image: safeUrl(image, SAFE_IMAGE_HOST),
+          width: Number(size && size.width) || 700,
+          height: Number(size && size.height) || 700,
+          type: ['IMAGE', 'VIDEO', 'CAROUSEL_ALBUM'].includes(p.mediaType) ? p.mediaType : 'IMAGE',
+          alt: plainText(p.altText, 300),
+          caption: plainText(p.prunedCaption || p.caption, 280),
+          timestamp: clean(p.timestamp || '', 40),
+        };
+      })
+      .filter((p) => p.url && p.image)
+      .slice(0, 10);
+    const username = /^[A-Za-z0-9._]{1,30}$/.test(feed.username || '') ? feed.username : INSTAGRAM_FALLBACK.username;
+    const response = json(200, { ok: true, configured: true, username, posts }, { 'Cache-Control': `public, max-age=600, s-maxage=${INSTAGRAM_CACHE_SECONDS}` });
+    if (cache && ctx) ctx.waitUntil(cache.put(key, response.clone()).catch(() => {}));
+    return response;
+  } catch (err) {
+    console.error('instagram feed failed', err && err.message);
+    return json(200, INSTAGRAM_FALLBACK, { 'Cache-Control': 'public, max-age=120' });
+  }
+}
+
+function plainText(value, max) {
+  return clean(value, 2000)
+    .replace(/https?:\/\/\S+/g, ' ')
+    .replace(/#[\p{L}\p{N}_]+/gu, ' ')
+    .replace(/\s*[\u2013\u2014\u2015]+\s*/g, ', ')
+    .replace(/\s+-+\s+/g, ', ')
+    .replace(/(\S)[-\u2010\u2011](?=\S)/g, '$1 ')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([,.!?;:])/g, '$1')
+    .replace(/,(\s*,)+/g, ',')
+    .replace(/^[\s,]+|[\s,]+$/g, '')
+    .slice(0, max);
+}
+
+function safeUrl(value, hostPattern) {
+  try {
+    const u = new URL(String(value || ''));
+    return u.protocol === 'https:' && hostPattern.test(u.hostname) ? u.toString() : '';
+  } catch {
+    return '';
+  }
+}
 
 function withSiteHeaders(response, url) {
   const headers = new Headers(response.headers);

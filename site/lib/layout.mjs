@@ -142,7 +142,7 @@ function megaMenu() {
     <div class="mega__inner">
       <ul class="mega__list" role="list">${list}</ul>
       <div class="mega__aside">
-        <p class="mega__aside-title">Not sure where to start?</p>
+        <div class="mega__aside-title">Not sure where to start?</div>
         <p class="mega__aside-text">A short phone call helps us understand your family and recommend the right next step.</p>
         ${button('/contact', 'Book a call', { variant: 'ink', size: 'sm' })}
         <a class="mega__all" href="/services">View all services ${icon('arrow')}</a>
@@ -163,7 +163,7 @@ function mobileMenu(page) {
   return `<dialog class="mobile-menu" id="mobile-menu" aria-label="Menu" data-menu>
   <div class="mobile-menu__inner">
     <div class="mobile-menu__top">
-      <a class="brand" href="/" aria-label="${esc(site.name)} home"><img class="brand__logo" src="/assets/img/logo-light-560.webp" width="280" height="66" alt="${esc(site.name)}"></a>
+      <div class="brand"><img class="brand__logo" src="/assets/img/logo-light-560.webp" width="280" height="66" alt="${esc(site.name)}"></div>
       <button class="menu-button menu-button--close" type="button" data-menu-close><span class="menu-button__label">Close</span></button>
     </div>
     <nav aria-label="Mobile">
@@ -203,7 +203,7 @@ function footer(page) {
       ? ''
       : `<section class="footer-cta" aria-labelledby="footer-cta-title">
     <div class="container footer-cta__inner">
-      <p class="kicker kicker--light">Let’s talk</p>
+      <div class="kicker kicker--light">Let’s talk</div>
       <h2 class="footer-cta__title" id="footer-cta-title" data-split>Every journey starts with <em>one conversation.</em></h2>
       <div class="footer-cta__actions" data-reveal>
         ${button('/contact', 'Book a call', { variant: 'light' })}
@@ -260,6 +260,5 @@ function footer(page) {
     </ul>
     <p class="site-footer__credit">Designed by ${link(site.designer.url, site.designer.name)}</p>
   </div>
-  <div class="site-footer__wordmark" aria-hidden="true"><span data-wordmark data-text="Hummingbird Nest"></span></div>
 </footer>`;
 }

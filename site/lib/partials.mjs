@@ -47,7 +47,7 @@ export function testimonialsSection({ title = 'Words from our <em>families</em>'
       <h2 class="h2" id="quotes-title" data-split>${title}</h2>
     </div>
     <div class="quotes__controls">
-      <p class="quotes__count" aria-hidden="true"><span data-carousel-current>01</span> / ${total}</p>
+      <div class="quotes__count" aria-hidden="true"><span data-carousel-current>01</span> / ${total}</div>
       <button class="round-btn" type="button" data-carousel-prev aria-label="Previous testimonial">${icon('arrow-left')}</button>
       <button class="round-btn" type="button" data-carousel-next aria-label="Next testimonial">${icon('arrow')}</button>
     </div>
@@ -77,7 +77,7 @@ export function faqSection({ id = 'faq' } = {}) {
       ${kicker('FAQ')}
       <h2 class="h2" id="${id}-title" data-split>Questions families <em>often ask</em></h2>
       <p data-reveal>Still wondering about something? We are always happy to talk it through.</p>
-      <div data-reveal>${button('/contact', 'Ask us anything', { variant: 'ink' })}</div>
+      <div data-reveal>${button(`mailto:${site.email}`, 'Email us a question', { variant: 'ink', iconName: 'mail' })}</div>
     </div>
     <div class="faq__list" data-reveal>
       ${faqs
