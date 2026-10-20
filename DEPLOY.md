@@ -29,6 +29,8 @@ These were done through the Cloudflare and GitHub connectors:
 
 ## 1. Publish to production
 
+The current branch has already been built and deployed once, so you can review the new site right now at **https://thehummingbirdnest.henrymm.workers.dev**.
+
 1. Open a pull request from `claude/charming-ptolemy-kcab42` into `main` (create `main` if it does not exist yet) and merge it.
 2. Cloudflare builds and deploys automatically. Check progress in **Cloudflare > Workers and Pages > thehummingbirdnest > Deployments**.
 3. Review it at `https://thehummingbirdnest.henrymm.workers.dev`.
