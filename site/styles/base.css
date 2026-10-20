@@ -46,11 +46,11 @@
   --sage-light: #9ad0b4;
   --sage-deep: #2d6e52;
   --mint: #e3f1ea;
-  --rose: #cd668a;
-  --rose-light: #e58fb0;
-  --rose-deep: #a8456b;
-  --blush: #f7e3ea;
-  --sky: #dcebf2;
+  --blue: #95ced3;
+  --blue-pale: #d7ecee;
+  --blue-deep: #1d6a72;
+  --error: #b42318;
+  --error-pale: #fdeceb;
   --lime: #d8e26a;
   --on-dark: #f7f5f0;
   --on-dark-2: #b9cdd0;
@@ -201,7 +201,7 @@ main:focus {
 
 /* Focus: always visible and high contrast */
 :focus-visible {
-  outline: 3px solid var(--rose-deep);
+  outline: 3px solid var(--blue-deep);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -606,7 +606,7 @@ main:focus {
   color: var(--ink-2);
 }
 .req {
-  color: var(--rose-deep);
+  color: var(--blue-deep);
 }
 .field input,
 .field textarea,
@@ -638,8 +638,8 @@ main:focus {
   box-shadow: 0 0 0 4px rgba(116, 185, 150, 0.45);
 }
 .field [aria-invalid='true'] {
-  border-color: var(--rose-deep);
-  box-shadow: 0 0 0 3px rgba(168, 69, 107, 0.18);
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.16);
 }
 .field__hint {
   font-size: 0.9375rem;
@@ -652,7 +652,7 @@ main:focus {
   align-items: center;
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--rose-deep);
+  color: var(--error);
 }
 .select {
   position: relative;
@@ -700,8 +700,8 @@ main:focus {
   background: var(--mint);
 }
 .form__status.is-error {
-  background: var(--blush);
-  color: #6e2240;
+  background: var(--error-pale);
+  color: #7a1a12;
 }
 .form button[type='submit'][aria-disabled='true'] {
   opacity: 0.7;

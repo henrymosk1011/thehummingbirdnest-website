@@ -141,7 +141,7 @@ export const supportCards = [
     href: '/services-1-1-therapy',
     image: 'floortime-school-bus',
     alt: 'A therapist and a young boy playing with a toy school bus',
-    tone: 'blush',
+    tone: 'blue',
   },
   {
     title: 'Parent Support',
@@ -160,7 +160,7 @@ export const supportCards = [
     external: true,
     image: 'kids-on-grass',
     alt: 'A group of children sitting in a circle on the grass, talking and playing',
-    tone: 'sky',
+    tone: 'aqua',
   },
 ];
 

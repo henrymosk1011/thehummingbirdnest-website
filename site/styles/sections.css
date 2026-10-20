@@ -40,7 +40,7 @@ section {
   }
 }
 .hero__title em {
-  color: var(--rose-deep);
+  color: var(--blue-deep);
   padding-right: 0.04em;
 }
 .hero__row {
@@ -96,7 +96,7 @@ section {
 .hero__statement em {
   font-family: var(--font-serif);
   font-weight: 400;
-  color: var(--sage);
+  color: var(--blue);
 }
 .video-toggle {
   position: absolute;
@@ -294,7 +294,7 @@ section {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 400;
-  color: var(--rose-deep);
+  color: var(--blue-deep);
   letter-spacing: -0.02em;
 }
 .marquee__mark {
@@ -330,7 +330,7 @@ section {
   background: var(--mint);
 }
 .pillar:nth-child(3) {
-  background: var(--blush);
+  background: var(--blue-pale);
 }
 .pillar__num {
   font-size: var(--step-4);
@@ -357,9 +357,9 @@ section {
   background: var(--stack-bg, var(--paper));
   transition: background-color 0.8s var(--ease);
 }
-.stack[data-tone='blush'] { --stack-bg: var(--blush); }
+.stack[data-tone='blue'] { --stack-bg: var(--blue-pale); }
 .stack[data-tone='mint'] { --stack-bg: var(--mint); }
-.stack[data-tone='sky'] { --stack-bg: var(--sky); }
+.stack[data-tone='aqua'] { --stack-bg: var(--blue); --ink-2: var(--ink); --sage-deep: var(--ink); }
 .stack__stage {
   --card-h: min(64svh, 620px);
   --col-gap: clamp(16px, 2vw, 28px);
@@ -505,7 +505,7 @@ section {
   transform: translateX(6px);
 }
 .stack-card:focus-visible {
-  outline: 4px solid var(--rose-deep);
+  outline: 4px solid var(--blue-deep);
   outline-offset: 6px;
 }
 
@@ -581,7 +581,7 @@ section {
   scale: 1.15;
 }
 .founder__copy .h2 em {
-  color: var(--rose-deep);
+  color: var(--blue-deep);
 }
 .founder__text {
   display: grid;
@@ -645,7 +645,7 @@ section {
   color: var(--sage);
 }
 .hscroll .h2 em {
-  color: var(--sage);
+  color: var(--blue);
 }
 .hscroll__head {
   display: flex;
@@ -813,7 +813,7 @@ section {
   color: var(--sage-deep);
 }
 .hscroll--gallery .h2 em {
-  color: var(--rose-deep);
+  color: var(--blue-deep);
 }
 .hscroll--gallery .hscroll__count,
 .hscroll--gallery .hscroll__count span {
@@ -912,7 +912,7 @@ section {
   background: var(--mint);
 }
 .quote-card:nth-child(3n + 3) figure {
-  background: var(--blush);
+  background: var(--blue-pale);
 }
 .quote-card__mark {
   width: 44px;
@@ -1202,7 +1202,7 @@ html.js-ready:not(.reduce-motion) .insta__grid:not(.is-in) .insta__tile {
   max-width: 42ch;
 }
 .contact-block__intro .h2 em {
-  color: var(--rose-deep);
+  color: var(--blue-deep);
 }
 .contact-block__form {
   padding: clamp(24px, 3.4vw, 48px);
@@ -1329,7 +1329,7 @@ html.js-ready:not(.reduce-motion) .insta__grid:not(.is-in) .insta__tile {
   max-width: 16ch;
 }
 .page-hero__title em {
-  color: var(--rose-deep);
+  color: var(--blue-deep);
 }
 .page-hero__meta {
   display: flex;

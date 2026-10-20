@@ -525,7 +525,7 @@
   max-width: 14ch;
 }
 .footer-cta__title em {
-  color: var(--sage);
+  color: var(--blue);
 }
 .footer-cta__actions {
   display: flex;
