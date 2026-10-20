@@ -366,6 +366,8 @@ section {
   --stick: calc(50svh - var(--card-h) / 2 + 3svh);
   --top-2: 100svh;
   --top-3: 200svh;
+  /* Space under the cards once they lock into a row: they release sooner and leave a gap above the next section. */
+  --tail: 170px;
   position: relative;
   max-width: calc(var(--max) + var(--gutter) * 2);
   margin-inline: auto;
@@ -399,7 +401,7 @@ section {
 }
 .stack__cols {
   position: absolute;
-  inset: 0 var(--gutter);
+  inset: 0 var(--gutter) var(--tail);
 }
 .stack__col {
   position: absolute;
@@ -520,12 +522,15 @@ section {
     left: 0;
     right: 0;
   }
+  /* Cards stick at different heights here, so each column ends one card higher than the next: they all release together. */
   .stack__col--1 {
     top: 4svh;
+    bottom: calc((var(--card-h) + var(--gap-v)) * 2);
   }
   .stack__col--2 {
     top: 75svh;
     left: 0;
+    bottom: calc(var(--card-h) + var(--gap-v));
   }
   .stack__col--3 {
     top: 150svh;
