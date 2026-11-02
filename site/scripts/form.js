@@ -37,8 +37,6 @@ function validate(form) {
   else if (!EMAIL_RE.test(v('email'))) errors.email = 'Please enter a valid email address, like name@example.com.';
   const phone = v('phone');
   if (phone && (!PHONE_RE.test(phone) || (phone.match(/\d/g) || []).length < 7)) errors.phone = 'Please enter a valid phone number, or leave this field blank.';
-  if (!v('message')) errors.message = 'Please tell us a little about how we can help.';
-  else if (v('message').length < 10) errors.message = 'Please add a few more details, at least 10 characters.';
   return errors;
 }
 
@@ -113,7 +111,7 @@ export function initForms() {
       submit.setAttribute('aria-disabled', 'true');
       const original = label.textContent;
       label.textContent = 'Sending';
-      setStatus(form, 'Sending your message.');
+      setStatus(form, 'Sending.');
 
       const data = Object.fromEntries(new FormData(form).entries());
       if (window.turnstile && widgetId !== null) data.turnstileToken = window.turnstile.getResponse(widgetId) || '';
@@ -129,14 +127,14 @@ export function initForms() {
           form.reset();
           if (start) start.value = String(Date.now());
           showErrors(form, {});
-          setStatus(form, 'Thank you! Your message has been sent. We will be in touch soon.');
+          setStatus(form, 'Thank you! Your submission has been received!');
         } else if (out.fields) {
           showErrors(form, out.fields);
           setStatus(form, out.error || 'Please check the highlighted fields.', 'error');
           const first = Object.keys(out.fields)[0];
           form.elements[first]?.focus();
         } else {
-          setStatus(form, `${out.error || 'Your message could not be sent right now.'} ${FALLBACK}`, 'error');
+          setStatus(form, `Oops! Something went wrong while submitting the form. ${out.error || ''} ${FALLBACK}`.replace(/\s+/g, ' '), 'error');
         }
       } catch {
         setStatus(form, `We could not reach the server. Please check your connection and try again. ${FALLBACK}`, 'error');

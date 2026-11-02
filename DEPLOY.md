@@ -52,7 +52,7 @@ The current branch has already been built and deployed once, so you can review t
 3. The Worker sends the bare domain to `https://www.thehummingbirdnest.org` (the address Google already indexes) with a permanent redirect.
 4. Turn off the custom domain in Webflow and cancel Webflow hosting once you are happy.
 
-Every old URL is preserved (`/about`, `/services-1-1-therapy`, `/post/...`, `/blog-categories/...`), so existing Google rankings and bookmarks carry over.
+Every old URL is preserved (`/about`, `/services-1-1-therapy`, `/post/...`, `/blog-categories/...`), so existing Google rankings and bookmarks carry over. The old `/blog` page now redirects permanently to the blog on the Resources page (`/resources#blog`).
 
 ## 4. Turn on the contact form (Resend)
 
@@ -74,6 +74,16 @@ The sender and recipient are set in `wrangler.jsonc`:
 Edit them there (not in the dashboard), because values in `wrangler.jsonc` are applied on every deploy. Secrets are kept between deploys.
 
 Spam protection already included: same origin check, 5 messages per minute per visitor, a hidden honeypot field, and a minimum fill time.
+
+### HIPAA and the contact form
+
+The form is **not** a HIPAA compliant channel, so it only collects a name, email, optional phone number, and the service someone is interested in, and it shows "Please do not submit any Protected Health Information (PHI)". The Worker ignores any other field, so free text never reaches the inbox. To accept health details online, every service that handles the submission must sign a Business Associate Agreement (BAA), and today that is not the case:
+
+* **Cloudflare** signs a BAA only on Enterprise plans.
+* **Resend** does not offer a BAA.
+* **Google Workspace** does sign one (Admin console > Account > Legal and compliance), which covers the inbox.
+
+If the practice wants a HIPAA compliant intake form later, use a form service that signs a BAA (for example Jotform with its HIPAA plan, IntakeQ, or the client portal of their practice management system) and link to it or embed it on `/contact`.
 
 ### Optional: Cloudflare Turnstile
 
@@ -105,7 +115,7 @@ The old site used an Elfsight widget, which is now disabled on Elfsight's side. 
 2. Choose **User feed**, pick the @thehummingbirdnestlcf source, then choose **JSON** (not Widget).
 3. Name it (for example "Website") and click **Create feed**.
 4. On the feed page that opens, in the settings:
-   * **Max posts:** 6 on the free plan, 10 on a paid plan.
+   * **Max posts:** 6 (the home page shows one row of six; the free plan allows 6).
    * Leave any domain or website restriction **empty**. The website's server reads the feed, not the visitor's browser, so a domain restriction would block it.
 5. Copy the **JSON Feed URL**. It looks like `https://feeds.behold.so/AbCdEf123456`. The feed ID is the part after the last slash (`AbCdEf123456`).
 
@@ -133,7 +143,7 @@ The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Be
 
 ## 7. Let the practice edit the blog, team, testimonials and FAQ (Pages CMS)
 
-Pages CMS (free) gives the practice simple forms for **Blog posts**, **Team**, **Testimonials** and **FAQ**. The screens are defined in `.pages.yml`. Each save is a commit to GitHub, and Cloudflare publishes it in about two minutes. Photos are resized automatically, dashes are fixed automatically, and a post with **Draft** turned on stays off the site.
+Pages CMS (free) gives the practice simple forms for **Blog posts** (shown on the Resources page), **Team**, **Testimonials** and **FAQ**. The screens are defined in `.pages.yml`. Each save is a commit to GitHub, and Cloudflare publishes it in about two minutes. Photos are resized automatically, dashes are fixed automatically, and a post with **Draft** turned on stays off the site.
 
 Do this after launch, once `main` is the live branch. Edits are saved to whichever branch is open in Pages CMS, and only `main` publishes to the real site.
 

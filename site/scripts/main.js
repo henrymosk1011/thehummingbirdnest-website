@@ -301,7 +301,7 @@ if ('IntersectionObserver' in window) {
 }
 toggles.forEach((t) =>
   t.addEventListener('click', () => {
-    const video = t.closest('[data-hero-media], .finale')?.querySelector('video') || videos[0];
+    const video = t.closest('[data-hero-media]')?.querySelector('video') || videos[0];
     if (!video) return;
     if (video.paused) {
       video.dataset.userPlay = '1';
@@ -334,9 +334,13 @@ if (hero && !reduce) {
   const copy = $('[data-hero-copy]', hero);
   let state = {};
   let st = null;
+  // Same screens as the enhanced hero media query in sections.css.
+  const HERO_QUERY =
+    '(min-width: 900px) and (max-width: 1199.98px) and (min-height: 740px), (min-width: 1200px) and (max-width: 1599.98px) and (min-height: 820px), (min-width: 1600px) and (min-height: 900px)';
+  const wide = window.matchMedia(HERO_QUERY);
   const fits = () => {
     const content = [...copy.children].reduce((sum, el) => sum + el.offsetHeight, 0) + 70;
-    return window.innerWidth >= 900 && content + headerOffset() < window.innerHeight * 0.66;
+    return wide.matches && content + headerOffset() < window.innerHeight * 0.66;
   };
   const measure = () => {
     const vh = window.innerHeight;
@@ -351,7 +355,6 @@ if (hero && !reduce) {
   };
   const apply = (p) => {
     const k = easeInOut(clamp(p / 0.62));
-    const s = easeOut(clamp((p - 0.5) / 0.3));
     media.style.setProperty('--clip-top', `${(state.top * (1 - k)).toFixed(1)}px`);
     media.style.setProperty('--clip-x', `${(state.x * (1 - k)).toFixed(1)}px`);
     media.style.setProperty('--clip-bottom', `${(state.bottom * (1 - k)).toFixed(1)}px`);
@@ -359,14 +362,13 @@ if (hero && !reduce) {
     media.style.setProperty('--clip-x-px', `${(state.x * (1 - k)).toFixed(1)}px`);
     media.style.setProperty('--clip-bottom-px', `${(state.bottom * (1 - k)).toFixed(1)}px`);
     media.style.setProperty('--video-scale', (1.16 - 0.16 * k).toFixed(4));
-    media.style.setProperty('--statement', s.toFixed(3));
     copy.style.transform = `translate3d(0, ${(-k * 140).toFixed(1)}px, 0)`;
     copy.style.opacity = (1 - k * 1.6).toFixed(3);
     copy.style.visibility = k > 0.62 ? 'hidden' : '';
     setHeaderDark('hero', k > 0.9);
   };
   const enable = () => {
-    hero.classList.add('is-enhanced');
+    hero.classList.remove('is-static');
     measure();
     st = ScrollTrigger.create({
       trigger: hero,
@@ -383,7 +385,7 @@ if (hero && !reduce) {
   const disable = () => {
     st?.kill();
     st = null;
-    hero.classList.remove('is-enhanced');
+    hero.classList.add('is-static');
     media.removeAttribute('style');
     copy.removeAttribute('style');
     setHeaderDark('hero', false);
@@ -391,7 +393,7 @@ if (hero && !reduce) {
   const decide = () => {
     const want = fits();
     if (want && !st) enable();
-    else if (!want && st) disable();
+    else if (!want && (st || !hero.classList.contains('is-static'))) disable();
   };
   decide();
   let resizeTimer;
@@ -421,7 +423,6 @@ const stage = $('[data-stack]');
 if (stage) {
   const section = stage.closest('.stack');
   const cards = $$('[data-stack-card]', stage);
-  const words = $$('[data-stack-word]', stage);
   const tilt = [-7, 6, -5];
   const update = () => {
     const vh = window.innerHeight;
@@ -442,7 +443,6 @@ if (stage) {
       const body = card.querySelector('.stack-card__body');
       if (body) body.style.opacity = clamp((p - 0.35) / 0.5).toFixed(3);
     });
-    words.forEach((w, i) => w.classList.toggle('is-active', i === Math.max(0, active)));
     if (active >= 0) section.dataset.tone = cards[active].dataset.tone;
     else delete section.dataset.tone;
   };
@@ -450,94 +450,7 @@ if (stage) {
   update();
 }
 
-/* Horizontal scroll: vertical scrolling moves the track sideways while the section is pinned */
-const mm = gsap.matchMedia();
-mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
-  const cleanups = $$('[data-hscroll]').map((section) => {
-    const track = $('[data-hscroll-track]', section);
-    const items = $$('[data-hscroll-item]', section);
-    const counter = $('[data-hscroll-current]', section);
-    section.classList.add('is-pinned');
-    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
-    const tween = gsap.to(track, {
-      x: () => -distance(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        start: 'top top',
-        end: () => `+=${distance()}`,
-        pin: true,
-        scrub: 0.6,
-        invalidateOnRefresh: true,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          if (counter) counter.textContent = String(Math.min(items.length, Math.round(self.progress * (items.length - 1)) + 1)).padStart(2, '0');
-        },
-      },
-    });
-    // Keyboard users: when focus lands on a card, scroll the page so that card is on screen.
-    const onFocus = (e) => {
-      const item = e.target.closest('[data-hscroll-item]');
-      const st = tween.scrollTrigger;
-      if (!item || !st) return;
-      const target = clamp((item.offsetLeft - (window.innerWidth - item.offsetWidth) / 2) / Math.max(1, distance()));
-      scrollToY(st.start + target * (st.end - st.start), true);
-    };
-    track.addEventListener('focusin', onFocus);
-    return () => {
-      track.removeEventListener('focusin', onFocus);
-      section.classList.remove('is-pinned');
-    };
-  });
-  return () => cleanups.forEach((fn) => fn());
-});
-// Native horizontal scrolling (mobile and reduced motion): keep the counter in sync.
-$$('[data-hscroll]').forEach((section) => {
-  const viewport = $('[data-hscroll-viewport]', section);
-  const items = $$('[data-hscroll-item]', section);
-  const counter = $('[data-hscroll-current]', section);
-  viewport?.addEventListener(
-    'scroll',
-    () => {
-      if (section.classList.contains('is-pinned') || !counter) return;
-      const step = items[1] ? items[1].offsetLeft - items[0].offsetLeft : 1;
-      counter.textContent = String(Math.min(items.length, Math.round(viewport.scrollLeft / step) + 1)).padStart(2, '0');
-    },
-    { passive: true }
-  );
-});
-
-/* Marquee of neighborhoods, driven by scrolling (it never moves on its own) */
-const marquee = $('[data-marquee]');
-if (marquee && !reduce) {
-  let groupW = marquee.firstElementChild.offsetWidth;
-  const setX = () => {
-    const offset = (window.scrollY * 0.5) % groupW;
-    marquee.style.transform = `translate3d(${-offset.toFixed(1)}px, 0, 0)`;
-  };
-  ScrollTrigger.create({
-    trigger: marquee,
-    start: 'top bottom',
-    end: 'bottom top',
-    onUpdate: setX,
-    onRefresh: () => {
-      groupW = marquee.firstElementChild.offsetWidth;
-      setX();
-    },
-  });
-}
-
-/* Finale: giant type settles into place as it arrives */
-const finaleTitle = $('[data-finale-title]');
-if (finaleTitle && !reduce) {
-  gsap.fromTo(
-    finaleTitle,
-    { scale: 0.78, yPercent: 18 },
-    { scale: 1, yPercent: 0, ease: 'none', scrollTrigger: { trigger: '[data-finale]', start: 'top bottom', end: 'top 15%', scrub: true } }
-  );
-}
-
-/* Testimonials carousel */
+/* Blog carousel (Resources page): native scroll snap plus previous and next buttons */
 $$('[data-carousel]').forEach((carousel) => {
   const track = $('[data-carousel-track]', carousel);
   const slides = $$('[data-carousel-slide]', carousel);
@@ -583,7 +496,7 @@ $$('[data-accordion]').forEach((details) => {
 });
 
 /* Instagram feed on the home page */
-initInstagram({ reduce });
+initInstagram();
 
 /* Forms */
 initForms();

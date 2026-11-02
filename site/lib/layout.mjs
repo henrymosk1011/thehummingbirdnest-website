@@ -2,6 +2,8 @@ import { site, nav } from '../config.mjs';
 import { services } from '../data/services.mjs';
 import { esc, attrs, icon, picture, button, link } from './html.mjs';
 import { organizationGraph } from './seo.mjs';
+import { softenHtml, softenDashes } from './cms.mjs';
+import { getInTouch } from './partials.mjs';
 
 /**
  * Wraps page content in the full document.
@@ -14,8 +16,14 @@ import { organizationGraph } from './seo.mjs';
  * }
  */
 export function renderPage(page, build) {
+  // Copy is written word for word from the original site; house style removes dashes here.
+  page = { ...page, title: softenDashes(page.title), description: softenDashes(page.description), ogTitle: page.ogTitle && softenDashes(page.ogTitle) };
   const canonical = site.url + (page.path === '/' ? '/' : page.path);
-  const fullTitle = page.title === site.name ? `${site.name} | DIR Floortime® in La Cañada Flintridge` : `${page.title} | ${site.name}`;
+  // Search results show about 60 characters of a title, so long titles drop or shorten the brand.
+  const fullTitle =
+    page.title === site.name
+      ? `${site.name} | DIR Floortime® in La Cañada Flintridge`
+      : [`${page.title} | ${site.name}`, `${page.title} | ${site.shortName}`].find((t) => t.length <= 62) || page.title;
   const ogImage = page.image ? `${site.url}/assets/img/${page.image}-og.jpg` : `${site.url}/assets/img/og-default.jpg`;
   const graph = [...organizationGraph(), ...(page.jsonld || [])];
   if (page.crumbs?.length) {
@@ -57,6 +65,7 @@ export function renderPage(page, build) {
 <meta name="twitter:title" content="${esc(page.ogTitle || page.title)}">
 <meta name="twitter:description" content="${esc(page.description)}">
 <meta name="twitter:image" content="${ogImage}">
+<meta name="twitter:image:alt" content="${esc(page.imageAlt || site.name)}">
 ${page.ogType === 'article' && page.published ? `<meta property="article:published_time" content="${page.published}">\n` : ''}<meta name="theme-color" content="#f7f5f0">
 <meta name="format-detection" content="telephone=no">
 ${site.googleSiteVerification ? `<meta name="google-site-verification" content="${esc(site.googleSiteVerification)}">\n` : ''}<link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -69,12 +78,13 @@ ${(page.preload || []).join('\n')}${page.preload?.length ? '\n' : ''}<link rel="
 ${ga ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(ga)}"></script>\n<script src="/assets/js/analytics.js?v=${build.hash}" data-ga="${esc(ga)}" defer></script>\n` : ''}<script type="application/ld+json">${ld}</script>
 </head>
 <body${attrs({ class: page.bodyClass })}>
-<a class="skip-link" href="#main">Skip to main content</a>
+${softenHtml(`<a class="skip-link" href="#main">Skip to main content</a>
 ${header(page)}
 <main id="main" tabindex="-1">
 ${page.crumbs?.length && !page.hideCrumbs ? breadcrumbs(page.crumbs) : ''}${page.body}
+${page.footerCta === false ? '' : getInTouch()}
 </main>
-${footer(page)}
+${footer()}`)}
 </body>
 </html>
 `;
@@ -83,7 +93,7 @@ ${footer(page)}
 function isCurrent(page, href) {
   if (href === '/') return page.path === '/';
   if (href === '/services') return page.path === '/services' || page.path.startsWith('/services-');
-  if (href === '/blog') return page.path === '/blog' || page.path.startsWith('/post/') || page.path.startsWith('/blog-categories/');
+  if (href === '/resources') return page.path === '/resources' || page.path.startsWith('/post/') || page.path.startsWith('/blog-categories/');
   return page.path === href;
 }
 
@@ -117,7 +127,7 @@ function header(page) {
       </ul>
     </nav>
     <div class="site-header__actions">
-      ${button('/contact', 'Book a call', { variant: 'ink', size: 'sm', className: 'site-header__cta' })}
+      ${button('/contact', 'Contact us', { variant: 'ink', size: 'sm', className: 'site-header__cta' })}
       <button class="menu-button" type="button" aria-haspopup="dialog" aria-controls="mobile-menu" data-menu-open>
         <span class="menu-button__label">Menu</span>
       </button>
@@ -133,7 +143,7 @@ function megaMenu() {
       (s) => `<li>
         <a class="mega__link" href="/${s.slug}">
           ${picture(s.card.image, { alt: '', sizes: '96px', className: 'mega__thumb', maxWidth: 480 })}
-          <span class="mega__text"><span class="mega__title">${s.menuTitle}</span><span class="mega__desc">${s.eyebrow}</span></span>
+          <span class="mega__text"><span class="mega__title">${s.menuTitle}</span></span>
         </a>
       </li>`
     )
@@ -142,9 +152,9 @@ function megaMenu() {
     <div class="mega__inner">
       <ul class="mega__list" role="list">${list}</ul>
       <div class="mega__aside">
-        <div class="mega__aside-title">Not sure where to start?</div>
-        <p class="mega__aside-text">A short phone call helps us understand your family and recommend the right next step.</p>
-        ${button('/contact', 'Book a call', { variant: 'ink', size: 'sm' })}
+        <p class="mega__aside-text">Contact us through the link below or give our team a call today to schedule an intake session.</p>
+        ${button('/contact', 'Contact us', { variant: 'ink', size: 'sm' })}
+        <a class="mega__phone" href="${site.phone.href}">${icon('phone')} ${site.phone.display}</a>
         <a class="mega__all" href="/services">View all services ${icon('arrow')}</a>
       </div>
     </div>
@@ -157,7 +167,6 @@ function mobileMenu(page) {
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
     { label: 'Resources', href: '/resources' },
-    { label: 'Blog', href: '/blog' },
     { label: 'Contact', href: '/contact' },
   ];
   return `<dialog class="mobile-menu" id="mobile-menu" aria-label="Menu" data-menu>
@@ -196,28 +205,13 @@ function breadcrumbs(crumbs) {
     .join('')}</ol></nav>\n`;
 }
 
-function footer(page) {
+function footer() {
   const year = new Date().getFullYear();
-  const cta =
-    page.footerCta === false
-      ? ''
-      : `<section class="footer-cta" aria-labelledby="footer-cta-title">
-    <div class="container footer-cta__inner">
-      <div class="kicker kicker--light">Let’s talk</div>
-      <h2 class="footer-cta__title" id="footer-cta-title" data-split>Every journey starts with <em>one conversation.</em></h2>
-      <div class="footer-cta__actions" data-reveal>
-        ${button('/contact', 'Book a call', { variant: 'light' })}
-        ${link(site.phone.href, `${icon('phone')}<span>${site.phone.display}</span>`, { className: 'footer-cta__phone' })}
-      </div>
-    </div>
-  </section>`;
-
   return `<footer class="site-footer" data-header-theme="dark">
-  ${cta}
   <div class="container site-footer__grid">
     <div class="site-footer__brand">
       <a class="brand" href="/" aria-label="${esc(site.name)} home"><img class="brand__logo" src="/assets/img/logo-light-560.webp" width="280" height="66" alt="${esc(site.name)}" loading="lazy"></a>
-      <p>Cultivating joyful family connections through DIR Floortime®, social learning, and family coaching.</p>
+      <p>Cultivating Joyful Family Connections</p>
       <ul class="social" role="list">
         ${site.social.map((s) => `<li>${link(s.url, s.name, { className: 'social__link' })}</li>`).join('')}
       </ul>
@@ -229,7 +223,6 @@ function footer(page) {
         <li><a href="/about">About</a></li>
         <li><a href="/services">Services</a></li>
         <li><a href="/resources">Resources</a></li>
-        <li><a href="/blog">Blog</a></li>
         <li><a href="/contact">Contact</a></li>
       </ul>
     </nav>
@@ -247,7 +240,7 @@ function footer(page) {
           <li>${link(site.address.mapUrl, `${site.address.street}<br>${site.address.city}, ${site.address.region} ${site.address.postalCode}`)}</li>
           <li><a href="${site.phone.href}">${site.phone.display}</a></li>
           <li><a href="mailto:${site.email}">${site.email}</a></li>
-          <li>${link(site.booking, 'Book an appointment')}</li>
+          <li>${link(site.booking, site.bookingLabel)}</li>
         </ul>
       </address>
     </div>

@@ -37,10 +37,10 @@ site/
     services.mjs      The five service pages (titles, copy, photos)
     content.mjs       Loads the content files above; home page blocks and gallery
     images.json       Image sizes, written by the photo step
-  pages/              Page templates (home, about, services, blog, contact, legal, 404)
+  pages/              Page templates (home, about, services, resources and blog, contact, legal, 404)
   lib/                Layout (header, menus, footer), shared sections, SEO and CMS helpers
   styles/             CSS (base tokens, layout, sections, pages, motion)
-  scripts/            Browser JavaScript (motion, menus, carousel, contact form, Instagram feed)
+  scripts/            Browser JavaScript (motion, menus, blog carousel, contact form, Instagram feed)
   images/             Master photos (uploads from the CMS land here too)
   static/             Copied as is into dist/ (generated images, video, favicon)
 src/worker.js         Cloudflare Worker
@@ -52,6 +52,7 @@ wrangler.jsonc        Worker configuration
 * **The practice edits in Pages CMS:** blog posts, team, testimonials and FAQ. See DEPLOY.md, section 7. Every save publishes in about two minutes.
 * **Contact details, links, analytics:** `site/config.mjs`.
 * **Services:** `site/data/services.mjs`. Each entry is one page; URLs match the old site so search rankings carry over.
+* **Blog:** posts appear in a carousel on the Resources page (`/resources#blog`), with Children, Teens and Adults tabs at their original `/blog-categories/...` addresses. The old `/blog` address redirects there.
 * **Blog posts by hand:** add a Markdown file to `site/content/posts/`. The file name becomes the address (`my-post.md` is `/post/my-post`).
 
   ```markdown
@@ -74,7 +75,8 @@ Content from the CMS is made safe automatically: dashes become commas, spaces or
 
 ## House rules (enforced by the build)
 
-* **No dashes or em dashes in visible text.** The build fails if a hyphen, en dash or em dash appears in page text, alt text or meta descriptions (web and email addresses are exempt). Phone numbers are written as `(626) 765 1724`. Content edited in the CMS is fixed automatically instead.
+* **Copy matches the original site word for word.** Page text is written exactly as it was on the old Webflow site (hyphens included); only the dash rule below is applied when the page is built.
+* **No dashes or em dashes in visible text.** The build fails if a hyphen, en dash or em dash appears in page text, alt text or meta descriptions (web and email addresses are exempt). Phone numbers are written as `(626) 765 1724`. Content edited in the CMS is fixed automatically instead. To show hyphens inside words exactly as the old site did ("1-on-1 In-School Support"), set `keepWordHyphens: true` in `site/config.mjs`; dashes used as punctuation still become commas.
 * **Every image needs alt text** (or `alt=""` when purely decorative).
 * **Internal links must resolve** to a real page or file.
 * No dot or pulse graphics, and no lines or hyphens next to headings.

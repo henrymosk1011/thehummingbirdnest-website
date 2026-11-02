@@ -39,6 +39,22 @@ export const imageUrl = (name, width) => {
 };
 
 /**
+ * Sizes for a photo cropped to fill a frame (object-fit: cover). When the photo is wider than
+ * its frame, the browser shows it wider than the frame, so the sizes hint has to grow by the
+ * same amount (and by any zoom, such as parallax overscan) or a file that is too small loads
+ * and looks soft. frameRatio is the frame's width divided by its height.
+ */
+export function coverSizes(name, frameRatio, sizes, zoom = 1) {
+  const m = imageMeta(name);
+  const k = Math.max(1, m.width / m.height / frameRatio) * zoom;
+  if (k <= 1.02) return sizes;
+  return sizes
+    .split(',')
+    .map((part) => part.replace(/(\d+(?:\.\d+)?)(vw|px)\s*$/, (_, n, unit) => `${Math.round(Number(n) * k)}${unit}`))
+    .join(',');
+}
+
+/**
  * Responsive <picture> with AVIF and WebP sources.
  * alt: required. Pass '' for decorative images.
  */

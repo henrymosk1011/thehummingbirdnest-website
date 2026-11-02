@@ -8,7 +8,7 @@ imageAlt: "A boy resting his head on his arm at a table while a sibling looks on
 description: "Behavior is communication. Simple ways to model emotional language, validate feelings, and create space for children to express what they feel at home."
 ---
 
-Emotional wellbeing is a foundational part of every child’s development. As children grow, they are constantly learning how to understand, process, and express their feelings. These skills shape their relationships, confidence, and ability to navigate the world around them.
+Emotional well-being is a foundational part of every child’s development. As children grow, they are constantly learning how to understand, process, and express their feelings. These skills shape their relationships, confidence, and ability to navigate the world around them.
 
 At Hummingbird Nest, we believe that emotional expression is not something children simply “figure out” on their own. It develops over time with support, modeling, and safe opportunities to practice.
 
@@ -24,7 +24,7 @@ This shift can turn moments of frustration into opportunities for connection and
 
 When children are supported in expressing their emotions, they begin to:
 
-* Build self awareness
+* Build self-awareness
 * Develop stronger relationships
 * Improve their ability to regulate emotions
 * Feel more confident and understood
@@ -52,6 +52,6 @@ Instead of reacting quickly, try to pause and consider what might be underneath 
 
 ## A Supportive Process
 
-Emotional development is not a one time lesson. It is an ongoing process that unfolds over time. There will be moments of ease and moments of challenge, and both are part of the journey.
+Emotional development is not a one-time lesson. It is an ongoing process that unfolds over time. There will be moments of ease and moments of challenge, and both are part of the journey.
 
 At Hummingbird Nest, we are here to support each child and family as they build these important skills. With patience, understanding, and the right support, children can learn to express themselves in ways that feel safe, meaningful, and empowering.

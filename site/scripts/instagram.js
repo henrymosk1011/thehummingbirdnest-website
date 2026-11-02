@@ -81,20 +81,15 @@ function tile(post) {
   return li;
 }
 
-// Use a count that fills whole rows at every screen size.
-const usable = (n) => (n >= 10 ? 10 : n >= 6 ? 6 : n >= 4 ? 4 : 0);
+// One row: six photos on wide screens (the CSS shows four, then three, on smaller screens).
+const ROW = 6;
 
-// Rows drift in opposite directions on wide screens, so mark each tile with its row direction.
+// Tiles rise in one after another.
 function layout(grid) {
-  const items = [...grid.children];
-  const cols = { 10: 5, 6: 3, 4: 4 }[items.length] || 5;
-  items.forEach((item, i) => {
-    item.style.setProperty('--i', String(i % cols + Math.floor(i / cols)));
-    item.style.setProperty('--dir', Math.floor(i / cols) % 2 ? '-1' : '1');
-  });
+  [...grid.children].forEach((item, i) => item.style.setProperty('--i', String(i)));
 }
 
-export function initInstagram({ reduce = false } = {}) {
+export function initInstagram() {
   const section = document.querySelector('[data-insta]');
   const grid = section && section.querySelector('[data-insta-grid]');
   if (!grid) return;
@@ -108,12 +103,12 @@ export function initInstagram({ reduce = false } = {}) {
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         const posts = (data && Array.isArray(data.posts) ? data.posts : []).filter((p) => p && p.url && p.image);
-        const count = usable(posts.length);
-        if (!count) return;
+        // Keep our own photos unless there are enough posts to fill the row.
+        if (posts.length < ROW) return;
         // Never pull focus away from someone who is already tabbing through the grid.
         if (grid.contains(document.activeElement)) return;
-        grid.replaceChildren(...posts.slice(0, count).map(tile));
-        grid.classList.add('is-live', `insta__grid--${count}`);
+        grid.replaceChildren(...posts.slice(0, ROW).map(tile));
+        grid.classList.add('is-live');
         layout(grid);
         ScrollTrigger.refresh();
       })
@@ -144,18 +139,5 @@ export function initInstagram({ reduce = false } = {}) {
   } else {
     grid.classList.add('is-in');
     load();
-  }
-
-  // Wide screens: the two rows slide gently in opposite directions as the page scrolls.
-  if (!reduce) {
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top bottom',
-      end: 'bottom top',
-      onUpdate: (self) => {
-        const amount = Math.min(56, window.innerWidth * 0.035);
-        grid.style.setProperty('--drift', `${((self.progress - 0.5) * 2 * amount).toFixed(1)}px`);
-      },
-    });
   }
 }

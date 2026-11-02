@@ -24,7 +24,7 @@ import home from './pages/home.mjs';
 import about from './pages/about.mjs';
 import contact from './pages/contact.mjs';
 import { servicesHub, servicePage } from './pages/services.mjs';
-import { blogIndex, categoryPage, postPage, resourcesPage, categories, categoryById } from './pages/blog.mjs';
+import { categoryPage, postPage, resourcesPage, categories, categoryById } from './pages/blog.mjs';
 import { privacyPage, accessibilityPage } from './pages/legal.mjs';
 import { notFoundPage, thanksPage } from './pages/system.mjs';
 
@@ -79,7 +79,6 @@ const pages = [
   servicesHub(),
   ...services.map(servicePage),
   resourcesPage(posts),
-  blogIndex(posts),
   ...categories.map((c) => categoryPage(c, posts)),
   ...posts.map((p) => postPage(p, posts)),
   contact(),
@@ -263,7 +262,9 @@ async function check(pages) {
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
         .replace(/\S*(?::\/\/|www\.|@)\S*/g, ' ');
-      const hit = decoded.match(/.{0,30}[-‐‑‒–—―−].{0,30}/);
+      // With keepWordHyphens on, hyphens inside words ("In-School") are allowed; dashes are not.
+      const visible = site.keepWordHyphens ? decoded.replace(/([\p{L}\p{N}])[-‐‑]+(?=[\p{L}\p{N}])/gu, '$1') : decoded;
+      const hit = visible.match(/.{0,30}[-‐‑‒–—―−].{0,30}/);
       if (hit) issues.push(`${file}: dash in visible text: "${hit[0].trim()}"`);
     }
 
