@@ -59,7 +59,7 @@ content:
         required: true
         options:
           format: yyyy-MM-dd
-        description: Newest posts appear first on the blog and home page.
+        description: Newest posts appear first on the Resources page and the home page.
       - name: image
         label: Cover photo
         type: image

@@ -25,7 +25,9 @@ export const site = {
     mapUrl: 'https://maps.google.com/?q=808+Foothill+Blvd+Unit+A,+La+Canada+Flintridge,+CA+91011',
   },
   serviceAreas: ['La Cañada Flintridge', 'Glendale', 'Pasadena', 'Burbank', 'La Crescenta', 'Northern Los Angeles'],
+  // Calendly page for booking a phone call. Every "Book a call" button on the site goes here.
   booking: 'https://calendly.com/thehummingbirdnest',
+  bookingLabel: 'Book a call with Calendly',
   socialClub: 'https://www.thesocialclubkids.com',
   book: {
     title: 'What’s Autism',
@@ -41,6 +43,12 @@ export const site = {
 
   designer: { name: 'TENELEVENMEDIA', url: 'https://www.tenelevenmedia.com' },
 
+  // House style: no dashes in visible text. Page copy is kept word for word from the original
+  // site (hyphens included) and the build turns dashes into commas, spaces or "to" when it
+  // renders. Set this to true to show hyphens inside words exactly as the original site did
+  // ("1-on-1 In-School Support", "co-regulation"); dashes used as punctuation still become commas.
+  keepWordHyphens: false,
+
   // Turn these on later. Leave empty to disable.
   analytics: {
     // Google Analytics 4 measurement ID, for example 'G-XXXXXXXXXX'.
@@ -55,5 +63,4 @@ export const nav = [
   { label: 'About', href: '/about' },
   { label: 'Services', href: '/services', mega: true },
   { label: 'Resources', href: '/resources' },
-  { label: 'Blog', href: '/blog' },
 ];

@@ -48,33 +48,19 @@ export const faqs = readList('faq.json', 'questions')
   .map((f) => ({ q: softenDashes(f.question), html: markdown(f.answer) }))
   .filter((f) => f.q && f.html);
 
+// Home page: the three columns under the introduction (word for word from the original site).
 export const pillars = [
   {
-    number: '01',
-    title: 'A qualified team',
-    text: 'A compassionate group of specialists attuned to your child and your family’s dynamic needs. We integrate strategies across all of your family’s therapeutic disciplines, so you and your child receive a cohesive and collaborative experience.',
+    title: 'Qualified Team',
+    text: 'A compassionate group of specialists that are attuned to your child and family’s dynamic needs. Our team strives to provide you with the best care in a supportive environment. We love to integrate strategies across all of your family’s therapeutic disciplines to ensure you and your child are receiving a cohesive and collaborative therapeutic experience.',
   },
   {
-    number: '02',
     title: 'Customized sessions',
-    text: 'Specializing in DIR Floortime® Therapy, we meet your child at their developmental level and expand their social and play world to help meet your family’s goals. Individual differences and sensory needs are supported with trust and care.',
+    text: 'Specializing in DIR Floortime® Therapy, we meet your child at their developmental level and expand their social and play world to help meet your family’s goals. Our relationship-based model invites your child’s individual differences and sensory needs to be supported with trust and care to ensure emotional regulation and trust in the therapeutic process.',
   },
   {
-    number: '03',
-    title: 'Specializing in',
-    tags: [
-      'Autism Spectrum Disorders',
-      'Emotional Regulation',
-      'Anxiety',
-      'Tantrums and Meltdowns',
-      'Sensory Modulation and Integration',
-      'Friendship Struggles',
-      'ADHD',
-      'Neuroaffirming Approaches',
-      'Trauma',
-      'Grief and Loss',
-      'Phobias',
-    ],
+    title: 'Specializing In',
+    text: 'Autism Spectrum Disorders, Emotional Regulation, Anxiety, Tantrums/Meltdowns, Sensory Modulation & Integration, Friendship Struggles, Attention-Deficit/Hyperactivity Disorder (ADHD), Using Neuro-affirming approaches, Trauma, Grief, Loss, & Phobias.',
   },
 ];
 
@@ -82,17 +68,13 @@ export const pillars = [
 export const supportCards = [
   {
     title: 'Individualized Therapy',
-    word: 'Connect',
-    text: 'DIR Floortime® sessions that follow your child’s lead and build on their strengths.',
     href: '/services-1-1-therapy',
-    image: 'floortime-school-bus',
-    alt: 'A therapist and a young boy playing with a toy school bus',
+    image: 'therapist-girl-sensory-spinner',
+    alt: 'A therapist and a laughing young girl playing together on a spinning sensory seat in the playroom',
     tone: 'blue',
   },
   {
     title: 'Parent Support',
-    word: 'Support',
-    text: 'Coaching that gives you the words, tools, and confidence to keep growth going at home.',
     href: '/services-family-sibling-sessions',
     image: 'parent-support',
     alt: 'Parents and a toddler talking with a therapist outdoors',
@@ -100,8 +82,6 @@ export const supportCards = [
   },
   {
     title: 'The Social Club',
-    word: 'Belong',
-    text: 'Social learning groups where kids, teens, and young adults practice friendship together.',
     href: 'https://www.thesocialclubkids.com',
     external: true,
     image: 'kids-on-grass',
@@ -110,26 +90,20 @@ export const supportCards = [
   },
 ];
 
+// About page, "A space made for play". Add a line here for each new office photo
+// (put the photo in site/images first). Two to four photos lay out best.
 export const gallery = [
-  { image: 'group-play-session', alt: 'Therapists playing on the floor with children in the playroom', caption: 'The playroom' },
-  { image: 'intake-session', alt: 'A parent meeting with a therapist while a child plays nearby', caption: 'Intake sessions' },
-  { image: 'floortime-dollhouse', alt: 'A therapist and a young boy playing at a wooden dollhouse', caption: 'Floortime in action' },
-  { image: 'parent-coaching-goals', alt: 'Two parents meeting with a therapist to set goals', caption: 'Setting goals together' },
-  { image: 'office-door-sign', alt: 'The Hummingbird Nest sign on the office wall', caption: 'Our La Cañada Flintridge office' },
-  { image: 'floortime-school-bus', alt: 'A therapist and a young boy playing with a toy school bus', caption: 'Play with purpose' },
-  { image: 'office-lets-just-play', alt: 'A framed sign reading Let’s just play on a white brick wall', caption: 'Let’s just play' },
+  { image: 'group-play-session', alt: 'Therapists playing on the floor with children in the playroom' },
+  { image: 'intake-session', alt: 'A parent meeting with a therapist while a child plays nearby' },
 ];
 
-// Shown in the home page Instagram section until the live feed loads (or if it is not set up yet).
+// Shown in the home page Instagram row until the live feed loads (or if it is not set up yet).
+// One row: six photos on wide screens, four on tablets, three on phones.
 export const instagramFallback = [
-  { image: 'toy-train-play', alt: 'An adult and a young girl playing together with a wooden toy train on the floor' },
-  { image: 'playdate-clay', alt: 'Two children playing with colorful clay together at a table' },
-  { image: 'office-lets-just-play', alt: 'A framed sign reading Let’s just play on a white brick wall' },
-  { image: 'kids-on-grass', alt: 'A group of children sitting in a circle on the grass, talking and playing' },
-  { image: 'floortime-dollhouse', alt: 'A therapist and a young boy playing at a wooden dollhouse' },
-  { image: 'cardboard-house-play', alt: 'A parent and child playing together inside a painted cardboard house' },
+  { image: 'therapist-girl-sensory-spinner', alt: 'A therapist and a laughing young girl playing together on a spinning sensory seat' },
   { image: 'tamar-facilitated-playdate', alt: 'Tamar supporting two children building with colorful blocks during a facilitated playdate' },
-  { image: 'group-play-session', alt: 'Therapists playing on the floor with children in the playroom' },
   { image: 'family-sibling-session', alt: 'Tamar leading a family session with a parent and two children on a play mat' },
-  { image: 'office-door-sign', alt: 'The Hummingbird Nest sign on the office wall' },
+  { image: 'juliana-facilitated-playdate', alt: 'Juliana guiding a facilitated playdate as two children play with soft balls' },
+  { image: 'toy-train-play', alt: 'An adult and a young girl playing together with a wooden toy train on the floor' },
+  { image: 'kids-on-grass', alt: 'A group of children sitting in a circle on the grass, talking and playing' },
 ];

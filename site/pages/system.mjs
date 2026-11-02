@@ -6,7 +6,7 @@ export function notFoundPage() {
     path: '/404',
     output: '404.html',
     title: 'Page Not Found',
-    description: 'The page you are looking for may have moved. Explore The Hummingbird Nest home page, services, or blog.',
+    description: 'The page you are looking for may have moved. Explore The Hummingbird Nest home page, services, or resources.',
     noindex: true,
     sitemap: false,
     body: `<section class="system" aria-labelledby="system-title">
@@ -18,7 +18,7 @@ export function notFoundPage() {
     <div class="actions" data-reveal>
       ${button('/', 'Back to home', { variant: 'ink' })}
       ${button('/services', 'Our services', { variant: 'ghost' })}
-      ${button('/blog', 'Read the blog', { variant: 'ghost' })}
+      ${button('/resources', 'Resources', { variant: 'ghost' })}
     </div>
   </div>
 </section>`,
@@ -36,12 +36,10 @@ export function thanksPage() {
     body: `<section class="system" aria-labelledby="system-title">
   <div class="container system__inner">
     <img class="system__mark" src="/assets/img/mark.webp" alt="" width="120" height="92">
-    ${kicker('Message sent')}
-    <h1 class="page-hero__title" id="system-title" data-split>Thank you. <em>We will be in touch soon.</em></h1>
-    <p class="lead" data-reveal>Your message is on its way to our team. If you need us sooner, call <a href="${site.phone.href}">${site.phone.display}</a>.</p>
+    <h1 class="page-hero__title" id="system-title" data-split>Thank you! <em>Your submission has been received!</em></h1>
     <div class="actions" data-reveal>
       ${button('/', 'Back to home', { variant: 'ink' })}
-      ${button('/blog', 'Read the blog', { variant: 'ghost' })}
+      ${button(site.phone.href, site.phone.display, { variant: 'ghost', iconName: 'phone' })}
     </div>
   </div>
 </section>`,

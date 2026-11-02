@@ -5,7 +5,8 @@
  * first for every request (run_worker_first in wrangler.jsonc) so it can:
  *
  *   Redirect thehummingbirdnest.org to www.thehummingbirdnest.org (CANONICAL_HOST).
- *   POST /api/contact   Validate the contact form and email it through Resend.
+ *   POST /api/contact   Validate the contact form (name, email, phone, service) and email it through Resend.
+ *   GET  /blog          301 to /resources#blog (the blog moved onto the Resources page).
  *   GET  /api/config    Public client config (the optional Turnstile site key).
  *   GET  /api/instagram Latest Instagram posts for the home page, read from a Behold JSON feed and cached.
  *   Add security headers and cache rules to every page and file.
@@ -24,16 +25,17 @@
 const MAX_BODY_BYTES = 32 * 1024;
 const MIN_FILL_MS = 2500; // people take longer than this to fill in the form
 
-const SERVICES = new Set([
-  'Not sure yet',
-  'DIR Floortime® Sessions',
-  '1:1 In School Support',
-  'Staff Training',
-  'Family and Sibling Sessions',
-  'Facilitated Playdates',
-  'The Social Club',
-  'Parent coaching',
-]);
+// The "I am interested in" menu sends one of these values (see SERVICE_OPTIONS in site/lib/partials.mjs).
+const SERVICES = {
+  'not-sure': 'Not sure yet',
+  'services-1-1-therapy': 'DIR Floortime® Sessions',
+  'services-1-1-in-school-support': '1-on-1 In-School Support',
+  'services-staff-training': 'Staff Training',
+  'services-family-sibling-sessions': 'Family/Sibling Sessions',
+  'services-facilitated-playdates': 'Facilitated Playdates',
+  'social-club': 'The Social Club',
+  'parent-coaching': 'Parent coaching',
+};
 
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]{2,}$/;
 const PHONE_RE = /^[0-9+().\s\-xX]{7,40}$/;
@@ -102,6 +104,11 @@ export default {
     // Old Webflow paths that no longer exist.
     if (url.pathname === '/checkout' || url.pathname.startsWith('/pages/')) {
       return Response.redirect(`${url.origin}/`, 301);
+    }
+
+    // The blog now lives on the Resources page (posts and categories keep their addresses).
+    if (url.pathname === '/blog' || url.pathname === '/blog/') {
+      return Response.redirect(`${url.origin}/resources#blog`, 301);
     }
 
     const response = await env.ASSETS.fetch(request);
@@ -238,13 +245,13 @@ async function handleContact(request, env, url) {
     return respond(request, 200, { ok: true });
   }
 
+  // Only contact details and a service choice are read. Any other field (for example from an
+  // older copy of the form) is ignored and never emailed, so no health information is passed on.
   const data = {
     name: singleLine(clean(raw.name, 100)),
     email: singleLine(clean(raw.email, 254)),
     phone: singleLine(clean(raw.phone, 40)),
-    service: singleLine(clean(raw.service, 60)) || 'Not sure yet',
-    age: singleLine(clean(raw.age, 20)),
-    message: clean(raw.message, 5000),
+    service: serviceName(singleLine(clean(raw.service, 60))),
   };
 
   const fields = validate(data);
@@ -314,6 +321,11 @@ function clean(value, max) {
     .slice(0, max);
 }
 
+// Own keys only, so a crafted value such as "constructor" falls back to "Not sure yet".
+function serviceName(value) {
+  return Object.hasOwn(SERVICES, value) ? SERVICES[value] : SERVICES['not-sure'];
+}
+
 function singleLine(value) {
   return value.replace(/\s+/g, ' ');
 }
@@ -326,9 +338,6 @@ function validate(d) {
   if (d.phone && (!PHONE_RE.test(d.phone) || (d.phone.match(/\d/g) || []).length < 7)) {
     f.phone = 'Please enter a valid phone number, or leave this field blank.';
   }
-  if (!SERVICES.has(d.service)) d.service = 'Not sure yet';
-  if (!d.message) f.message = 'Please tell us a little about how we can help.';
-  else if (d.message.length < 10) f.message = 'Please add a few more details, at least 10 characters.';
   return f;
 }
 
@@ -354,14 +363,13 @@ async function sendEmail(env, d) {
     ['Email', d.email],
     ['Phone', d.phone || 'Not provided'],
     ['Interested in', d.service],
-    ['Child’s age', d.age || 'Not provided'],
   ];
-  const text = ['New message from thehummingbirdnest.org', '', ...rows.map(([k, v]) => `${k}: ${v}`), '', 'Message:', d.message, '', `Sent ${when} (Pacific)`].join('\n');
+  const text = ['New contact request from thehummingbirdnest.org', '', ...rows.map(([k, v]) => `${k}: ${v}`), '', `Sent ${when} (Pacific)`].join('\n');
   const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#f7f5f0;font-family:Arial,Helvetica,sans-serif;color:#0d2024">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:16px">
     <tr><td style="padding:28px 28px 8px">
       <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#4a5f63">Website contact form</p>
-      <h1 style="margin:0;font-size:24px;line-height:1.2">New message from ${esc(d.name)}</h1>
+      <h1 style="margin:0;font-size:24px;line-height:1.2">New contact request from ${esc(d.name)}</h1>
     </td></tr>
     <tr><td style="padding:16px 28px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.5">
@@ -369,9 +377,7 @@ async function sendEmail(env, d) {
       </table>
     </td></tr>
     <tr><td style="padding:8px 28px 28px">
-      <p style="margin:0 0 8px;color:#4a5f63;font-size:13px;letter-spacing:1px;text-transform:uppercase">Message</p>
-      <div style="font-size:16px;line-height:1.6;white-space:pre-wrap">${esc(d.message)}</div>
-      <p style="margin:24px 0 0;color:#4a5f63;font-size:13px">Sent ${esc(when)} (Pacific). Reply to this email to respond directly.</p>
+      <p style="margin:0;color:#4a5f63;font-size:13px">Sent ${esc(when)} (Pacific). Reply to this email to respond directly.</p>
     </td></tr>
   </table></body></html>`;
 
@@ -387,7 +393,7 @@ async function sendEmail(env, d) {
       from: env.CONTACT_FROM,
       to,
       reply_to: d.email,
-      subject: `New website message from ${d.name}`,
+      subject: `New website contact request from ${d.name}`,
       text,
       html,
       tags: [{ name: 'source', value: 'website_contact' }],

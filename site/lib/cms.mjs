@@ -43,14 +43,22 @@ function softenPart(text) {
 // those spots and leaves the writer's own punctuation alone.
 const MARK = '\u0001';
 
+// Hyphens joining two words or numbers ("In-School", "1-on-1", "2-25").
+const WORD_HYPHEN = /([\p{L}\p{N}])[\-\u2010\u2011]+(?=[\p{L}\p{N}])/gu;
+// Any dash left over once word hyphens are kept.
+const LOOSE_DASH = new RegExp(`(?<![\\p{L}\\p{N}])[${DASH}]+|[${DASH}]+(?![\\p{L}\\p{N}])|[\\u2012-\\u2015\\u2212]+`, 'gu');
+
 function softenPlain(s) {
-  return s
+  const keep = site.keepWordHyphens;
+  // Phone numbers: (626) 765-1724 and 626-765-1724 read as (626) 765 1724 and 626 765 1724.
+  let out = s
     .replace(new RegExp(`(\\d{3})[${DASH}](\\d{3})[${DASH}](\\d{4})`, 'g'), '$1 $2 $3')
-    .replace(new RegExp(`\\b(\\d{1,4})\\s*[${DASH}]\\s*(\\d{1,4})\\b`, 'g'), '$1 to $2')
-    .replace(/\s*[\u2012\u2013\u2014\u2015]+\s*/g, MARK)
-    .replace(/\s+[\-\u2010\u2011\u2212]+\s+/g, MARK)
-    .replace(/([\p{L}\p{N}])[\-\u2010\u2011\u2212]+(?=[\p{L}\p{N}])/gu, '$1 ')
-    .replace(new RegExp(`[${DASH}]+`, 'g'), ' ')
+    .replace(new RegExp(`(\\(\\d{3}\\)\\s*\\d{3})[${DASH}](\\d{4})\\b`, 'g'), '$1 $2');
+  if (!keep) out = out.replace(new RegExp(`\\b(\\d{1,4})\\s*[${DASH}]\\s*(\\d{1,4})\\b`, 'g'), '$1 to $2');
+  out = out.replace(/\s*[\u2012\u2013\u2014\u2015]+\s*/g, MARK).replace(/\s+[\-\u2010\u2011\u2212]+\s+/g, MARK);
+  if (!keep) out = out.replace(WORD_HYPHEN, '$1 ');
+  return out
+    .replace(keep ? LOOSE_DASH : new RegExp(`[${DASH}]+`, 'g'), ' ')
     .replace(/\u0001+/g, MARK)
     .replace(/,?\s*\u0001\s*(?=[.,;:!?)\]”"’])/g, '')
     .replace(/([(\[“"‘])\s*\u0001\s*/g, '$1')

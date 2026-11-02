@@ -441,19 +441,6 @@
     "alpha": false,
     "hash": "7a3f5162e6ac"
   },
-  "staff-training-notebook": {
-    "width": 2400,
-    "height": 1600,
-    "widths": [
-      480,
-      800,
-      1200,
-      1600,
-      2000
-    ],
-    "alpha": false,
-    "hash": "4bc5a6dc327e"
-  },
   "tamar-facilitated-playdate": {
     "width": 2400,
     "height": 1600,
@@ -512,6 +499,18 @@
     ],
     "alpha": true,
     "hash": "057f09391b60"
+  },
+  "therapist-girl-sensory-spinner": {
+    "width": 1333,
+    "height": 2000,
+    "widths": [
+      480,
+      800,
+      1200,
+      1333
+    ],
+    "alpha": false,
+    "hash": "8c9e91639b4a"
   },
   "toy-animals": {
     "width": 1600,

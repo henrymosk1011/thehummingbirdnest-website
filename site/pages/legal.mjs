@@ -2,8 +2,8 @@ import { site } from '../config.mjs';
 import { link, kicker } from '../lib/html.mjs';
 import { webPage } from '../lib/seo.mjs';
 
-const EFFECTIVE = 'October 20, 2026';
-const EFFECTIVE_ISO = '2026-10-20';
+const EFFECTIVE = 'November 2, 2026';
+const EFFECTIVE_ISO = '2026-11-02';
 
 function legalPage({ path, title, intro, sections, description, updatedLabel = 'Effective' }) {
   const toc = sections.map((s) => `<li><a href="#${s.id}">${s.title}</a></li>`).join('');
@@ -45,7 +45,7 @@ export function privacyPage() {
         id: 'information-we-collect',
         title: 'Information we collect',
         html: `<h3>Information you give us</h3>
-<p>When you fill out our contact form, email us, or call us, we collect the information you choose to share. Our contact form asks for your name and email address, and optionally your phone number, your child’s age, the service you are interested in, and a message.</p>
+<p>When you fill out our contact form, email us, or call us, we collect the information you choose to share. Our contact form asks only for your name and email address, and optionally your phone number and the service you are interested in. It does not ask about your child or their health.</p>
 <h3>Information collected automatically</h3>
 <p>Like most websites, our hosting and security provider automatically receives basic technical information when you visit, such as your IP address, browser type, device type, the pages you request, the referring page, and the date and time of your visit. This information is used to deliver the Site, keep it secure, and prevent abuse.</p>
 <h3>Cookies and similar technologies</h3>
@@ -54,7 +54,7 @@ export function privacyPage() {
       {
         id: 'health-information',
         title: 'Please do not send health information',
-        html: `<p>The Site and our contact form are designed for general inquiries only. Please do not submit Protected Health Information (PHI) or other sensitive details through the Site, such as diagnoses, medical or school records, insurance information, or details about a child’s health or treatment.</p>
+        html: `<p>The Site and our contact form are designed for general inquiries only, so we can reach you by phone or email. Please do not submit any Protected Health Information (PHI) or other sensitive details through the Site, such as diagnoses, medical or school records, insurance information, or details about a child’s health or treatment. We will talk through those details with you directly.</p>
 <p>Information you share with us as part of a client relationship, such as intake paperwork and session records, is handled separately from this website and is kept confidential as required by applicable law.</p>`,
       },
       {
