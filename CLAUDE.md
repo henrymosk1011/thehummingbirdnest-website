@@ -6,8 +6,9 @@ Every time a change is requested, do all of this without asking first:
 
 1. Make the change on the working branch, run `npm run build` (it must pass its checks), then commit and push.
 2. Open a pull request into `main`.
-3. Merge it. Merging to `main` is what makes it live: Cloudflare builds and deploys `main` to production automatically (see DEPLOY.md, section 1).
-4. Confirm the deploy is live (the new content is served at https://thehummingbirdnest.henrymm.workers.dev, and on www.thehummingbirdnest.org once DNS points to Cloudflare), then report the PR link.
+3. Merge it.
+4. Deploy `main`. Pushes to GitHub do not start Cloudflare builds on their own (as of November 2026 the repository's push events never reach Workers Builds), so start the production build with the Cloudflare API: `POST /accounts/{account_id}/builds/triggers/b194d803-1d6d-4568-a0d2-8cd3e6988233/builds` with body `{"branch": "main"}`. That trigger runs `npm run build` then `npx wrangler deploy` for the `thehummingbirdnest` Worker. Wait for the build to finish with outcome `success` and check its logs for "Checks passed" and a new "Current Version ID". If GitHub pushes start building automatically again, skip this step.
+5. Report the PR link and the deployed version. The site is served at https://thehummingbirdnest.henrymm.workers.dev, and at www.thehummingbirdnest.org once its nameservers point to Cloudflare and the custom domains are added (DEPLOY.md, sections 2 and 3).
 
 If the working branch's earlier PR is already merged, start the next change from the latest `main`.
 
