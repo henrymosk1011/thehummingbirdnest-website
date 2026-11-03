@@ -18,7 +18,7 @@ npm install          # once
 npm run build        # process any new photos, then build dist/ (also checks for dashes, missing alt text and broken links)
 npm run dev          # build, then run the site and Worker locally at http://localhost:8787
 npm run images       # only the photo step (add -- --force to re-encode every photo)
-npm run deploy       # build and deploy from your machine (normally Cloudflare does this on push)
+npm run deploy       # build and deploy from your machine (normally every push to main publishes; see DEPLOY.md, section 1)
 ```
 
 ## Project layout
