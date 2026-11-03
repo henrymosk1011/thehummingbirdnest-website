@@ -1,33 +1,12 @@
-// Contact form: client side validation with accessible error messages, then a
-// JSON post to the Worker at /api/contact. Without JavaScript the form still
-// posts normally and the Worker redirects to /thanks.
+// Contact form: client side validation with accessible error messages, then a JSON
+// post to FormSubmit's AJAX endpoint (data-endpoint on the form), which emails it to
+// the practice. Without JavaScript the form still posts normally to FormSubmit, which
+// shows a quick check and then returns the visitor to /thanks.
 
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]{2,}$/;
 const PHONE_RE = /^[0-9+().\s\-xX]{7,40}$/;
 const FALLBACK = 'You can also email info@thehummingbirdnest.org or call (626) 765 1724.';
-
-let turnstilePromise = null;
-let siteKey = null;
-
-function loadTurnstile() {
-  if (turnstilePromise) return turnstilePromise;
-  turnstilePromise = fetch('/api/config', { headers: { Accept: 'application/json' } })
-    .then((r) => (r.ok ? r.json() : {}))
-    .then((cfg) => {
-      siteKey = cfg && cfg.turnstileSiteKey;
-      if (!siteKey) return null;
-      return new Promise((resolve) => {
-        const s = document.createElement('script');
-        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-        s.async = true;
-        s.onload = () => resolve(window.turnstile || null);
-        s.onerror = () => resolve(null);
-        document.head.appendChild(s);
-      });
-    })
-    .catch(() => null);
-  return turnstilePromise;
-}
+const MIN_FILL_MS = 2500; // people take longer than this to fill in the form
 
 function validate(form) {
   const v = (name) => (form.elements[name]?.value || '').trim();
@@ -62,27 +41,27 @@ function setStatus(form, message, type = 'info') {
   status.textContent = message;
 }
 
+// Only these fields are sent, under readable names, so the email is a tidy table and
+// nothing else on the page (and never health information) can ride along.
+function payload(form) {
+  const v = (name) => (form.elements[name]?.value || '').trim().replace(/\s+/g, ' ');
+  return {
+    Name: v('name'),
+    Email: v('email'),
+    Phone: v('phone') || 'Not provided',
+    'Interested in': v('service') || 'Not sure yet',
+    _subject: `New website contact request from ${v('name')}`,
+    _replyto: v('email'),
+    _template: 'table',
+    _captcha: 'false',
+  };
+}
+
 export function initForms() {
   document.querySelectorAll('[data-contact-form]').forEach((form) => {
-    const start = form.querySelector('[data-form-start]');
-    if (start) start.value = String(Date.now());
     const submit = form.querySelector('[data-submit]');
     const label = submit.querySelector('.btn__label');
-    const widgetHost = form.querySelector('[data-turnstile]');
-    let widgetId = null;
-
-    // Load the optional human check only when someone starts filling in the form.
-    form.addEventListener(
-      'focusin',
-      () => {
-        loadTurnstile().then((ts) => {
-          if (!ts || !widgetHost || widgetId !== null) return;
-          widgetHost.hidden = false;
-          widgetId = ts.render(widgetHost, { sitekey: siteKey, theme: 'light', size: 'flexible' });
-        });
-      },
-      { once: true }
-    );
+    let startedAt = Date.now();
 
     // Clear a field's error as soon as it is fixed.
     form.addEventListener('input', (e) => {
@@ -96,6 +75,13 @@ export function initForms() {
       e.target.removeAttribute('aria-invalid');
     });
 
+    const succeed = () => {
+      form.reset();
+      startedAt = Date.now();
+      showErrors(form, {});
+      setStatus(form, 'Thank you! Your submission has been received!');
+    };
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (submit.getAttribute('aria-disabled') === 'true') return;
@@ -108,40 +94,31 @@ export function initForms() {
         return;
       }
 
+      // Bots: honeypot filled in, or sent faster than a person could type. Pretend it worked.
+      if (form.elements._honey?.value || Date.now() - startedAt < MIN_FILL_MS) {
+        succeed();
+        return;
+      }
+
       submit.setAttribute('aria-disabled', 'true');
       const original = label.textContent;
       label.textContent = 'Sending';
       setStatus(form, 'Sending.');
 
-      const data = Object.fromEntries(new FormData(form).entries());
-      if (window.turnstile && widgetId !== null) data.turnstileToken = window.turnstile.getResponse(widgetId) || '';
-
       try {
-        const res = await fetch(form.action, {
+        const res = await fetch(form.dataset.endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload(form)),
         });
         const out = await res.json().catch(() => ({}));
-        if (res.ok && out.ok) {
-          form.reset();
-          if (start) start.value = String(Date.now());
-          showErrors(form, {});
-          setStatus(form, 'Thank you! Your submission has been received!');
-        } else if (out.fields) {
-          showErrors(form, out.fields);
-          setStatus(form, out.error || 'Please check the highlighted fields.', 'error');
-          const first = Object.keys(out.fields)[0];
-          form.elements[first]?.focus();
-        } else {
-          setStatus(form, `Oops! Something went wrong while submitting the form. ${out.error || ''} ${FALLBACK}`.replace(/\s+/g, ' '), 'error');
-        }
+        if (res.ok && String(out.success) === 'true') succeed();
+        else setStatus(form, `Oops! Something went wrong while submitting the form. ${FALLBACK}`, 'error');
       } catch {
         setStatus(form, `We could not reach the server. Please check your connection and try again. ${FALLBACK}`, 'error');
       } finally {
         submit.removeAttribute('aria-disabled');
         label.textContent = original;
-        if (window.turnstile && widgetId !== null) window.turnstile.reset(widgetId);
       }
     });
   });

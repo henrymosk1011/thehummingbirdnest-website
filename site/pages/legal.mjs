@@ -73,7 +73,7 @@ export function privacyPage() {
         title: 'How we share information',
         html: `<p>We share personal information only as needed to run the Site and respond to you, including with:</p>
 <ul>
-<li><strong>Service providers</strong> that help us operate, such as our website hosting and security provider (Cloudflare), our email delivery provider (Resend), our online scheduling provider (Calendly), our Instagram feed provider (Behold), and, if enabled, our analytics provider (Google). These providers may only use the information to perform services for us.</li>
+<li><strong>Service providers</strong> that help us operate, such as our website hosting and security provider (Cloudflare), our contact form delivery provider (FormSubmit), our online scheduling provider (Calendly), our Instagram feed provider (Behold), and, if enabled, our analytics provider (Google). These providers may only use the information to perform services for us.</li>
 <li><strong>Legal and safety reasons</strong>, when we believe disclosure is required by law, legal process, or a government request, or is needed to protect the rights, property, or safety of our clients, our team, or others.</li>
 <li><strong>Business transfers</strong>, if our practice is involved in a merger, acquisition, or sale of assets, subject to this policy.</li>
 </ul>

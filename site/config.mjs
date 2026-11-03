@@ -16,6 +16,11 @@ export const site = {
     e164: '+16267651724',
   },
   email: 'info@thehummingbirdnest.org',
+  // The contact form is delivered by FormSubmit (formsubmit.co) to this address. The first
+  // message sends an activation email here; someone with access must click "Activate Form"
+  // once. FormSubmit's confirmation email also offers a random alias: paste it here instead of
+  // the address to keep the address out of the page source.
+  formSubmitTo: 'info@thehummingbirdnest.org',
   address: {
     street: '808 Foothill Blvd, Unit A',
     city: 'La Cañada Flintridge',
