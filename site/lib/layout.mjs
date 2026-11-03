@@ -12,7 +12,9 @@ import { getInTouch } from './partials.mjs';
  *   path, title, description, body,
  *   image?: image name for social cards, ogType?, noindex?,
  *   jsonld?: array of schema objects for this page,
- *   crumbs?: [{ name, path }], footerCta?: boolean, bodyClass?
+ *   crumbs?: [{ name, path }] (breadcrumb data for search engines only, not shown on the page),
+ *   clearsHeader?: true when the first section makes its own room for the fixed header,
+ *   footerCta?: boolean, bodyClass?
  * }
  */
 export function renderPage(page, build) {
@@ -80,8 +82,8 @@ ${ga ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(ga)
 <body${attrs({ class: page.bodyClass })}>
 ${softenHtml(`<a class="skip-link" href="#main">Skip to main content</a>
 ${header(page)}
-<main id="main" tabindex="-1">
-${page.crumbs?.length && !page.hideCrumbs ? breadcrumbs(page.crumbs) : ''}${page.body}
+<main id="main" tabindex="-1"${page.clearsHeader ? '' : ' class="main--offset"'}>
+${page.body}
 ${page.footerCta === false ? '' : getInTouch()}
 </main>
 ${footer()}`)}
@@ -192,17 +194,6 @@ function mobileMenu(page) {
     </div>
   </div>
 </dialog>`;
-}
-
-function breadcrumbs(crumbs) {
-  const all = [{ name: 'Home', path: '/' }, ...crumbs];
-  return `<nav class="crumbs container" aria-label="Breadcrumb"><ol role="list">${all
-    .map((c, i) =>
-      i === all.length - 1
-        ? `<li><span aria-current="page">${esc(c.name)}</span></li>`
-        : `<li><a href="${c.path}">${esc(c.name)}</a>${icon('chevron-right', { className: 'icon crumbs__sep' })}</li>`
-    )
-    .join('')}</ol></nav>\n`;
 }
 
 function footer() {

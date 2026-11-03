@@ -469,46 +469,9 @@
   text-decoration: none;
 }
 
-/* Breadcrumbs */
-.crumbs {
+/* Room for the fixed header. The home hero and the 404 and thank you pages make their own. */
+.main--offset {
   padding-top: calc(var(--header-h) + 36px);
-  font-size: 0.9375rem;
-  color: var(--ink-2);
-}
-.crumbs ol {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-.crumbs li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.crumbs a {
-  text-decoration: none;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  min-height: 32px;
-  align-items: center;
-}
-.crumbs a:hover {
-  text-decoration: underline;
-}
-.crumbs__sep {
-  width: 14px;
-  height: 14px;
-  color: var(--ink-muted);
-}
-.crumbs [aria-current] {
-  display: inline-block;
-  max-width: 40ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: bottom;
 }
 
 /* Footer */
