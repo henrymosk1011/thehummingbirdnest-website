@@ -47,7 +47,7 @@ export const site = {
   // site (hyphens included) and the build turns dashes into commas, spaces or "to" when it
   // renders. Set this to true to show hyphens inside words exactly as the original site did
   // ("1-on-1 In-School Support", "co-regulation"); dashes used as punctuation still become commas.
-  keepWordHyphens: false,
+  keepWordHyphens: true,
   // Words that always keep their hyphens, even with keepWordHyphens off (the client asked for
   // "1-on-1" with hyphens everywhere).
   keepHyphensIn: ['1-on-1'],

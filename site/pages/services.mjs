@@ -98,7 +98,7 @@ ${pageHero({
   actions: `${button('/contact', 'Contact us', { variant: 'ink' })}${button(site.phone.href, site.phone.display, { variant: 'ghost', iconName: 'phone' })}`,
 })}
 
-<section class="svc-detail" aria-labelledby="detail-title">
+<section class="svc-detail"${s.heading === s.title ? '' : ' aria-labelledby="detail-title"'}>
   <div class="container svc-detail__grid">
     <div class="svc-detail__head">
       <span class="svc-detail__num" aria-hidden="true" data-text="${s.number}"></span>
