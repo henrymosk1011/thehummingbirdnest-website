@@ -83,7 +83,7 @@ content:
         options:
           format: markdown
           switcher: false
-        description: Use Heading 2 for section titles. Photos added here are resized automatically; give each one a description.
+        description: "To format, highlight text or type / on an empty line. Use Heading 2 for section titles (not Heading 1). Photos added here are resized automatically; give each one a description."
 
   - name: team
     label: Team

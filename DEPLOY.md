@@ -155,11 +155,33 @@ Saves only go live once the deploy hook secret from section 1 is set. Edits are 
 
 **Tips to pass on:**
 
-* **New post:** open **Blog posts** and add a new entry. Fill in every field and click **Save**. Turn on **Draft** to save without publishing.
+* **New post:** open **Blog posts** and add a new entry. Fill in every field and click **Save**. Turn on **Draft** to save without publishing. The post is on the site 2 to 3 minutes after saving (a little longer with a new photo).
 * **Photos:** JPG, PNG or WebP. On an iPhone, choose **Settings > Camera > Formats > Most Compatible** so photos are saved as JPG.
 * **Photo description:** one sentence about what is in the photo, for people who cannot see it.
 * **Team members** appear on the About page in the order they are listed. Typing **{years}** in a bio shows the practice's years of experience, updated every year.
 * **Mistakes are recoverable:** every save is in the GitHub history, so any earlier version can be restored.
+
+**Formatting your article:**
+
+The **Article** box has no toolbar that is always showing. Formatting comes from two menus:
+
+* **Highlight some text** and a small toolbar appears above it: a style menu (normal text or headings), **Bold**, *Italic*, **Link**, and a few more.
+* **Type / at the start of an empty line** (the box says "Press '/' for commands") for a menu of headings, bulleted and numbered lists, **Image**, **Quote** and more.
+* **Shortcuts:** Cmd+B (Ctrl+B on Windows) for bold, Cmd+I for italic. Typing `## ` starts a heading, `- ` a bulleted list, `1. ` a numbered list, and `> ` a quote.
+
+Use these, which the site is designed for:
+
+* **Heading 2** for section titles, and **Heading 3** for smaller headings inside a section.
+* **Bold**, *italic*, bulleted and numbered lists, quotes, and links.
+* **Image** to put a photo inside the article. It is resized for every screen automatically. Click the photo, then the **alt text** button in the toolbar, and describe what is in it.
+
+Avoid these:
+
+* **Heading 1:** the post title is already the page's main heading. A second one hurts accessibility and Google, and the site does not style it.
+* **Underline:** readers mistake underlined text for a link.
+* **Table** and **Code block:** the site does not style them, and a wide table makes the page scroll sideways on phones.
+
+Pasting from Google Docs or Word usually keeps headings, bold and lists. Check the article before saving.
 
 ## Local development
 
