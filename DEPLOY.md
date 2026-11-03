@@ -29,11 +29,19 @@ These were done through the Cloudflare and GitHub connectors:
 
 ## 1. Publish to production
 
-The current branch has already been built and deployed once, so you can review the new site right now at **https://thehummingbirdnest.henrymm.workers.dev**.
+`main` is the live branch. Review the site at **https://thehummingbirdnest.henrymm.workers.dev**.
 
-1. Open a pull request from `claude/charming-ptolemy-kcab42` into `main` (create `main` if it does not exist yet) and merge it.
-2. Cloudflare builds and deploys automatically. Check progress in **Cloudflare > Workers and Pages > thehummingbirdnest > Deployments**.
-3. Review it at `https://thehummingbirdnest.henrymm.workers.dev`.
+Cloudflare does not receive this repository's GitHub push events, so the **Publish site** workflow (`.github/workflows/publish.yml`) starts the production build instead. Every push to `main` (a merged pull request, an edit on github.com, or a save in Pages CMS) calls the Worker's **deploy hook**, and Cloudflare runs `npm run build` and `npx wrangler deploy`. The site updates about two minutes later. Check progress in **Cloudflare > Workers and Pages > thehummingbirdnest > Deployments**.
+
+**One time setup: give GitHub the deploy hook.** Until this is done, pushes to `main` are not published (the workflow shows a warning saying so).
+
+1. In Cloudflare, open **Workers and Pages > thehummingbirdnest > Settings > Builds > Deploy Hooks** and copy the URL of the hook named **GitHub push to main** (branch `main`). It looks like `https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/...`.
+2. In GitHub, open the repository's **Settings > Secrets and variables > Actions** and click **New repository secret**. Name it `CLOUDFLARE_DEPLOY_HOOK`, paste the URL, and click **Add secret**.
+3. Check it: open the **Actions** tab, choose **Publish site**, and click **Run workflow**. The run should finish green with "Cloudflare accepted the build", and a new build triggered by the deploy hook appears under **Deployments**.
+
+Treat the hook URL like a password: the repository is public, and anyone who has the URL can start a build. They cannot change the site (a build only publishes what is already on `main`), but keep it out of files and messages. If it leaks, delete the hook in Cloudflare, create a new one for branch `main`, and paste the new URL into the secret.
+
+If Cloudflare starts building on push again by itself, delete `.github/workflows/publish.yml` so each change is not built twice (Cloudflare skips duplicate builds that are still queued, so nothing breaks in the meantime).
 
 ## 2. Move DNS to Cloudflare (GoDaddy)
 
@@ -129,7 +137,7 @@ The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Be
 
 Pages CMS (free) gives the practice simple forms for **Blog posts** (shown on the Resources page), **Team**, **Testimonials** and **FAQ**. The screens are defined in `.pages.yml`. Each save is a commit to GitHub, and Cloudflare publishes it in about two minutes. Photos are resized automatically, dashes are fixed automatically, and a post with **Draft** turned on stays off the site.
 
-Do this after launch, once `main` is the live branch. Edits are saved to whichever branch is open in Pages CMS, and only `main` publishes to the real site.
+Saves only go live once the deploy hook secret from section 1 is set. Edits are saved to whichever branch is open in Pages CMS, and only `main` publishes to the real site.
 
 **One time setup (you):**
 
