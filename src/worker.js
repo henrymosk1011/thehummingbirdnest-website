@@ -5,55 +5,31 @@
  * first for every request (run_worker_first in wrangler.jsonc) so it can:
  *
  *   Redirect thehummingbirdnest.org to www.thehummingbirdnest.org (CANONICAL_HOST).
- *   POST /api/contact   Validate the contact form (name, email, phone, service) and email it through Resend.
  *   GET  /blog          301 to /resources#blog (the blog moved onto the Resources page).
- *   GET  /api/config    Public client config (the optional Turnstile site key).
  *   GET  /api/instagram Latest Instagram posts for the home page, read from a Behold JSON feed and cached.
  *   Add security headers and cache rules to every page and file.
  *
- * Configuration (Cloudflare dashboard: Workers and Pages > thehummingbirdnest > Settings > Variables and Secrets):
- *   RESEND_API_KEY        secret, required to send mail
- *   CONTACT_TO            var, inbox that receives submissions (comma separated for several)
- *   CONTACT_FROM          var, verified Resend sender, for example "The Hummingbird Nest <website@forms.thehummingbirdnest.org>"
- *   CANONICAL_HOST        var, www.thehummingbirdnest.org
- *   ALLOWED_ORIGINS       var, optional comma separated list of extra allowed origins
- *   TURNSTILE_SITE_KEY    var, optional, turns on Cloudflare Turnstile on the form
- *   TURNSTILE_SECRET_KEY  secret, optional, required when TURNSTILE_SITE_KEY is set
- *   BEHOLD_FEED_ID        var, optional, the Behold JSON feed ID that powers the Instagram section
+ * The contact form does not use the Worker: the browser sends it straight to FormSubmit
+ * (formsubmit.co), which emails it to the practice (see site/scripts/form.js and DEPLOY.md).
+ *
+ * Configuration (vars in wrangler.jsonc):
+ *   CANONICAL_HOST        www.thehummingbirdnest.org
+ *   BEHOLD_FEED_ID        optional, the Behold JSON feed ID that powers the Instagram section
  */
 
-const MAX_BODY_BYTES = 32 * 1024;
-const MIN_FILL_MS = 2500; // people take longer than this to fill in the form
-
-// The "I am interested in" menu sends one of these values (see SERVICE_OPTIONS in site/lib/partials.mjs).
-const SERVICES = {
-  'not-sure': 'Not sure yet',
-  'services-1-1-therapy': 'DIR Floortime® Sessions',
-  'services-1-1-in-school-support': '1-on-1 In-School Support',
-  'services-staff-training': 'Staff Training',
-  'services-family-sibling-sessions': 'Family/Sibling Sessions',
-  'services-facilitated-playdates': 'Facilitated Playdates',
-  'social-club': 'The Social Club',
-  'parent-coaching': 'Parent coaching',
-};
-
-const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]{2,}$/;
-const PHONE_RE = /^[0-9+().\s\-xX]{7,40}$/;
-
 // Google Analytics hosts are allowed ahead of time so analytics can be switched on
-// from site/config.mjs without touching this file. Turnstile is allowed for the form.
+// from site/config.mjs without touching this file. FormSubmit receives the contact form.
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com",
+  "script-src 'self' https://www.googletagmanager.com",
   "style-src 'self'",
   "img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://behold.pictures https://*.behold.pictures https://*.cdninstagram.com https://*.fbcdn.net",
   "font-src 'self'",
   "media-src 'self'",
-  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://challenges.cloudflare.com",
-  'frame-src https://challenges.cloudflare.com',
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://formsubmit.co",
   "frame-ancestors 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://formsubmit.co",
   "object-src 'none'",
   'upgrade-insecure-requests',
 ].join('; ');
@@ -78,19 +54,6 @@ export default {
       url.hostname = canonical;
       url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
-    }
-
-    if (url.pathname === '/api/contact') {
-      try {
-        return await handleContact(request, env, url);
-      } catch (err) {
-        console.error('contact handler failed', err && err.stack ? err.stack : err);
-        return respond(request, 500, { ok: false, error: 'Unexpected server error.' });
-      }
-    }
-
-    if (url.pathname === '/api/config') {
-      return json(200, { turnstileSiteKey: env.TURNSTILE_SITE_KEY || null }, { 'Cache-Control': 'public, max-age=300' });
     }
 
     if (url.pathname === '/api/instagram') {
@@ -208,109 +171,6 @@ function withSiteHeaders(response, url) {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
-async function handleContact(request, env, url) {
-  if (request.method !== 'POST') {
-    return json(405, { ok: false, error: 'Method not allowed.' }, { Allow: 'POST' });
-  }
-
-  // Only accept submissions that come from this site.
-  if (!originAllowed(request, env, url)) {
-    return json(403, { ok: false, error: 'Forbidden.' });
-  }
-
-  const length = Number(request.headers.get('Content-Length') || 0);
-  if (length > MAX_BODY_BYTES) {
-    return respond(request, 413, { ok: false, error: 'Your message is too large.' });
-  }
-
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  if (env.CONTACT_LIMITER) {
-    const { success } = await env.CONTACT_LIMITER.limit({ key: `contact:${ip}` });
-    if (!success) {
-      return respond(request, 429, { ok: false, error: 'Too many messages. Please try again in a minute.' });
-    }
-  }
-
-  let raw;
-  try {
-    raw = await readBody(request);
-  } catch {
-    return respond(request, 400, { ok: false, error: 'Could not read your message.' });
-  }
-
-  // Bots: honeypot filled in, or the form was sent faster than a person could type.
-  // Pretend success so they learn nothing.
-  const startedAt = Number(raw.t || 0);
-  if (clean(raw.website, 200) || (startedAt && Date.now() - startedAt < MIN_FILL_MS)) {
-    return respond(request, 200, { ok: true });
-  }
-
-  // Only contact details and a service choice are read. Any other field (for example from an
-  // older copy of the form) is ignored and never emailed, so no health information is passed on.
-  const data = {
-    name: singleLine(clean(raw.name, 100)),
-    email: singleLine(clean(raw.email, 254)),
-    phone: singleLine(clean(raw.phone, 40)),
-    service: serviceName(singleLine(clean(raw.service, 60))),
-  };
-
-  const fields = validate(data);
-  if (Object.keys(fields).length) {
-    return respond(request, 422, { ok: false, error: 'Please check the highlighted fields.', fields });
-  }
-
-  if (env.TURNSTILE_SECRET_KEY) {
-    const token = clean(raw.turnstileToken || raw['cf-turnstile-response'], 2048);
-    const passed = token && (await verifyTurnstile(token, ip, env.TURNSTILE_SECRET_KEY));
-    if (!passed) {
-      return respond(request, 400, { ok: false, error: 'We could not verify that you are human. Please try again.' });
-    }
-  }
-
-  if (!env.RESEND_API_KEY || !env.CONTACT_TO || !env.CONTACT_FROM) {
-    console.error('Contact form is not configured: set RESEND_API_KEY, CONTACT_TO and CONTACT_FROM.');
-    return respond(request, 503, { ok: false, error: 'The contact form is not available right now.' });
-  }
-
-  const sent = await sendEmail(env, data);
-  if (!sent) {
-    return respond(request, 502, { ok: false, error: 'Your message could not be delivered.' });
-  }
-
-  return respond(request, 200, { ok: true });
-}
-
-function originAllowed(request, env, url) {
-  const origin = request.headers.get('Origin');
-  if (!origin) {
-    // Older browsers may omit Origin on same origin form posts; fall back to Sec-Fetch-Site.
-    const site = request.headers.get('Sec-Fetch-Site');
-    return !site || site === 'same-origin' || site === 'none';
-  }
-  const allowed = new Set([url.origin]);
-  (env.ALLOWED_ORIGINS || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .forEach((o) => allowed.add(o));
-  return allowed.has(origin);
-}
-
-async function readBody(request) {
-  const type = (request.headers.get('Content-Type') || '').toLowerCase();
-  const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) throw new Error('too large');
-  if (type.includes('application/json')) {
-    const parsed = JSON.parse(text || '{}');
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('bad json');
-    return parsed;
-  }
-  if (type.includes('application/x-www-form-urlencoded')) {
-    return Object.fromEntries(new URLSearchParams(text));
-  }
-  throw new Error('unsupported content type');
-}
-
 function clean(value, max) {
   if (typeof value !== 'string') return '';
   // Drop control characters except tab and newline, normalize line endings, trim.
@@ -319,116 +179,6 @@ function clean(value, max) {
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
     .trim()
     .slice(0, max);
-}
-
-// Own keys only, so a crafted value such as "constructor" falls back to "Not sure yet".
-function serviceName(value) {
-  return Object.hasOwn(SERVICES, value) ? SERVICES[value] : SERVICES['not-sure'];
-}
-
-function singleLine(value) {
-  return value.replace(/\s+/g, ' ');
-}
-
-function validate(d) {
-  const f = {};
-  if (!d.name) f.name = 'Please enter your name.';
-  if (!d.email) f.email = 'Please enter your email address.';
-  else if (!EMAIL_RE.test(d.email)) f.email = 'Please enter a valid email address, like name@example.com.';
-  if (d.phone && (!PHONE_RE.test(d.phone) || (d.phone.match(/\d/g) || []).length < 7)) {
-    f.phone = 'Please enter a valid phone number, or leave this field blank.';
-  }
-  return f;
-}
-
-async function verifyTurnstile(token, ip, secret) {
-  try {
-    const body = new FormData();
-    body.append('secret', secret);
-    body.append('response', token);
-    if (ip && ip !== 'unknown') body.append('remoteip', ip);
-    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body });
-    const out = await res.json();
-    return Boolean(out && out.success);
-  } catch (err) {
-    console.error('turnstile verification failed', err);
-    return false;
-  }
-}
-
-async function sendEmail(env, d) {
-  const when = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', dateStyle: 'full', timeStyle: 'short' });
-  const rows = [
-    ['Name', d.name],
-    ['Email', d.email],
-    ['Phone', d.phone || 'Not provided'],
-    ['Interested in', d.service],
-  ];
-  const text = ['New contact request from thehummingbirdnest.org', '', ...rows.map(([k, v]) => `${k}: ${v}`), '', `Sent ${when} (Pacific)`].join('\n');
-  const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#f7f5f0;font-family:Arial,Helvetica,sans-serif;color:#0d2024">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:16px">
-    <tr><td style="padding:28px 28px 8px">
-      <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#4a5f63">Website contact form</p>
-      <h1 style="margin:0;font-size:24px;line-height:1.2">New contact request from ${esc(d.name)}</h1>
-    </td></tr>
-    <tr><td style="padding:16px 28px">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.5">
-        ${rows.map(([k, v]) => `<tr><td style="padding:6px 16px 6px 0;color:#4a5f63;white-space:nowrap;vertical-align:top">${esc(k)}</td><td style="padding:6px 0;font-weight:bold">${esc(v)}</td></tr>`).join('')}
-      </table>
-    </td></tr>
-    <tr><td style="padding:8px 28px 28px">
-      <p style="margin:0;color:#4a5f63;font-size:13px">Sent ${esc(when)} (Pacific). Reply to this email to respond directly.</p>
-    </td></tr>
-  </table></body></html>`;
-
-  const to = env.CONTACT_TO.split(',').map((s) => s.trim()).filter(Boolean);
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      'Idempotency-Key': `thn-${crypto.randomUUID()}`,
-    },
-    body: JSON.stringify({
-      from: env.CONTACT_FROM,
-      to,
-      reply_to: d.email,
-      subject: `New website contact request from ${d.name}`,
-      text,
-      html,
-      tags: [{ name: 'source', value: 'website_contact' }],
-    }),
-  });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => '');
-    console.error('resend send failed', res.status, detail.slice(0, 500));
-    return false;
-  }
-  return true;
-}
-
-function esc(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
-function wantsJson(request) {
-  const type = (request.headers.get('Content-Type') || '').toLowerCase();
-  const accept = (request.headers.get('Accept') || '').toLowerCase();
-  return type.includes('application/json') || accept.includes('application/json');
-}
-
-// JSON for the script powered form; a redirect or a simple page when the form posts without JavaScript.
-function respond(request, status, payload) {
-  if (wantsJson(request)) return json(status, payload);
-  if (payload.ok) {
-    return new Response(null, { status: 303, headers: { Location: '/thanks', 'Cache-Control': 'no-store' } });
-  }
-  const msg = esc(payload.error || 'Something went wrong.');
-  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Message not sent | The Hummingbird Nest</title><link rel="stylesheet" href="/assets/css/main.css"></head><body><main id="main" class="system"><div class="container system__inner"><h1 class="page-hero__title">Message not sent.</h1><p class="lead">${msg} You can also email <a href="mailto:info@thehummingbirdnest.org">info@thehummingbirdnest.org</a> or call <a href="tel:+16267651724">(626) 765 1724</a>.</p><p><a class="text-link" href="/contact">Back to the contact form</a></p></div></main></body></html>`;
-  return new Response(body, {
-    status,
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', ...SECURITY_HEADERS },
-  });
 }
 
 function json(status, payload, extra = {}) {

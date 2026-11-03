@@ -1,6 +1,6 @@
 # Deploying The Hummingbird Nest
 
-The site runs on **Cloudflare Workers** (static assets plus a small Worker for the contact form), builds from **GitHub**, and sends form email through **Resend**. The domain is registered at **GoDaddy**.
+The site runs on **Cloudflare Workers** (static assets plus a small Worker), builds from **GitHub**, and delivers the contact form by email through **FormSubmit**. The domain is registered at **GoDaddy**.
 
 ## Already set up
 
@@ -54,44 +54,28 @@ The current branch has already been built and deployed once, so you can review t
 
 Every old URL is preserved (`/about`, `/services-1-1-therapy`, `/post/...`, `/blog-categories/...`), so existing Google rankings and bookmarks carry over. The old `/blog` page now redirects permanently to the blog on the Resources page (`/resources#blog`).
 
-## 4. Turn on the contact form (Resend)
+## 4. Turn on the contact form (FormSubmit)
 
-The form is fully built. Until Resend is configured it politely tells visitors to call or email instead.
+The form is delivered by [FormSubmit](https://formsubmit.co), a free form to email service (the same setup as hyeteam.com). There is no account, API key or DNS record. The browser sends the form straight to FormSubmit, which emails it to the address in `formSubmitTo` in `site/config.mjs` (`info@thehummingbirdnest.org`).
 
-1. After upgrading Resend, add the sending domain **`forms.thehummingbirdnest.org`** (same pattern as `forms.starlighthh.com`).
-2. Add the DNS records Resend shows (DKIM, SPF and MX on the `forms` subdomain) in **Cloudflare > thehummingbirdnest.org > DNS**, set to **DNS only** (grey cloud), then click **Verify** in Resend. These live on the subdomain, so they do not touch Google Workspace email.
-3. In Resend, create an API key with **Sending access** limited to that domain.
-4. In **Cloudflare > Workers and Pages > thehummingbirdnest > Settings > Variables and Secrets**, add a **Secret** named `RESEND_API_KEY` with that key. (Or run `npx wrangler secret put RESEND_API_KEY`.)
-5. Submit a test message on `/contact`. It arrives at `info@thehummingbirdnest.org`, and replying goes straight to the visitor.
+1. Send a test message from `/contact` (on the workers.dev address or the live site). This first message is not delivered: FormSubmit emails **info@thehummingbirdnest.org** an activation request instead, and the form shows "Something went wrong" with the phone number and email.
+2. Someone with access to that inbox clicks **Activate Form** in FormSubmit's email.
+3. Send a second test message. It arrives at info@thehummingbirdnest.org from FormSubmit as a table (Name, Email, Phone, Interested in), and replying goes straight to the visitor.
+4. If messages land in spam, mark one **Not spam** in Gmail and add a filter for mail from FormSubmit with **Never send it to Spam**, so no inquiry is missed.
+5. Optional: FormSubmit's confirmation email offers a random alias for the address. Put it in `formSubmitTo` in `site/config.mjs` so the address no longer appears in the page source.
 
-The sender and recipient are set in `wrangler.jsonc`:
+To send messages somewhere else, change `formSubmitTo` (a new address needs its own activation).
 
-```jsonc
-"CONTACT_TO": "info@thehummingbirdnest.org",
-"CONTACT_FROM": "The Hummingbird Nest <website@forms.thehummingbirdnest.org>",
-```
-
-Edit them there (not in the dashboard), because values in `wrangler.jsonc` are applied on every deploy. Secrets are kept between deploys.
-
-Spam protection already included: same origin check, 5 messages per minute per visitor, a hidden honeypot field, and a minimum fill time.
+Spam protection: a hidden honeypot field and a minimum fill time in the browser. Without JavaScript the form posts normally, FormSubmit shows its own quick human check, then returns the visitor to `/thanks`.
 
 ### HIPAA and the contact form
 
-The form is **not** a HIPAA compliant channel, so it only collects a name, email, optional phone number, and the service someone is interested in, and it shows "Please do not submit any Protected Health Information (PHI)". The Worker ignores any other field, so free text never reaches the inbox. To accept health details online, every service that handles the submission must sign a Business Associate Agreement (BAA), and today that is not the case:
+The form is **not** a HIPAA compliant channel, so it only collects a name, email, optional phone number, and the service someone is interested in, and it shows "Please do not submit any Protected Health Information (PHI)". The form script sends only those four fields, so free text never reaches the inbox. To accept health details online, every service that handles the submission must sign a Business Associate Agreement (BAA), and today that is not the case:
 
-* **Cloudflare** signs a BAA only on Enterprise plans.
-* **Resend** does not offer a BAA.
+* **FormSubmit** does not offer a BAA.
 * **Google Workspace** does sign one (Admin console > Account > Legal and compliance), which covers the inbox.
 
-If the practice wants a HIPAA compliant intake form later, use a form service that signs a BAA (for example Jotform with its HIPAA plan, IntakeQ, or the client portal of their practice management system) and link to it or embed it on `/contact`.
-
-### Optional: Cloudflare Turnstile
-
-1. **Cloudflare > Turnstile > Add widget** for `www.thehummingbirdnest.org` and `thehummingbirdnest.org` (Managed mode).
-2. Add `"TURNSTILE_SITE_KEY": "<site key>"` to `vars` in `wrangler.jsonc`.
-3. Add a Secret `TURNSTILE_SECRET_KEY` with the secret key.
-
-The form loads the check automatically once both are set.
+If the practice wants a HIPAA compliant intake form later, use a form service that signs a BAA and link to it or embed it on `/contact`: the contact or intake form of their practice management system (for example SimplePractice, TherapyNotes, Jane or IntakeQ), Google Forms under their Google Workspace BAA, Hushmail for Healthcare, or Jotform's Gold plan. An embedded form also needs its address added to the Content Security Policy in `src/worker.js`.
 
 ## 5. Turn on the live Instagram feed (Behold)
 
@@ -173,7 +157,7 @@ Do this after launch, once `main` is the live branch. Edits are saved to whichev
 
 ```bash
 npm install
-npm run dev     # http://localhost:8787 with the real Worker, headers and form handling
+npm run dev     # http://localhost:8787 with the real Worker and headers
 ```
 
-For a local form test, create `.dev.vars` (ignored by git) with `RESEND_API_KEY=...`.
+The contact form sends real email through FormSubmit, even locally.

@@ -118,22 +118,19 @@ export function faqSection({ id = 'faq' } = {}) {
 </section>`;
 }
 
-// What the "I am interested in" menu offers. The value is what the Worker receives; it turns it
-// back into a readable name for the email (see SERVICES in src/worker.js).
-export const SERVICE_OPTIONS = [
-  { value: 'not-sure', label: 'Not sure yet' },
-  ...services.map((s) => ({ value: s.slug, label: s.menuTitle })),
-  { value: 'social-club', label: 'The Social Club' },
-  { value: 'parent-coaching', label: 'Parent coaching' },
-];
+// What the "I am interested in" menu offers. The name itself is sent, so the email reads clearly.
+export const SERVICE_OPTIONS = ['Not sure yet', ...services.map((s) => s.menuTitle), 'The Social Club', 'Parent coaching'];
 
 /**
- * Contact form. Posts to the Worker at /api/contact; works without JavaScript too.
- * It only asks for contact details and a service, never health information: the form
- * runs on services that do not sign a HIPAA Business Associate Agreement (see DEPLOY.md).
+ * Contact form, delivered by FormSubmit to site.formSubmitTo. With JavaScript it posts to
+ * FormSubmit's AJAX endpoint (site/scripts/form.js); without it, it posts normally and
+ * FormSubmit shows a quick check, then returns the visitor to /thanks.
+ * It only asks for contact details and a service, never health information: FormSubmit does
+ * not sign a HIPAA Business Associate Agreement (see DEPLOY.md).
  */
 export function contactForm({ id = 'contact-form' } = {}) {
-  return `<form class="form" id="${id}" action="/api/contact" method="post" novalidate data-contact-form>
+  const to = esc(site.formSubmitTo);
+  return `<form class="form" id="${id}" action="https://formsubmit.co/${to}" method="post" novalidate data-contact-form data-endpoint="https://formsubmit.co/ajax/${to}">
   <p class="form__note" id="${id}-required">Fields marked <span aria-hidden="true">*</span><span class="visually-hidden">with an asterisk</span> are required.</p>
   <div class="form__grid">
     ${field({ id, name: 'name', label: 'Your name', autocomplete: 'name', required: true })}
@@ -143,7 +140,7 @@ export function contactForm({ id = 'contact-form' } = {}) {
       <label for="${id}-service">I am interested in</label>
       <div class="select">
         <select id="${id}-service" name="service">
-          ${SERVICE_OPTIONS.map((o) => `<option value="${o.value}">${esc(o.label)}</option>`).join('')}
+          ${SERVICE_OPTIONS.map((name) => `<option value="${esc(name)}">${esc(name)}</option>`).join('')}
         </select>
         ${icon('chevron')}
       </div>
@@ -152,10 +149,11 @@ export function contactForm({ id = 'contact-form' } = {}) {
   <p class="form__phi">${icon('shield')}<span>Please do not submit any Protected Health Information (PHI).</span></p>
   <div class="form__trap" aria-hidden="true">
     <label for="${id}-website">Leave this field empty</label>
-    <input id="${id}-website" name="website" type="text" tabindex="-1" autocomplete="off">
+    <input id="${id}-website" name="_honey" type="text" tabindex="-1" autocomplete="off">
   </div>
-  <input type="hidden" name="t" value="" data-form-start>
-  <div class="form__turnstile" data-turnstile hidden></div>
+  <input type="hidden" name="_subject" value="New website contact request">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_next" value="${site.url}/thanks">
   <div class="form__footer">
     <button class="btn btn--ink" type="submit" data-submit>
       <span class="btn__label">Send message</span><span class="btn__icon" aria-hidden="true">${icon('arrow')}${icon('arrow')}</span>
