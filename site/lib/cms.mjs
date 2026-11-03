@@ -29,7 +29,8 @@ const PROTECTED = new RegExp(`(\\S*(?::\\/\\/|www\\.|@)\\S*${KEPT.map((k) => `|$
 const DASH = '\\-\\u2010\\u2011\\u2012\\u2013\\u2014\\u2015\\u2212';
 
 // The site never shows dashes. Turn them into the punctuation a careful editor would use:
-// "2-5" becomes "2 to 5", "self-regulation" becomes "self regulation", and an aside
+// "2–5" becomes "2 to 5" ("2-5" too with keepWordHyphens off, as does "self-regulation",
+// which becomes "self regulation"), and an aside
 // set off with dashes becomes an aside set off with commas.
 export function softenDashes(text) {
   return softenPart(text).replace(/^[\s,]+|[\s,]+$/g, '');
@@ -50,13 +51,19 @@ const MARK = '\u0001';
 const WORD_HYPHEN = /([\p{L}\p{N}])[\-\u2010\u2011]+(?=[\p{L}\p{N}])/gu;
 // Any dash left over once word hyphens are kept.
 const LOOSE_DASH = new RegExp(`(?<![\\p{L}\\p{N}])[${DASH}]+|[${DASH}]+(?![\\p{L}\\p{N}])|[\\u2012-\\u2015\\u2212]+`, 'gu');
+// A number range written with a long dash ("3–7", "3 – 7", "3—7") or a spaced hyphen
+// ("3 - 7") reads "3 to 7". Word and Google Docs turn typed hyphens into these, and
+// without this rule they would become commas ("ages 3, 7"). A plain hyphen ("3-7") is a
+// word hyphen and follows keepWordHyphens; a spaced em dash ("3 — 7") stays an aside.
+const RANGE_DASH = /\b(\d{1,4})(?:\s*[‒–−]+\s*|[—―]+|\s+[\-‐‑]+\s+)(?=\d{1,4}\b)/g;
 
 function softenPlain(s) {
   const keep = site.keepWordHyphens;
   // Phone numbers: (626) 765-1724 and 626-765-1724 read as (626) 765 1724 and 626 765 1724.
   let out = s
     .replace(new RegExp(`(\\d{3})[${DASH}](\\d{3})[${DASH}](\\d{4})`, 'g'), '$1 $2 $3')
-    .replace(new RegExp(`(\\(\\d{3}\\)\\s*\\d{3})[${DASH}](\\d{4})\\b`, 'g'), '$1 $2');
+    .replace(new RegExp(`(\\(\\d{3}\\)\\s*\\d{3})[${DASH}](\\d{4})\\b`, 'g'), '$1 $2')
+    .replace(RANGE_DASH, '$1 to ');
   if (!keep) out = out.replace(new RegExp(`\\b(\\d{1,4})\\s*[${DASH}]\\s*(\\d{1,4})\\b`, 'g'), '$1 to $2');
   out = out.replace(/\s*[\u2012\u2013\u2014\u2015]+\s*/g, MARK).replace(/\s+[\-\u2010\u2011\u2212]+\s+/g, MARK);
   if (!keep) out = out.replace(WORD_HYPHEN, '$1 ');

@@ -72,7 +72,7 @@ wrangler.jsonc        Worker configuration
 
   Put the photo in `site/images/`. The build creates every size automatically.
 
-Content from the CMS is made safe automatically: dashes become commas, spaces or "to" ("ages 3-7" reads "ages 3 to 7"), a missing photo falls back to the blog header photo, and a mistyped link or broken post is reported as a warning instead of stopping the site from publishing.
+Content from the CMS is made safe automatically: dashes become commas, spaces or "to" (a range written with a long dash or a spaced hyphen, such as "ages 3–7" or "ages 3 - 7", reads "ages 3 to 7"), a missing photo falls back to the blog header photo, and a mistyped link or broken post is reported as a warning instead of stopping the site from publishing.
 
 ## House rules (enforced by the build)
 
