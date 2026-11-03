@@ -573,13 +573,9 @@
 .res-intro__media img {
   scale: 1.12;
 }
-.res-intro__copy .h2 em {
-  color: var(--blue-deep);
-}
 .res-intro__copy [data-reveal] {
   display: grid;
   gap: 1em;
-  margin-top: 24px;
   color: var(--ink-2);
   font-size: var(--step-1);
   line-height: 1.6;

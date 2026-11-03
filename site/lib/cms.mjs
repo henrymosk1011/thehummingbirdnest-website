@@ -21,8 +21,11 @@ export function mediaName(value) {
     .replace(/^-+|-+$/g, '');
 }
 
-// Links, email addresses and web addresses keep their hyphens.
-const PROTECTED = /(\S*(?::\/\/|www\.|@)\S*)/;
+// Links, email addresses, web addresses and the words in site.keepHyphensIn ("1-on-1")
+// keep their hyphens.
+const KEPT = (site.keepHyphensIn || []).map((w) => `\\b${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+export const KEPT_WORDS = KEPT.length ? new RegExp(KEPT.join('|'), 'gi') : null;
+const PROTECTED = new RegExp(`(\\S*(?::\\/\\/|www\\.|@)\\S*${KEPT.map((k) => `|${k}`).join('')})`, 'i');
 const DASH = '\\-\\u2010\\u2011\\u2012\\u2013\\u2014\\u2015\\u2212';
 
 // The site never shows dashes. Turn them into the punctuation a careful editor would use:

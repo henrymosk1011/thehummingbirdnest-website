@@ -19,7 +19,7 @@ import { site } from './config.mjs';
 import { services } from './data/services.mjs';
 import { renderPage } from './lib/layout.mjs';
 import { readingTime, hasImage } from './lib/html.mjs';
-import { markdown, softenDashes, plainText, mediaName } from './lib/cms.mjs';
+import { markdown, softenDashes, plainText, mediaName, KEPT_WORDS } from './lib/cms.mjs';
 import home from './pages/home.mjs';
 import about from './pages/about.mjs';
 import contact from './pages/contact.mjs';
@@ -256,12 +256,14 @@ async function check(pages) {
       .replace(/<!--[\s\S]*?-->/g, ' ')
       .replace(/<[^>]+>/g, ' ');
     for (const chunk of [text, ...attrText]) {
-      // Web and email addresses keep their hyphens; everything else must not show a dash.
-      const decoded = chunk
+      // Web and email addresses and the words in site.keepHyphensIn ("1-on-1") keep their
+      // hyphens; everything else must not show a dash.
+      let decoded = chunk
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
         .replace(/\S*(?::\/\/|www\.|@)\S*/g, ' ');
+      if (KEPT_WORDS) decoded = decoded.replace(KEPT_WORDS, ' ');
       // With keepWordHyphens on, hyphens inside words ("In-School") are allowed; dashes are not.
       const visible = site.keepWordHyphens ? decoded.replace(/([\p{L}\p{N}])[-‐‑]+(?=[\p{L}\p{N}])/gu, '$1') : decoded;
       const hit = visible.match(/.{0,30}[-‐‑‒–—―−].{0,30}/);
