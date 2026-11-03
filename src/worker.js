@@ -17,6 +17,9 @@
  *   BEHOLD_FEED_ID        optional, the Behold JSON feed ID that powers the Instagram section
  */
 
+// Where /edit sends the practice: the Blog posts screen of this site in Pages CMS.
+const EDITOR_URL = 'https://app.pagescms.org/henrymosk1011/thehummingbirdnest-website/main/collection/posts';
+
 // Google Analytics hosts are allowed ahead of time so analytics can be switched on
 // from site/config.mjs without touching this file. FormSubmit receives the contact form.
 const CSP = [
@@ -72,6 +75,13 @@ export default {
     // The blog now lives on the Resources page (posts and categories keep their addresses).
     if (url.pathname === '/blog' || url.pathname === '/blog/') {
       return Response.redirect(`${url.origin}/resources#blog`, 301);
+    }
+
+    // An easy address for the practice's editing screens: /edit opens the blog in Pages CMS
+    // (sign in first if needed). Temporary (302) and not cached, so browsers never hold on
+    // to it if the editor's address changes.
+    if (url.pathname === '/edit' || url.pathname === '/edit/') {
+      return new Response(null, { status: 302, headers: { Location: EDITOR_URL, 'Cache-Control': 'no-store' } });
     }
 
     const response = await env.ASSETS.fetch(request);
