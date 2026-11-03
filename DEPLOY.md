@@ -156,7 +156,7 @@ Saves only go live once the deploy hook secret from section 1 is set. Edits are 
 **Tips to pass on:**
 
 * **New post:** open **Blog posts** and add a new entry. Fill in every field and click **Save**. Turn on **Draft** to save without publishing. The post is on the site 2 to 3 minutes after saving (a little longer with a new photo).
-* **Photos:** JPG, PNG or WebP. On an iPhone, choose **Settings > Camera > Formats > Most Compatible** so photos are saved as JPG.
+* **Photos:** JPG, PNG or WebP, under 2 MB each and about 1000 to 2000 pixels wide. Pages CMS cannot upload larger photos (a 5 MB photo failed, a 500 KB one worked); save a smaller copy and try again. On an iPhone, choose **Settings > Camera > Formats > Most Compatible** so photos are saved as JPG.
 * **Photo description:** one sentence about what is in the photo, for people who cannot see it.
 * **Team members** appear on the About page in the order they are listed. Typing **{years}** in a bio shows the practice's years of experience, updated every year.
 * **Mistakes are recoverable:** every save is in the GitHub history, so any earlier version can be restored.

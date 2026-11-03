@@ -64,7 +64,7 @@ content:
         label: Cover photo
         type: image
         required: true
-        description: A wide photo works best. It is resized for every screen automatically.
+        description: JPG, PNG or WebP, under 2 MB (larger photos will not upload). A wide photo works best. It is resized for every screen automatically.
       - name: imageAlt
         label: Photo description
         type: string
@@ -83,7 +83,7 @@ content:
         options:
           format: markdown
           switcher: false
-        description: "To format, highlight text or type / on an empty line. Use Heading 2 for section titles (not Heading 1). Pasting from Google Docs keeps headings, bold, italic, lists and links, but not photos: drag each photo in from your computer. Photos are resized automatically. Click each photo, then alt text, and describe what is in it."
+        description: "To format, highlight text or type / on an empty line. Use Heading 2 for section titles (not Heading 1). Pasting from Google Docs keeps headings, bold, italic, lists and links, but not photos: drag each photo in from your computer (JPG, PNG or WebP, under 2 MB each). Photos are resized automatically. Click each photo, then alt text, and describe what is in it."
 
   - name: team
     label: Team
@@ -115,7 +115,7 @@ content:
             label: Photo
             type: image
             required: true
-            description: A head and shoulders photo. It is cropped to a circle, so keep the face centered.
+            description: A head and shoulders photo, JPG, PNG or WebP, under 2 MB (larger photos will not upload). It is cropped to a circle, so keep the face centered.
           - name: photoAlt
             label: Photo description
             type: string
