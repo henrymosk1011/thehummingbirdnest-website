@@ -181,7 +181,15 @@ Avoid these:
 * **Underline:** readers mistake underlined text for a link.
 * **Table** and **Code block:** the site does not style them, and a wide table makes the page scroll sideways on phones.
 
-Pasting from Google Docs or Word usually keeps headings, bold and lists. Check the article before saving.
+**Writing in Google Docs (or Word) first:**
+
+Writing the article in Google Docs and pasting it into the **Article** box works well. Check the article before saving.
+
+* **Comes across:** headings, bold, italic, bulleted and numbered lists, and links.
+* **Left behind on purpose:** fonts, text sizes, colors, highlighting and centering, so every post matches the rest of the site.
+* **Photos do not come across.** Add each one again in the Article box with / then **Image**, and give it a description.
+* **In the Doc,** use **Heading 2** for section titles (not Title or Heading 1), and do not underline text. Leave the post's title out of the article: it goes in the **Title** field.
+* **Dashes are changed automatically:** a dash used as punctuation becomes a comma, and a number range written with a long dash ("ages 3–7") shows as "ages 3 to 7". A range typed with a plain hyphen ("ages 3-7") shows as typed.
 
 ## Local development
 
