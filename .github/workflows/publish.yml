@@ -3,10 +3,10 @@
 # Cloudflare Workers Builds does not receive this repository's GitHub push events, so this
 # workflow starts the production build instead: every push to main (a merged pull request,
 # an edit on github.com, or a save in Pages CMS) calls the Worker's deploy hook. Cloudflare
-# then runs `npm run build` and `npx wrangler deploy`, as it would for a normal push.
+# then runs `npm run build` and `npm run deploy:ci` (`wrangler deploy` with retries).
 #
 # The deploy hook URL is kept in the repository secret CLOUDFLARE_DEPLOY_HOOK (see DEPLOY.md,
-# section 7). Anyone holding the URL can start a build, so it never goes in a file. Until the
+# section 1). Anyone holding the URL can start a build, so it never goes in a file. Until the
 # secret is set, this workflow only prints a reminder.
 
 name: Publish site

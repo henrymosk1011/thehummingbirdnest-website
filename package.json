@@ -8,7 +8,8 @@
     "build": "node site/images.mjs && node site/build.mjs",
     "images": "node site/images.mjs",
     "dev": "npm run build && npx wrangler dev",
-    "deploy": "npm run build && npx wrangler deploy"
+    "deploy": "npm run build && npx wrangler deploy",
+    "deploy:ci": "node site/deploy.mjs"
   },
   "engines": {
     "node": ">=20"
