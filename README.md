@@ -29,6 +29,7 @@ site/
   config.mjs          Phone, email, address, social links, booking link, analytics switches
   build.mjs           The build (pages, sitemap.xml, robots.txt, manifest, output checks)
   images.mjs          Responsive image generator (AVIF + WebP, social share cards, icons)
+  deploy.mjs          Production deploy step on Cloudflare (wrangler deploy, retried on brief API errors)
   content/
     posts/            Blog posts, one Markdown file each
     team.json         Team members (About page)

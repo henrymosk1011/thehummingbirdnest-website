@@ -7,7 +7,7 @@ The site runs on **Cloudflare Workers** (static assets plus a small Worker), bui
 These were done through the Cloudflare and GitHub connectors:
 
 * **Worker `thehummingbirdnest`** in Cloudflare (account henrymm@gmail.com), connected to `henrymosk1011/thehummingbirdnest-website`, using the same build settings as The Social Club site:
-  * Production branch `main`: `npm run build`, then `npx wrangler deploy`
+  * Production branch `main`: `npm run build`, then `npm run deploy:ci` (runs `wrangler deploy` and, if Cloudflare's API fails for a moment, tries again after 20 and 40 seconds; see `site/deploy.mjs`)
   * Every other branch: `npm run build`, then `npx wrangler preview` (a preview URL per branch)
   * workers.dev address: `https://thehummingbirdnest.henrymm.workers.dev` (marked `noindex` so it never competes with the real domain in Google)
 * **Zone `thehummingbirdnest.org`** added to Cloudflare. It stays **pending** and changes nothing until the nameservers are switched at GoDaddy. The current DNS was imported so nothing breaks when you switch:
@@ -31,7 +31,7 @@ These were done through the Cloudflare and GitHub connectors:
 
 `main` is the live branch. Review the site at **https://thehummingbirdnest.henrymm.workers.dev**.
 
-Cloudflare does not receive this repository's GitHub push events, so the **Publish site** workflow (`.github/workflows/publish.yml`) starts the production build instead. Every push to `main` (a merged pull request, an edit on github.com, or a save in Pages CMS) calls the Worker's **deploy hook**, and Cloudflare runs `npm run build` and `npx wrangler deploy`. The site updates about two minutes later. Check progress in **Cloudflare > Workers and Pages > thehummingbirdnest > Deployments**.
+Cloudflare does not receive this repository's GitHub push events, so the **Publish site** workflow (`.github/workflows/publish.yml`) starts the production build instead. Every push to `main` (a merged pull request, an edit on github.com, or a save in Pages CMS) calls the Worker's **deploy hook**, and Cloudflare runs `npm run build` and `npm run deploy:ci` (`wrangler deploy`, retried if Cloudflare's API has a brief error). The site updates about two minutes later. Check progress in **Cloudflare > Workers and Pages > thehummingbirdnest > Deployments**.
 
 **One time setup: give GitHub the deploy hook.** Until this is done, pushes to `main` are not published (the workflow shows a warning saying so).
 
