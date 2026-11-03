@@ -19,7 +19,7 @@ import { site } from './config.mjs';
 import { services } from './data/services.mjs';
 import { renderPage } from './lib/layout.mjs';
 import { readingTime, hasImage } from './lib/html.mjs';
-import { markdown, softenDashes, plainText, mediaName, KEPT_WORDS } from './lib/cms.mjs';
+import { markdown, softenDashes, plainText, mediaName, KEPT_WORDS, looksLikeFileName } from './lib/cms.mjs';
 import home from './pages/home.mjs';
 import about from './pages/about.mjs';
 import contact from './pages/contact.mjs';
@@ -201,7 +201,8 @@ async function loadPosts() {
       if (data.image) warn(`photo "${data.image}" not found, using the blog header photo.`);
       image = 'blog-header';
     }
-    const html = leadParagraph(markdown(body));
+    if (looksLikeFileName(data.imageAlt)) warn(`the cover photo description "${data.imageAlt}" looks like a file name. Describe what is in the photo instead.`);
+    const html = leadParagraph(markdown(body, `Blog post ${f}`));
     const text = plainText(html);
     list.push({
       title,

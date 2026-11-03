@@ -84,6 +84,19 @@ export function softenHtml(html) {
     .join('');
 }
 
+// A photo description that is really a file name ("IMG_1234.jpg", "PXL_20261103.png").
+// Pages CMS fills one in when a photo is dragged or pasted into an article, and screen
+// readers would read it out, so the build warns about it.
+export const looksLikeFileName = (alt) => {
+  const a = String(alt ?? '').trim();
+  return /\.(jpe?g|png|webp|gif|heic|heif|avif|tiff?)$/i.test(a) || /^(img|dsc|dscn|pxl|mvimg|image|photo)[\s_-]*\d[\d\s_.()-]*$/i.test(a);
+};
+const FIX_DESCRIPTION = 'In Pages CMS, click the photo, then the alt text button, and describe what is in it.';
+// Where the Markdown being rendered comes from ("Blog post why-is-my-kid-hitting.md"), so
+// a warning about a photo inside it says which post to fix.
+let source = '';
+const warn = (message) => console.warn(source ? `${source}: ${message[0].toLowerCase()}${message.slice(1)}` : message);
+
 // Markdown to HTML. External links open in a new tab and say so to screen readers.
 // Links written in content carry data-cms, so a mistyped address is reported as a
 // warning instead of stopping the whole site from publishing.
@@ -99,15 +112,25 @@ marked.use({
     image({ href, text }) {
       const name = mediaName(href);
       if (!/^https?:/i.test(href) && hasImage(name)) {
+        // A photo picked from the library comes with no description at all.
+        if (!String(text ?? '').trim()) warn(`Photo "${href}" in the article has no description. ${FIX_DESCRIPTION}`);
+        else if (looksLikeFileName(text)) warn(`Photo "${href}" in the article is described as "${text}", which looks like a file name. ${FIX_DESCRIPTION}`);
         return picture(name, { alt: softenDashes(text), sizes: '(min-width: 900px) 760px, 100vw', className: 'prose__image' });
       }
-      console.warn(`Photo "${href}" in the content is not in the site's photo library and was left out.`);
+      warn(`Photo "${href}" in the content is not in the site's photo library and was left out.`);
       return '';
     },
   },
 });
 
-export const markdown = (md) => softenHtml(marked.parse(String(md ?? '')));
+export const markdown = (md, from = '') => {
+  source = from;
+  try {
+    return softenHtml(marked.parse(String(md ?? '')));
+  } finally {
+    source = '';
+  }
+};
 export const inlineMarkdown = (md) => softenHtml(marked.parseInline(String(md ?? '').trim()));
 
 // Markdown or HTML to plain text (for structured data and summaries).

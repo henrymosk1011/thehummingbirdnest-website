@@ -4,7 +4,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { markdown, softenDashes, mediaName } from '../lib/cms.mjs';
+import { markdown, softenDashes, mediaName, looksLikeFileName } from '../lib/cms.mjs';
 import { hasImage } from '../lib/html.mjs';
 
 const CONTENT = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'content');
@@ -32,12 +32,13 @@ export const team = readList('team.json', 'members')
     ids.add(id);
     let image = mediaName(m.photo);
     let alt = softenDashes(m.photoAlt) || name;
+    if (looksLikeFileName(m.photoAlt)) console.warn(`Team member ${name}: the photo description "${m.photoAlt}" looks like a file name. Describe what is in the photo instead.`);
     if (!hasImage(image)) {
       console.warn(`Team member ${name}: photo "${m.photo || ''}" not found, using the office photo.`);
       image = 'office-door-sign';
       alt = '';
     }
-    return { id, name, role: softenDashes(m.role), title: softenDashes(m.title), image, alt, bio: markdown(m.bio) };
+    return { id, name, role: softenDashes(m.role), title: softenDashes(m.title), image, alt, bio: markdown(m.bio, `Team member ${name}`) };
   });
 
 export const testimonials = readList('testimonials.json', 'testimonials')
@@ -45,7 +46,7 @@ export const testimonials = readList('testimonials.json', 'testimonials')
   .filter((t) => t.quote);
 
 export const faqs = readList('faq.json', 'questions')
-  .map((f) => ({ q: softenDashes(f.question), html: markdown(f.answer) }))
+  .map((f) => ({ q: softenDashes(f.question), html: markdown(f.answer, `FAQ "${softenDashes(f.question)}"`) }))
   .filter((f) => f.q && f.html);
 
 // Home page: the three columns under the introduction (word for word from the original site).

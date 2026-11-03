@@ -173,7 +173,8 @@ Use these, which the site is designed for:
 
 * **Heading 2** for section titles, and **Heading 3** for smaller headings inside a section.
 * **Bold**, *italic*, bulleted and numbered lists, quotes, and links.
-* **Image** to put a photo inside the article. It is resized for every screen automatically. Click the photo, then the **alt text** button in the toolbar, and describe what is in it.
+* **Photos inside the article:** drag a photo from your computer into the Article box, or paste a copied photo, and it uploads and appears where you dropped it. (/ then **Image** picks one already in the photo library.) Photos are resized for every screen automatically.
+* **Describe every photo in the article:** click the photo, then the **alt text** button in the toolbar, and describe what is in it. A dragged or pasted photo starts with its file name (such as "IMG_1234.jpg") as its description, and one picked from the library starts with none, so this step matters.
 
 Avoid these:
 
@@ -187,7 +188,7 @@ Writing the article in Google Docs and pasting it into the **Article** box works
 
 * **Comes across:** headings, bold, italic, bulleted and numbered lists, and links.
 * **Left behind on purpose:** fonts, text sizes, colors, highlighting and centering, so every post matches the rest of the site.
-* **Photos do not come across.** Add each one again in the Article box with / then **Image**, and give it a description.
+* **Photos do not come across.** Drag each photo from your computer into the Article box where it belongs, then describe it (click the photo, then **alt text**).
 * **In the Doc,** use **Heading 2** for section titles (not Title or Heading 1), and do not underline text. Leave the post's title out of the article: it goes in the **Title** field.
 * **Dashes are changed automatically:** a dash used as punctuation becomes a comma, and a number range written with a long dash ("ages 3–7") shows as "ages 3 to 7". A range typed with a plain hyphen ("ages 3-7") shows as typed.
 

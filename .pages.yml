@@ -83,7 +83,7 @@ content:
         options:
           format: markdown
           switcher: false
-        description: "To format, highlight text or type / on an empty line. Use Heading 2 for section titles (not Heading 1). Pasting from Google Docs keeps headings, bold, italic, lists and links, but not photos: add each photo again with / then Image. Photos added here are resized automatically; give each one a description."
+        description: "To format, highlight text or type / on an empty line. Use Heading 2 for section titles (not Heading 1). Pasting from Google Docs keeps headings, bold, italic, lists and links, but not photos: drag each photo in from your computer. Photos are resized automatically. Click each photo, then alt text, and describe what is in it."
 
   - name: team
     label: Team
