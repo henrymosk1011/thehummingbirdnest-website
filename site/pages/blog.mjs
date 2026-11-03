@@ -22,17 +22,16 @@ export function resourcesPage(posts) {
   const body = `
 ${pageHero({
   title: 'Resources',
-  lead: 'The Hummingbird Nest offers one-on-one DIR Floortime Therapy in-office and in-school. Sessions are held both indoors and outdoors with the incorporation of sensorimotor play to best support the child in social-emotional development. Parents are incorporated into 1:1 sessions to strengthen the parent-child relationship.',
+  lead: 'The Hummingbird Nest offers 1-on-1 DIR Floortime Therapy in-office and in-school. Sessions are held both indoors and outdoors with the incorporation of sensorimotor play to best support the child in social-emotional development. Parents are incorporated into 1:1 sessions to strengthen the parent-child relationship.',
   image: 'toy-animals',
   imageAlt: 'A row of small toy animals lined up on a wooden ledge',
   actions: button('/contact', 'Contact us', { variant: 'ink' }),
 })}
 
-<section class="res-intro" aria-labelledby="res-intro-title">
+<section class="res-intro">
   <div class="container res-intro__grid">
     <figure class="res-intro__media" data-clip>${picture('family-session-table', { alt: 'Tamar playing with two siblings and their parent around a coffee table', sizes: '(min-width: 1000px) 56vw, 112vw', data: { parallax: '0.08' } })}</figure>
     <div class="res-intro__copy">
-      <h2 class="h2" id="res-intro-title" data-split>It’s true that your child is different, <em>they all are.</em></h2>
       <div data-reveal>
         <p>With an approach like DIR Floortime, the child’s individual differences are accounted for and sessions are fine tuned to the unique child. The Hummingbird Nest uses a multidisciplinary approach in all her sessions to better understand the root causes of behaviors and how to best address them. Forming a healthy relationship with the child and family is key in development. Giving parents the tools they need to practice strategies at home speeds up progress in meeting the goals we create together.</p>
       </div>

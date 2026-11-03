@@ -36,7 +36,7 @@ ${pageHero({
   <h2 class="visually-hidden" id="approach-title">Our approach</h2>
   <div class="container approach__grid">
     <div class="approach__head">
-      <p class="approach__statement" data-reveal>Parenting can be difficult, there are times you feel like your kid is different from other kids, and the conflicting advice you receive from everyone becomes overwhelming. The struggle is real! It’s true that your child is different, <em>they all are.</em></p>
+      <p class="approach__statement" data-reveal>Parenting can be difficult, there are times you feel like your child is different from other children, and the conflicting advice you receive from everyone becomes overwhelming. The struggle is real! It’s true that your child is different, <em>they all are.</em></p>
     </div>
     <div class="approach__body" data-reveal>
       <p>At The Hummingbird Nest, we specialize in DIR Floortime® Therapy. With the DIR Floortime® approach, we meet your child at their current level and expand from there. Their individual differences are accounted for and the sessions are fine-tuned to your unique child.</p>
