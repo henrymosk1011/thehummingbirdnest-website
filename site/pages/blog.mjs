@@ -77,7 +77,7 @@ export function categoryPage(cat, posts) {
   const list = posts.filter((p) => p.category === cat.id);
   const body = `
 ${pageHero({ eyebrow: 'Blog', title: cat.name, variant: 'plain' })}
-<section class="blog-section blog-section--category" aria-labelledby="page-title">
+<section class="blog-section blog-section--category">
   <div class="container">
     ${list.length ? blogCarousel(list, { active: cat.id, categories, headingLevel: 2, label: `${cat.name} blog posts` }) : `<p>${blogIntro}</p>`}
   </div>
