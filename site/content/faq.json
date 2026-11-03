@@ -1,18 +1,20 @@
-[
-  {
-    "question": "How do we start?",
-    "answer": "Contact us [here](/contact), we will first set up a phone call to determine if we are a good fit for your family. Next, we will schedule an intake session or in-school observation.\n\nAfter services have begun, goals are created after 1 month of consistent attendance. Goals are not created after first visit as children will show you their difficulties after about a month or so. A goals meeting will be scheduled to discuss intervention strategies for both the interventionist and for the family to continue out-of-office hours. Goals are revisited and modified every 6 months."
-  },
-  {
-    "question": "Do you take insurance or Regional Center Funding?",
-    "answer": "We are currently accepting only private pay and work with the Self-Determination program through the regional centers."
-  },
-  {
-    "question": "What is the age range of kids you see?",
-    "answer": "We have children starting at 2 years old through 25 years of age in our current caseloads."
-  },
-  {
-    "question": "Do you see kids without a diagnosis?",
-    "answer": "Yes, we have a blend of kids with and without diagnoses that come for services. If your child has a diagnosis, please bring any supporting documents for us to review during the intake session. This will speed up progress in meeting the goals we create together."
-  }
-]
+{
+  "questions": [
+    {
+      "question": "How do we start?",
+      "answer": "Contact us [here](/contact), we will first set up a phone call to determine if we are a good fit for your family. Next, we will schedule an intake session or in-school observation.\n\nAfter services have begun, goals are created after 1 month of consistent attendance. Goals are not created after first visit as children will show you their difficulties after about a month or so. A goals meeting will be scheduled to discuss intervention strategies for both the interventionist and for the family to continue out-of-office hours. Goals are revisited and modified every 6 months."
+    },
+    {
+      "question": "Do you take insurance or Regional Center Funding?",
+      "answer": "We are currently accepting only private pay and work with the Self-Determination program through the regional centers."
+    },
+    {
+      "question": "What is the age range of kids you see?",
+      "answer": "We have children starting at 2 years old through 25 years of age in our current caseloads."
+    },
+    {
+      "question": "Do you see kids without a diagnosis?",
+      "answer": "Yes, we have a blend of kids with and without diagnoses that come for services. If your child has a diagnosis, please bring any supporting documents for us to review during the intake session. This will speed up progress in meeting the goals we create together."
+    }
+  ]
+}

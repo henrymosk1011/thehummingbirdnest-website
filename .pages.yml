@@ -90,82 +90,94 @@ content:
     type: file
     path: site/content/team.json
     format: json
-    list:
-      collapsible:
-        collapsed: true
-        summary: "{name}"
     fields:
-      - name: name
-        label: Name
-        type: string
-        required: true
-      - name: role
-        label: Role
-        type: string
-        required: true
-        description: "For example: DIR Floortime® Developmental Specialist"
-      - name: title
-        label: Second title (optional)
-        type: string
-      - name: photo
-        label: Photo
-        type: image
-        required: true
-        description: A head and shoulders photo. It is cropped to a circle, so keep the face centered.
-      - name: photoAlt
-        label: Photo description
-        type: string
-        required: true
-        description: "For example: Juliana Reyes, DIR Floortime developmental specialist"
-      - name: bio
-        label: Bio
-        type: rich-text
-        required: true
-        options:
-          format: markdown
-          switcher: false
-          media: false
-        description: Type {years} anywhere to show the practice's years of experience, which updates automatically each year.
+      - name: members
+        label: Team members
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{name}"
+        fields:
+          - name: name
+            label: Name
+            type: string
+            required: true
+          - name: role
+            label: Role
+            type: string
+            required: true
+            description: "For example: DIR Floortime® Developmental Specialist"
+          - name: title
+            label: Second title (optional)
+            type: string
+          - name: photo
+            label: Photo
+            type: image
+            required: true
+            description: A head and shoulders photo. It is cropped to a circle, so keep the face centered.
+          - name: photoAlt
+            label: Photo description
+            type: string
+            required: true
+            description: "For example: Juliana Reyes, DIR Floortime developmental specialist"
+          - name: bio
+            label: Bio
+            type: rich-text
+            required: true
+            options:
+              format: markdown
+              switcher: false
+              media: false
+            description: Type {years} anywhere to show the practice's years of experience, which updates automatically each year.
 
   - name: testimonials
     label: Testimonials
     type: file
     path: site/content/testimonials.json
     format: json
-    list:
-      collapsible:
-        collapsed: true
-        summary: "{name}"
     fields:
-      - name: quote
-        label: Quote
-        type: text
-        required: true
-      - name: name
-        label: Name
-        type: string
-        required: true
-        description: "First name and last initial is fine, for example: Megan B."
+      - name: testimonials
+        label: Testimonials
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{name}"
+        fields:
+          - name: quote
+            label: Quote
+            type: text
+            required: true
+          - name: name
+            label: Name
+            type: string
+            required: true
+            description: "First name and last initial is fine, for example: Megan B."
 
   - name: faq
     label: FAQ
     type: file
     path: site/content/faq.json
     format: json
-    list:
-      collapsible:
-        collapsed: true
-        summary: "{question}"
     fields:
-      - name: question
-        label: Question
-        type: string
-        required: true
-      - name: answer
-        label: Answer
-        type: rich-text
-        required: true
-        options:
-          format: markdown
-          switcher: false
-          media: false
+      - name: questions
+        label: Questions
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{question}"
+        fields:
+          - name: question
+            label: Question
+            type: string
+            required: true
+          - name: answer
+            label: Answer
+            type: rich-text
+            required: true
+            options:
+              format: markdown
+              switcher: false
+              media: false
