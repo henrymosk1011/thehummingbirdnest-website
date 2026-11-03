@@ -9,6 +9,7 @@ export function notFoundPage() {
     description: 'The page you are looking for may have moved. Explore The Hummingbird Nest home page, services, or resources.',
     noindex: true,
     sitemap: false,
+    clearsHeader: true,
     body: `<section class="system" aria-labelledby="system-title">
   <div class="container system__inner">
     <img class="system__mark" src="/assets/img/mark.webp" alt="" width="120" height="92">
@@ -32,6 +33,7 @@ export function thanksPage() {
     description: 'Thank you for contacting The Hummingbird Nest. We will be in touch soon.',
     noindex: true,
     sitemap: false,
+    clearsHeader: true,
     footerCta: false,
     body: `<section class="system" aria-labelledby="system-title">
   <div class="container system__inner">

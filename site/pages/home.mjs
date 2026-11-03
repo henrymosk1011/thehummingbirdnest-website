@@ -187,6 +187,7 @@ ${testimonialsSection()}
     description,
     body,
     bodyClass: 'page-home',
+    clearsHeader: true,
     preload: [`<link rel="preload" as="image" href="${imageUrl('hero-poster', 1280)}" fetchpriority="high">`],
     jsonld: [webPage({ path: '/', title: 'The Hummingbird Nest', description }), personNode(tamar)],
   };
