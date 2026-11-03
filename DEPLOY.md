@@ -151,7 +151,7 @@ Saves only go live once the deploy hook secret from section 1 is set. Edits are 
 
 1. Opens the invite email and clicks the **Join** link.
 2. Enters their email and types in the **6 digit code** Pages CMS emails them. They never need a password or a GitHub account.
-3. Next time: go to **https://app.pagescms.org**, sign in with their email, and enter the new code.
+3. Next time: go to **www.thehummingbirdnest.org/edit** (until the domain is connected: **thehummingbirdnest.henrymm.workers.dev/edit**). It opens the blog in Pages CMS; if asked, they sign in with their email and enter the new code. Going to **https://app.pagescms.org** directly works too.
 
 **Tips to pass on:**
 
