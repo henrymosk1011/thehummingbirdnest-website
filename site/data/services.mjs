@@ -82,7 +82,6 @@ export const services = [
     gallery: [
       { image: 'family-sibling-session', alt: 'Tamar leading a family session with a parent and two children on a play mat' },
       { image: 'family-session-table', alt: 'Tamar playing with two siblings and their parent around a coffee table' },
-      { image: 'parent-coaching-goals', alt: 'Two parents meeting with a therapist to set goals for their child' },
     ],
   },
   {
