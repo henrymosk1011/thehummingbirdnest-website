@@ -148,6 +148,7 @@ Saves only go live once the deploy hook secret from section 1 is set. Edits are 
 3. When asked, install the **Pages CMS** GitHub App on **henrymosk1011**. Choose **Only select repositories** and pick **thehummingbirdnest-website**.
 4. Open **thehummingbirdnest-website** in Pages CMS. You should see **Blog posts, Team, Testimonials, FAQ** in the sidebar.
 5. Open **Collaborators**, enter the client's email address, and send the invite.
+6. **Try it as the client before handing over.** Invite a second email address of your own, sign in with it in a private browser window, add a test question under **FAQ**, click **Save**, then remove it and click **Save** again. Check that both saves show up under **Commits** on GitHub and on the site a few minutes later. Your own saves go through your GitHub login; the client's go through the Pages CMS app, which is a different route and worth seeing work once.
 
 **The client:**
 
@@ -158,10 +159,15 @@ Saves only go live once the deploy hook secret from section 1 is set. Edits are 
 **Tips to pass on:**
 
 * **New post:** open **Blog posts** and add a new entry. Fill in every field and click **Save**. Turn on **Draft** to save without publishing. The post is on the site 2 to 3 minutes after saving (a little longer with a new photo).
+* **Nothing is saved until you click Save.** This matters most on **Team**, **Testimonials** and **FAQ**: the trash icon on a row asks "Remove this item?", but that only takes the row off the screen. Click **Save** at the top afterwards and wait for the confirmation. Leaving the page first loses the change without any warning. Each of the three screens has its own Save.
+* **Deleting a blog post** is different: it is removed as soon as you confirm, from the three dots menu on the post. To take a post down without losing it, turn on **Draft** instead.
+* **Photo library:** the library also holds the photos the website itself uses, so only delete photos you uploaded. (If a website photo is deleted by mistake the site keeps showing it, and it can be restored from the GitHub history.)
 * **Photos:** JPG, PNG or WebP, under 2 MB each and about 1000 to 2000 pixels wide. Pages CMS cannot upload larger photos (a 5 MB photo failed, a 500 KB one worked); save a smaller copy and try again. On an iPhone, choose **Settings > Camera > Formats > Most Compatible** so photos are saved as JPG.
 * **Photo description:** one sentence about what is in the photo, for people who cannot see it.
 * **Team members** appear on the About page in the order they are listed. Typing **{years}** in a bio shows the practice's years of experience, updated every year.
 * **Mistakes are recoverable:** every save is in the GitHub history, so any earlier version can be restored.
+
+**What cannot break the site:** the build is tested against the mistakes an editor can make in these screens, and none of them stops the site from publishing. A missing field or photo, a damaged or deleted photo, a Heading 1, a mistyped link, a duplicate title, and an emptied Team, Testimonials or FAQ list are all handled, with a note in the Cloudflare build log where something needs attention. The one thing the screens could do that would stop publishing, deleting a whole list file, is turned off in `.pages.yml` (`operations: delete: false`).
 
 **Formatting your article:**
 
@@ -180,7 +186,7 @@ Use these, which the site is designed for:
 
 Avoid these:
 
-* **Heading 1:** the post title is already the page's main heading. A second one hurts accessibility and Google, and the site does not style it.
+* **Heading 1:** the post title is already the page's main heading. If one is used anyway, the site shows it as a Heading 2.
 * **Underline:** readers mistake underlined text for a link.
 * **Table** and **Code block:** the site does not style them, and a wide table makes the page scroll sideways on phones.
 

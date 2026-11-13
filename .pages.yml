@@ -90,9 +90,15 @@ content:
     type: file
     path: site/content/team.json
     format: json
+    # Without this, the three dots menu on this screen offers "Delete", which deletes the
+    # whole list file and stops the site from publishing. People are removed one at a time
+    # with the trash icon instead.
+    operations:
+      delete: false
     fields:
       - name: members
         label: Team members
+        description: To remove someone, click the trash icon on their row. Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
         type: object
         list:
           collapsible:
@@ -136,9 +142,12 @@ content:
     type: file
     path: site/content/testimonials.json
     format: json
+    operations:
+      delete: false
     fields:
       - name: testimonials
         label: Testimonials
+        description: To remove a testimonial, click the trash icon on its row. Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
         type: object
         list:
           collapsible:
@@ -160,9 +169,12 @@ content:
     type: file
     path: site/content/faq.json
     format: json
+    operations:
+      delete: false
     fields:
       - name: questions
         label: Questions
+        description: To remove a question, click the trash icon on its row. Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
         type: object
         list:
           collapsible:

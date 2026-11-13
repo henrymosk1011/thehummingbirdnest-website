@@ -123,10 +123,19 @@ marked.use({
   },
 });
 
+// The page's own title is its one main heading (h1). A "Heading 1" used inside an article,
+// bio or answer is shown as a section heading (h2) instead: it gets the section heading style,
+// and the page keeps a single h1 for screen readers and search engines.
+const demoteMainHeadings = (html) => {
+  if (!/<h1[\s>]/i.test(html)) return html;
+  warn('A Heading 1 was shown as a section heading. Use Heading 2 for section titles.');
+  return html.replace(/<(\/?)h1(?=[\s>])/gi, '<$1h2');
+};
+
 export const markdown = (md, from = '') => {
   source = from;
   try {
-    return softenHtml(marked.parse(String(md ?? '')));
+    return softenHtml(demoteMainHeadings(marked.parse(String(md ?? ''))));
   } finally {
     source = '';
   }

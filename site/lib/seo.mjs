@@ -3,6 +3,7 @@
 
 import { site } from '../config.mjs';
 import { services } from '../data/services.mjs';
+import { team } from '../data/content.mjs';
 import { plainText } from './cms.mjs';
 import { yearsOfExperience } from './html.mjs';
 
@@ -37,7 +38,8 @@ export function organizationGraph() {
       },
       hasMap: site.address.mapUrl,
       areaServed: areaServed(),
-      founder: { '@id': TAMAR_ID },
+      // Only while Tamar is in the Team list, where her details come from.
+      ...(team.some((m) => m.id === 'tamar') ? { founder: { '@id': TAMAR_ID } } : {}),
       // Profiles of this same business only. The Social Club is its own brand, so it is
       // listed as a service below instead.
       sameAs: site.social.map((s) => s.url),
