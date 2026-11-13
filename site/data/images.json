@@ -415,18 +415,6 @@
     "alpha": true,
     "hash": "78ea8af0109e"
   },
-  "sensory-gym-play": {
-    "width": 1500,
-    "height": 1000,
-    "widths": [
-      480,
-      800,
-      1200,
-      1500
-    ],
-    "alpha": false,
-    "hash": "1e42351d398f"
-  },
   "staff-training-classroom": {
     "width": 2400,
     "height": 1031,
