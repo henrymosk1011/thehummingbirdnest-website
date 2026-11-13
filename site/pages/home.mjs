@@ -13,7 +13,8 @@ export default function home({ posts }) {
   const titleTag = `${site.name} | DIR Floortime® Therapy in La Cañada`;
   const description =
     'DIR Floortime® therapy, playdates, social skills groups, and parent coaching for ages 2 to 25 in La Cañada Flintridge, serving Pasadena, Glendale, and Burbank.';
-  const tamar = team[0];
+  // Found by name, not position, so reordering or emptying the Team list in the CMS is safe.
+  const tamar = team.find((m) => m.id === 'tamar');
   const instagram = site.social.find((s) => s.name === 'Instagram');
   const instagramHandle = instagram.url.split('/').filter(Boolean).pop();
 
@@ -193,6 +194,6 @@ ${testimonialsSection()}
     bodyClass: 'page-home',
     clearsHeader: true,
     preload: [`<link rel="preload" as="image" href="${imageUrl('hero-poster', 1280)}" fetchpriority="high">`],
-    jsonld: [webPage({ path: '/', title: 'The Hummingbird Nest', description }), personNode(tamar)],
+    jsonld: [webPage({ path: '/', title: 'The Hummingbird Nest', description }), ...(tamar ? [personNode(tamar)] : [])],
   };
 }

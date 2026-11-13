@@ -7,6 +7,10 @@
 // at site/data/images.json that the templates use to write width, height and srcset
 // attributes. Only new or replaced photos are encoded, so a photo uploaded through the
 // CMS is ready on the next Cloudflare build without anyone running anything by hand.
+//
+// The practice's photo library in Pages CMS is this same folder, so a photo problem must
+// never stop the site from publishing: a photo that cannot be processed is skipped with a
+// warning, and a site photo deleted from the library keeps showing (see the end of the loop).
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -63,19 +67,25 @@ for (const file of files) {
   const unique = [...new Set(widths)].sort((a, b) => a - b);
 
   let wrote = false;
-  for (const w of unique) {
-    const base = path.join(OUT, `${name}-${w}`);
-    if (!changed && (await exists(`${base}.webp`)) && (await exists(`${base}.avif`))) continue;
-    const pipeline = sharp(input).rotate().resize({ width: w, withoutEnlargement: true });
-    await pipeline.clone().webp({ quality: alpha ? 82 : 74, effort: 5, alphaQuality: 90 }).toFile(`${base}.webp`);
-    await pipeline.clone().avif({ quality: alpha ? 58 : 50, effort: 4 }).toFile(`${base}.avif`);
-    wrote = true;
-  }
+  try {
+    for (const w of unique) {
+      const base = path.join(OUT, `${name}-${w}`);
+      if (!changed && (await exists(`${base}.webp`)) && (await exists(`${base}.avif`))) continue;
+      const pipeline = sharp(input).rotate().resize({ width: w, withoutEnlargement: true });
+      await pipeline.clone().webp({ quality: alpha ? 82 : 74, effort: 5, alphaQuality: 90 }).toFile(`${base}.webp`);
+      await pipeline.clone().avif({ quality: alpha ? 58 : 50, effort: 4 }).toFile(`${base}.avif`);
+      wrote = true;
+    }
 
-  // 1200 x 630 JPEG for social sharing (Open Graph and Twitter cards prefer JPEG).
-  if (!alpha && (changed || !(await exists(path.join(OUT, `${name}-og.jpg`))))) {
-    await sharp(input).rotate().resize(1200, 630, { fit: 'cover', position: 'attention' }).jpeg({ quality: 80, mozjpeg: true }).toFile(path.join(OUT, `${name}-og.jpg`));
-    wrote = true;
+    // 1200 x 630 JPEG for social sharing (Open Graph and Twitter cards prefer JPEG).
+    if (!alpha && (changed || !(await exists(path.join(OUT, `${name}-og.jpg`))))) {
+      await sharp(input).rotate().resize(1200, 630, { fit: 'cover', position: 'attention' }).jpeg({ quality: 80, mozjpeg: true }).toFile(path.join(OUT, `${name}-og.jpg`));
+      wrote = true;
+    }
+  } catch (err) {
+    // A file that opens but cannot be read to the end, usually an upload that was cut off.
+    console.warn(`Skipping ${file}: the photo is damaged (${String(err.message).split('\n')[0]}). Upload it again.`);
+    continue;
   }
 
   manifest[name] = { width, height, widths: unique, alpha, hash };
@@ -85,53 +95,81 @@ for (const file of files) {
   }
 }
 
-// Logos: crisp WebP at 1x and 2x header sizes, plus a PNG for structured data.
-for (const variant of ['dark', 'light']) {
-  const input = path.join(SRC, `logo-${variant}.png`);
-  for (const w of [280, 560]) {
-    await sharp(input).resize({ width: w }).webp({ quality: 92, alphaQuality: 100, effort: 6 }).toFile(path.join(OUT, `logo-${variant}-${w}.webp`));
+// A photo the site was built with whose original is gone from site/images (deleted in the
+// CMS photo library, say) keeps working while its generated sizes are still in the
+// repository. To retire a photo for good, take it off the pages first, then delete the
+// original together with its files in site/static/assets/img.
+for (const [name, entry] of Object.entries(previous)) {
+  if (manifest[name] || name.startsWith('logo-') || !Array.isArray(entry?.widths) || !entry.widths.length) continue;
+  const sizes = entry.widths.flatMap((w) => [`${name}-${w}.webp`, `${name}-${w}.avif`]);
+  if (!(await Promise.all(sizes.map((f) => exists(path.join(OUT, f))))).every(Boolean)) continue;
+  manifest[name] = entry;
+  if (!files.some((f) => mediaName(f) === name)) {
+    console.warn(`Photo "${name}" is no longer in site/images, but the site still has its sizes, so it was kept. Restore the original from the GitHub history.`);
   }
-  const m = await sharp(input).metadata();
-  manifest[`logo-${variant}`] = { width: m.width, height: m.height, widths: [280, 560], alpha: true };
 }
-await sharp(path.join(SRC, 'logo-dark.png')).resize({ width: 600 }).png({ compressionLevel: 9 }).toFile(path.join(OUT, 'logo-600.png'));
 
-// Icons: the hummingbird mark, cut from the top left of the logo.
-const logo = sharp(path.join(SRC, 'logo-dark.png'));
-const lm = await logo.metadata();
-const markBuf = await sharp(path.join(SRC, 'logo-dark.png'))
-  .extract({ left: Math.round(lm.width * 0.0716), top: 0, width: Math.round(lm.width * 0.358), height: Math.round(lm.height * 0.723) })
-  .png()
-  .toBuffer()
-  .then(trimAlpha);
-await sharp(markBuf).resize({ width: 240 }).png({ compressionLevel: 9 }).toFile(path.join(OUT, 'mark.png'));
-await sharp(markBuf).resize({ width: 240 }).webp({ quality: 88, alphaQuality: 100 }).toFile(path.join(OUT, 'mark.webp'));
-const square = async (size, pad, bg) => {
-  const inner = Math.round(size * (1 - pad * 2));
-  const mark = await sharp(markBuf).resize({ width: inner, height: inner, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
-  return sharp({ create: { width: size, height: size, channels: 4, background: bg } })
-    .composite([{ input: mark, gravity: 'center' }])
-    .png({ compressionLevel: 9 });
-};
-const clear = { r: 0, g: 0, b: 0, alpha: 0 };
-const paper = { r: 247, g: 245, b: 240, alpha: 1 };
-await (await square(32, 0.02, clear)).toFile(path.join(OUT, 'favicon-32.png'));
-await (await square(192, 0.1, paper)).toFile(path.join(OUT, 'icon-192.png'));
-await (await square(512, 0.1, paper)).toFile(path.join(OUT, 'icon-512.png'));
-await (await square(180, 0.12, paper)).toFile(path.join(OUT, 'apple-touch-icon.png'));
-await writeIco(await (await square(32, 0.02, clear)).toBuffer(), path.join(ROOT, 'static', 'favicon.ico'));
-
-// Default social share image (1200 x 630): hero poster, darkened, with the light logo.
-const ogLogo = await sharp(path.join(SRC, 'logo-light.png')).resize({ width: 760 }).png().toBuffer();
-const ogShade = Buffer.from('<svg width="1200" height="630"><rect width="1200" height="630" fill="#0b1d21" fill-opacity="0.58"/></svg>');
-await sharp(path.join(SRC, 'hero-poster.jpg'))
-  .resize(1200, 630, { fit: 'cover', position: 'attention' })
-  .composite([{ input: ogShade }, { input: ogLogo, gravity: 'center' }])
-  .jpeg({ quality: 84, mozjpeg: true })
-  .toFile(path.join(OUT, 'og-default.jpg'));
+// The logo, icons and default share image are made from these three originals. If one is
+// missing, the copies already in the repository stay in use.
+const brandOriginals = ['logo-dark.png', 'logo-light.png', 'hero-poster.jpg'];
+const brandMissing = [];
+for (const f of brandOriginals) if (!(await exists(path.join(SRC, f)))) brandMissing.push(f);
+if (brandMissing.length) {
+  console.warn(`${brandMissing.join(' and ')} ${brandMissing.length > 1 ? 'are' : 'is'} missing from site/images, so the logo and icons were not remade. Restore ${brandMissing.length > 1 ? 'them' : 'it'} from the GitHub history.`);
+  for (const variant of ['dark', 'light']) if (previous[`logo-${variant}`]) manifest[`logo-${variant}`] = previous[`logo-${variant}`];
+} else {
+  await brandAssets();
+}
 
 await fs.writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
 console.log(`Images ready: ${Object.keys(manifest).length} photos, ${encoded} newly encoded.`);
+
+async function brandAssets() {
+  // Logos: crisp WebP at 1x and 2x header sizes, plus a PNG for structured data.
+  for (const variant of ['dark', 'light']) {
+    const input = path.join(SRC, `logo-${variant}.png`);
+    for (const w of [280, 560]) {
+      await sharp(input).resize({ width: w }).webp({ quality: 92, alphaQuality: 100, effort: 6 }).toFile(path.join(OUT, `logo-${variant}-${w}.webp`));
+    }
+    const m = await sharp(input).metadata();
+    manifest[`logo-${variant}`] = { width: m.width, height: m.height, widths: [280, 560], alpha: true };
+  }
+  await sharp(path.join(SRC, 'logo-dark.png')).resize({ width: 600 }).png({ compressionLevel: 9 }).toFile(path.join(OUT, 'logo-600.png'));
+
+  // Icons: the hummingbird mark, cut from the top left of the logo.
+  const logo = sharp(path.join(SRC, 'logo-dark.png'));
+  const lm = await logo.metadata();
+  const markBuf = await sharp(path.join(SRC, 'logo-dark.png'))
+    .extract({ left: Math.round(lm.width * 0.0716), top: 0, width: Math.round(lm.width * 0.358), height: Math.round(lm.height * 0.723) })
+    .png()
+    .toBuffer()
+    .then(trimAlpha);
+  await sharp(markBuf).resize({ width: 240 }).png({ compressionLevel: 9 }).toFile(path.join(OUT, 'mark.png'));
+  await sharp(markBuf).resize({ width: 240 }).webp({ quality: 88, alphaQuality: 100 }).toFile(path.join(OUT, 'mark.webp'));
+  const square = async (size, pad, bg) => {
+    const inner = Math.round(size * (1 - pad * 2));
+    const mark = await sharp(markBuf).resize({ width: inner, height: inner, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
+    return sharp({ create: { width: size, height: size, channels: 4, background: bg } })
+      .composite([{ input: mark, gravity: 'center' }])
+      .png({ compressionLevel: 9 });
+  };
+  const clear = { r: 0, g: 0, b: 0, alpha: 0 };
+  const paper = { r: 247, g: 245, b: 240, alpha: 1 };
+  await (await square(32, 0.02, clear)).toFile(path.join(OUT, 'favicon-32.png'));
+  await (await square(192, 0.1, paper)).toFile(path.join(OUT, 'icon-192.png'));
+  await (await square(512, 0.1, paper)).toFile(path.join(OUT, 'icon-512.png'));
+  await (await square(180, 0.12, paper)).toFile(path.join(OUT, 'apple-touch-icon.png'));
+  await writeIco(await (await square(32, 0.02, clear)).toBuffer(), path.join(ROOT, 'static', 'favicon.ico'));
+
+  // Default social share image (1200 x 630): hero poster, darkened, with the light logo.
+  const ogLogo = await sharp(path.join(SRC, 'logo-light.png')).resize({ width: 760 }).png().toBuffer();
+  const ogShade = Buffer.from('<svg width="1200" height="630"><rect width="1200" height="630" fill="#0b1d21" fill-opacity="0.58"/></svg>');
+  await sharp(path.join(SRC, 'hero-poster.jpg'))
+    .resize(1200, 630, { fit: 'cover', position: 'attention' })
+    .composite([{ input: ogShade }, { input: ogLogo, gravity: 'center' }])
+    .jpeg({ quality: 84, mozjpeg: true })
+    .toFile(path.join(OUT, 'og-default.jpg'));
+}
 
 // Crop transparent margins by scanning the alpha channel.
 async function trimAlpha(buf) {
