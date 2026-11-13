@@ -82,6 +82,7 @@ export const services = [
     gallery: [
       { image: 'family-sibling-session', alt: 'Tamar leading a family session with a parent and two children on a play mat' },
       { image: 'family-session-table', alt: 'Tamar playing with two siblings and their parent around a coffee table' },
+      { image: 'sensory-gym-play', alt: 'A woman and a young boy laughing and holding hands as they sit together on a large cushion in the sensory gym' },
     ],
   },
   {
