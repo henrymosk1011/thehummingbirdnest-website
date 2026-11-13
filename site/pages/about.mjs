@@ -1,7 +1,7 @@
 import { team, gallery, faqs } from '../data/content.mjs';
 import { picture, button, link, withYears, icon, esc, coverSizes } from '../lib/html.mjs';
 import { pageHero, pageHeroPreload, faqSection } from '../lib/partials.mjs';
-import { webPage, personNode, faqNode } from '../lib/seo.mjs';
+import { webPage, personNode, faqNode, bookNode } from '../lib/seo.mjs';
 
 // About page copy is word for word from the original site.
 export default function about() {
@@ -88,13 +88,20 @@ ${faqSection()}`;
 
   return {
     path,
-    title: 'About Us',
+    // Search result title only (the page heading stays "About Us"): people search for Tamar by name.
+    title: 'About Tamar Matossian and Our Team',
+    ogTitle: 'About The Hummingbird Nest',
     description,
     body,
     image: 'office-lets-just-play',
     imageAlt: 'A framed print reading Let’s just play in The Hummingbird Nest office',
     crumbs: [{ name: 'About', path }],
     preload: [pageHeroPreload('office-lets-just-play')],
-    jsonld: [webPage({ path, title: 'About The Hummingbird Nest', description, type: 'AboutPage' }), ...team.map((m) => personNode(m)), faqNode(faqs, path)],
+    jsonld: [
+      webPage({ path, title: 'About The Hummingbird Nest', description, type: 'AboutPage' }),
+      ...team.map((m) => personNode(m)),
+      ...(team.some((m) => m.id === 'tamar') ? [bookNode()] : []),
+      faqNode(faqs, path),
+    ],
   };
 }

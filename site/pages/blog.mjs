@@ -6,9 +6,9 @@ import { webPage, articleNode } from '../lib/seo.mjs';
 // The blog lives on the Resources page (as on the original site). Category pages keep their
 // original addresses and act as tabs; the old /blog address redirects to /resources#blog.
 export const categories = [
-  { id: 'children', name: 'Children', path: '/blog-categories/resources-children', blurb: 'Articles from The Hummingbird Nest on supporting young children through play, regulation, and connection.' },
-  { id: 'teens', name: 'Teens', path: '/blog-categories/teens', blurb: 'Articles from The Hummingbird Nest on attachment, relationships, and emotional growth for older kids and teens.' },
-  { id: 'adults', name: 'Adults', path: '/blog-categories/resources-adults', blurb: 'Articles from The Hummingbird Nest for parents and caregivers, from burnout to brain based regulation.' },
+  { id: 'children', name: 'Children', seoTitle: 'Articles on Supporting Young Children', path: '/blog-categories/resources-children', blurb: 'Articles from The Hummingbird Nest on supporting young children through play, regulation, and connection.' },
+  { id: 'teens', name: 'Teens', seoTitle: 'Articles on Older Kids and Teens', path: '/blog-categories/teens', blurb: 'Articles from The Hummingbird Nest on attachment, relationships, and emotional growth for older kids and teens.' },
+  { id: 'adults', name: 'Adults', seoTitle: 'Articles for Parents and Caregivers', path: '/blog-categories/resources-adults', blurb: 'Articles from The Hummingbird Nest for parents and caregivers, from burnout to brain based regulation.' },
 ];
 export const categoryById = Object.fromEntries(categories.map((c) => [c.id, c]));
 
@@ -51,16 +51,17 @@ ${pageHero({
 
   return {
     path,
-    title: 'Resources and Blog',
+    title: 'Child Development Resources and Blog',
     ogTitle: 'Resources',
     description,
+    lastmod: posts[0]?.date,
     body,
     image: 'toy-animals',
     imageAlt: 'A row of small toy animals lined up on a wooden ledge',
     crumbs: [{ name: 'Resources', path }],
     preload: [pageHeroPreload('toy-animals')],
     jsonld: [
-      webPage({ path, title: 'Resources and Blog', description, type: 'CollectionPage' }),
+      webPage({ path, title: 'Child Development Resources and Blog', description, type: 'CollectionPage' }),
       {
         '@type': 'Blog',
         '@id': `${site.url}${path}#blog`,
@@ -84,14 +85,16 @@ ${pageHero({ eyebrow: 'Blog', title: cat.name, variant: 'plain' })}
 </section>`;
   return {
     path: cat.path,
-    title: `${cat.name} Articles`,
+    title: cat.seoTitle,
+    ogTitle: `${cat.name} Articles`,
     description: cat.blurb,
+    lastmod: list[0]?.date,
     body,
     crumbs: [
       { name: 'Resources', path: '/resources' },
       { name: cat.name, path: cat.path },
     ],
-    jsonld: [webPage({ path: cat.path, title: `${cat.name} Articles`, description: cat.blurb, type: 'CollectionPage' })],
+    jsonld: [webPage({ path: cat.path, title: cat.seoTitle, description: cat.blurb, type: 'CollectionPage' })],
   };
 }
 

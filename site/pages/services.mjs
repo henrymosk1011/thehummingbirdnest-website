@@ -6,8 +6,10 @@ import { webPage, serviceNode } from '../lib/seo.mjs';
 
 export function servicesHub() {
   const path = '/services';
+  // Search result title and summary only; the page heading stays "Services".
+  const title = 'Services: DIR Floortime®, School Support, Parent Coaching';
   const description =
-    'DIR Floortime® sessions, 1:1 in school support, staff training, family and sibling sessions, and facilitated playdates in La Cañada Flintridge, CA.';
+    'DIR Floortime® sessions, 1:1 in school support, staff training, parent coaching, sibling sessions, and facilitated playdates in La Cañada Flintridge, CA.';
   const row = (s) => `<span class="svc-row__num" aria-hidden="true">${s.number}</span>
         <span class="svc-row__main"><span class="svc-row__title">${s.title}</span></span>
         <span class="svc-row__media">${picture(s.image, { alt: '', sizes: coverSizes(s.image, 4 / 3, '260px'), maxWidth: 800 })}</span>
@@ -36,12 +38,13 @@ ${pageHero({
 
   return {
     path,
-    title: 'Services',
+    title,
+    ogTitle: 'Services',
     description,
     body,
     crumbs: [{ name: 'Services', path }],
     jsonld: [
-      webPage({ path, title: 'Services', description, type: 'CollectionPage' }),
+      webPage({ path, title, description, type: 'CollectionPage' }),
       {
         '@type': 'ItemList',
         '@id': `${site.url}${path}#list`,
@@ -146,6 +149,6 @@ ${benefits}
       { name: s.title, path },
     ],
     preload: [pageHeroPreload(s.hero.image)],
-    jsonld: [webPage({ path, title: s.seoTitle, description: s.description }), serviceNode(s)],
+    jsonld: [webPage({ path, title: s.seoTitle, description: s.description, image: `${site.url}/assets/img/${s.hero.image}-og.jpg` }), serviceNode(s)],
   };
 }

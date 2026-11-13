@@ -122,9 +122,11 @@ The old site used an Elfsight widget, which is now disabled on Elfsight's side. 
 
 The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Behold or Instagram image addresses, and keeps the result in Cloudflare's cache for two hours. That keeps Behold requests well under the free plan's 1,200 feed loads a month, even in a busy month. Alt text comes from the post's Instagram alt text (add it in Instagram under **Advanced settings > Write alt text**), or from the caption when there is none.
 
-## 6. Google Search Console and Analytics
+## 6. Google Search Console, Business Profile and Analytics
 
-* **Search Console:** the domain is already verified through the DNS TXT record above. After launch, submit `https://www.thehummingbirdnest.org/sitemap.xml` under **Sitemaps**, and use **URL Inspection** on the home page to request indexing.
+* **Search Console:** the domain is already verified through the DNS TXT record above. After launch, submit `https://www.thehummingbirdnest.org/sitemap.xml` under **Sitemaps**, and use **URL Inspection** to request indexing of the home page and the five service pages. The old Webflow site had no sitemap and no page descriptions, so this is the first time Google gets either.
+* **Google Business Profile:** for a local practice this counts as much as the website. Check that the profile shows as open, links to `https://www.thehummingbirdnest.org/`, lists each service, and uses exactly the name, address and phone number in `site/config.mjs` (808 Foothill Blvd, Unit A; at least one directory listing says "Suite A"). Fix the same details on Yelp, MapQuest and other listings, and ask families for Google reviews.
+* **Opening hours and map position** are not in the site's structured data because they are not in `site/config.mjs` yet. Once the practice confirms its hours, add them to `organizationGraph()` in `site/lib/seo.mjs` (`openingHoursSpecification`, and `geo` with the office's latitude and longitude).
 * **Google Analytics 4:** put the Measurement ID in `site/config.mjs`:
 
   ```js

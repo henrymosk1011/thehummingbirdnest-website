@@ -140,4 +140,5 @@ export const plainText = (html) =>
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
+    .replace(/ ([,.;:!?])(?= |$)/g, '$1')
     .trim();
