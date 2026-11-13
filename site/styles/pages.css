@@ -415,6 +415,10 @@
 .svc-gallery__item img {
   scale: 1.12;
 }
+/* Holds a gallery spot until its photo is chosen (see site/data/services.mjs). */
+.svc-gallery__item--placeholder {
+  background: #e02020;
+}
 .svc-gallery--1 .svc-gallery__item {
   grid-column: 1 / -1;
   aspect-ratio: 21 / 9;

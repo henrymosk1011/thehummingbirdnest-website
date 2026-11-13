@@ -76,6 +76,8 @@ export function servicePage(s) {
   // sizes hint accounts for both (otherwise a file that is too small loads and looks soft).
   const n = s.gallery?.length || 0;
   const galleryItem = (g, i) => {
+    // A placeholder is an empty coloured block, hidden from screen readers.
+    if (g.placeholder) return `<div class="svc-gallery__item svc-gallery__item--placeholder" data-clip aria-hidden="true"></div>`;
     const full = n === 1 || (n === 3 && i === 0);
     const frame = full ? 21 / 9 : 3 / 2;
     const base = full ? '(min-width: 1500px) 1400px, 100vw' : '(min-width: 1500px) 700px, (min-width: 641px) 50vw, 100vw';
