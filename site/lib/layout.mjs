@@ -10,6 +10,9 @@ import { getInTouch } from './partials.mjs';
  *
  * page: {
  *   path, title, description, body,
+ *   titleTag?: the whole search result title, used as written (otherwise the title plus the site name),
+ *   ogTitle?: the title on social share cards (otherwise the title),
+ *   lastmod?: the date the page last changed, for the sitemap, when it is really known,
  *   image?: image name for social cards, ogType?, noindex?,
  *   jsonld?: array of schema objects for this page,
  *   crumbs?: [{ name, path }] (breadcrumb data for search engines only, not shown on the page),
@@ -19,13 +22,17 @@ import { getInTouch } from './partials.mjs';
  */
 export function renderPage(page, build) {
   // Copy is written word for word from the original site; house style removes dashes here.
-  page = { ...page, title: softenDashes(page.title), description: softenDashes(page.description), ogTitle: page.ogTitle && softenDashes(page.ogTitle) };
+  page = {
+    ...page,
+    title: softenDashes(page.title),
+    titleTag: page.titleTag && softenDashes(page.titleTag),
+    description: softenDashes(page.description),
+    ogTitle: page.ogTitle && softenDashes(page.ogTitle),
+  };
   const canonical = site.url + (page.path === '/' ? '/' : page.path);
-  // Search results show about 60 characters of a title, so long titles drop or shorten the brand.
-  const fullTitle =
-    page.title === site.name
-      ? `${site.name} | DIR Floortime® in La Cañada Flintridge`
-      : [`${page.title} | ${site.name}`, `${page.title} | ${site.shortName}`].find((t) => t.length <= 62) || page.title;
+  // Google shows about 600 pixels of a title (roughly 60 characters), so long titles drop or
+  // shorten the brand. Google prints the site name above every result either way.
+  const fullTitle = page.titleTag || [`${page.title} | ${site.name}`, `${page.title} | ${site.shortName}`].find((t) => t.length <= 62) || page.title;
   const ogImage = page.image ? `${site.url}/assets/img/${page.image}-og.jpg` : `${site.url}/assets/img/og-default.jpg`;
   const graph = [...organizationGraph(), ...(page.jsonld || [])];
   if (page.crumbs?.length) {

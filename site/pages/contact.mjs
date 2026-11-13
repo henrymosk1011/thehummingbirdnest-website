@@ -33,6 +33,7 @@ export default function contact() {
   return {
     path,
     title: 'Contact Us',
+    titleTag: `Contact ${site.name} | ${site.address.city}, ${site.address.region}`,
     description,
     body,
     footerCta: false,

@@ -4,7 +4,9 @@
 // Page copy (title, heading, body, benefits) is word for word from the original site.
 // Hyphens are kept here as written; the build applies the no dash house style when it
 // renders (see keepWordHyphens in site/config.mjs). seoTitle and description are for
-// search results only and do not appear on the page.
+// search results only and do not appear on the page. Each seoTitle names the service and
+// where it happens (the office, or schools around Los Angeles) in under 600 pixels of
+// Google's result type, about 60 characters; each description stays under 160 characters.
 
 export const services = [
   {
@@ -13,9 +15,9 @@ export const services = [
     title: 'DIR Floortime® Sessions',
     menuTitle: 'DIR Floortime® Sessions',
     eyebrow: '1-on-1 Therapy',
-    seoTitle: 'DIR Floortime® Therapy for Children',
+    seoTitle: 'DIR Floortime® Therapy for Children in La Cañada Flintridge',
     description:
-      'Play based DIR Floortime® therapy in La Cañada Flintridge for children with autism, developmental delays, and behavioral challenges, with parents included.',
+      'Play based DIR Floortime® therapy in La Cañada Flintridge for children with autism and developmental delays, with parents included. Near Pasadena and Glendale.',
     hero: { image: 'toy-train-play', alt: 'An adult and a young girl playing together with a wooden toy train on the floor' },
     card: { image: 'floortime-school-bus', alt: 'A therapist and a young boy playing with a toy school bus during a DIR Floortime session' },
     heading: 'DIR Floortime® Children’s Therapy',
@@ -33,9 +35,9 @@ export const services = [
     number: '02',
     title: '1-on-1 In-School Support',
     menuTitle: '1-on-1 In-School Support',
-    seoTitle: '1:1 In School Support and Shadow Services',
+    seoTitle: '1:1 In School Support and Shadow Services, Los Angeles Area',
     description:
-      'Attuned 1:1 in school support and shadow services for children who need individualized help in the classroom, designed to phase out as your child succeeds.',
+      'Attuned 1:1 in school support and shadow services across the greater Los Angeles area for children who need individualized help in class, phased out over time.',
     hero: { image: 'in-school-classroom', alt: 'Children working at their desks in a bright classroom' },
     card: { image: 'in-school-classroom', alt: 'Children working at their desks in a bright classroom' },
     heading: 'In-School Support / 1:1 shadow',
@@ -49,7 +51,7 @@ export const services = [
     number: '03',
     title: 'Staff Training',
     menuTitle: 'Staff Training',
-    seoTitle: 'Staff Training for Schools and Child Care',
+    seoTitle: 'Staff Training for Schools and Child Care, Los Angeles Area',
     description:
       'Interactive staff trainings for schools and child care facilities in greater Los Angeles that give educators practical tools for challenging behaviors.',
     hero: { image: 'staff-training-classroom', alt: 'A presenter leading a staff training for a room of seated educators' },
@@ -68,9 +70,9 @@ export const services = [
     number: '04',
     title: 'Family/Sibling Sessions',
     menuTitle: 'Family/Sibling Sessions',
-    seoTitle: 'Family Coaching and Sibling Sessions',
+    seoTitle: 'Parent Coaching and Sibling Sessions in La Cañada Flintridge',
     description:
-      'Family coaching and DIR Floortime® sibling sessions that help parents and siblings build connection, coregulation, and lasting skills at home.',
+      'Parent coaching and DIR Floortime® sibling sessions in La Cañada Flintridge that help families build connection, coregulation, and lasting skills at home.',
     hero: { image: 'cardboard-house-play', alt: 'A parent and child playing together inside a painted cardboard house' },
     card: { image: 'family-sibling-session', alt: 'Tamar leading a family session with a parent and two children on a play mat' },
     heading: 'Family/Sibling Sessions',
@@ -92,9 +94,9 @@ export const services = [
     number: '05',
     title: 'Facilitated Playdates',
     menuTitle: 'Facilitated Playdates',
-    seoTitle: 'Facilitated Playdates for Social Skills',
+    seoTitle: 'Facilitated Playdates for Social Skills in La Cañada Flintridge',
     description:
-      'Clinician supported 2:1 facilitated playdates that pair carefully matched peers to build social communication, regulation, flexibility, and confidence.',
+      'Clinician supported 2:1 facilitated playdates in La Cañada Flintridge that pair matched peers to build social communication, regulation, and confidence.',
     hero: { image: 'juliana-facilitated-playdate', alt: 'Juliana guiding a facilitated playdate as two children play with soft balls on the playroom floor' },
     card: { image: 'juliana-facilitated-playdate', alt: 'Juliana guiding a facilitated playdate as two children play with balls' },
     heading: 'What is it?',

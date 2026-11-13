@@ -7,7 +7,8 @@
 // 3. Renders every page and blog post to HTML.
 // 4. Writes sitemap.xml, robots.txt and the web app manifest.
 // 5. Checks the output: no dashes in visible text, every image has alt text,
-//    and every internal link points at a real page.
+//    every internal link points at a real page, and every page has one main heading
+//    and its own search title and description.
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -97,24 +98,24 @@ for (const page of pages) {
 }
 
 // 4. Sitemap, robots, manifest
-const today = new Date().toISOString().slice(0, 10);
+// A page only carries a "last changed" date when the date is real: a post's own date, and the
+// newest post on the pages that list posts. Stamping every page with today's date on every
+// build teaches Google to ignore the dates altogether. (Google ignores priority, so it is left out.)
 const indexable = pages.filter((p) => !p.noindex && p.sitemap !== false);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${indexable
   .map((p) => {
-    const lastmod = p.published || today;
-    const priority = p.path === '/' ? '1.0' : p.path.startsWith('/post/') ? '0.6' : p.path.startsWith('/services') ? '0.9' : '0.7';
-    return `  <url><loc>${site.url}${p.path === '/' ? '/' : p.path}</loc><lastmod>${lastmod}</lastmod><priority>${priority}</priority></url>`;
+    const lastmod = p.published || p.lastmod;
+    return `  <url><loc>${site.url}${p.path === '/' ? '/' : p.path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
   })
   .join('\n')}
 </urlset>
 `;
 await fs.writeFile(path.join(DIST, 'sitemap.xml'), sitemap);
-await fs.writeFile(
-  path.join(DIST, 'robots.txt'),
-  `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /thanks\n\nSitemap: ${site.url}/sitemap.xml\n`
-);
+// /thanks is kept out of search by its own noindex tag, which Google can only read if it is
+// allowed to fetch the page, so it is not blocked here.
+await fs.writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${site.url}/sitemap.xml\n`);
 await fs.writeFile(
   path.join(DIST, 'site.webmanifest'),
   JSON.stringify(
@@ -145,7 +146,7 @@ if (problems.length) {
   console.error(`\n${problems.length} problem(s) found:\n  ${problems.join('\n  ')}`);
   process.exit(1);
 }
-console.log('Checks passed: no dashes in visible text, alt text present, internal links resolve.');
+console.log('Checks passed: no dashes in visible text, alt text present, internal links resolve, search titles and descriptions in order.');
 
 // Helpers
 
@@ -240,12 +241,36 @@ function summarize(text, max) {
 }
 
 async function check(pages) {
+  // Search results: Google shows roughly 60 characters of a title and 160 of a description.
+  const TITLE_MAX = 70;
+  const DESCRIPTION_MIN = 50;
+  const DESCRIPTION_MAX = 165;
   const issues = [];
   const routes = new Set(pages.map((p) => p.path));
   routes.add('/');
+  const titles = new Map();
+  const descriptions = new Map();
   for (const page of pages) {
     const file = page.output || (page.path === '/' ? 'index.html' : `${page.path.slice(1)}.html`);
     const html = await fs.readFile(path.join(DIST, file), 'utf8');
+
+    // Search basics. A blog post is written in the CMS, so its problems are warnings that
+    // never stop the site from publishing; everywhere else they fail the build.
+    const report = page.path.startsWith('/post/') ? (msg) => console.warn(`${file}: ${msg}`) : (msg) => issues.push(`${file}: ${msg}`);
+    const headings = (html.match(/<h1\b/g) || []).length;
+    if (headings !== 1) issues.push(`${file}: a page needs exactly one h1, found ${headings}`);
+    if (!page.noindex) {
+      const decode = (s) => s.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+      const title = decode((html.match(/<title>([^<]*)<\/title>/) || [])[1] || '');
+      const description = decode((html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '');
+      if (title.length > TITLE_MAX) report(`the search title is ${title.length} characters, so Google will cut it off (keep it to ${TITLE_MAX}): "${title}"`);
+      if (description.length < DESCRIPTION_MIN || description.length > DESCRIPTION_MAX)
+        report(`the search description is ${description.length} characters (keep it between ${DESCRIPTION_MIN} and ${DESCRIPTION_MAX}).`);
+      for (const [seen, value, what] of [[titles, title, 'title'], [descriptions, description, 'description']]) {
+        if (seen.has(value)) report(`same search ${what} as ${seen.get(value)}; each page needs its own.`);
+        else seen.set(value, file);
+      }
+    }
 
     // Visible text: drop scripts, styles, tags and URLs, keep alt, title, aria-label, placeholder and meta content.
     const attrText = [...html.matchAll(/\s(?:alt|aria-label|placeholder|title|content)="([^"]*)"/g)]

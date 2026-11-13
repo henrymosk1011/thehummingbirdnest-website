@@ -8,9 +8,11 @@ import { webPage, personNode } from '../lib/seo.mjs';
 // Home page copy is word for word from the original site, except the Meet Tamar bio,
 // which Tamar supplied for the new site.
 export default function home({ posts }) {
-  // Search result summary (the longer site.description is used in structured data).
+  // Search result title and summary (the longer site.description is used in structured data).
+  // Neither appears on the page. The summary names the nearby cities families search from.
+  const titleTag = `${site.name} | DIR Floortime® Therapy in La Cañada`;
   const description =
-    'DIR Floortime® therapy, facilitated playdates, social skills groups, family coaching, and in school support for ages 2 to 25 in La Cañada Flintridge, CA.';
+    'DIR Floortime® therapy, playdates, social skills groups, and parent coaching for ages 2 to 25 in La Cañada Flintridge, serving Pasadena, Glendale, and Burbank.';
   const tamar = team[0];
   const instagram = site.social.find((s) => s.name === 'Instagram');
   const instagramHandle = instagram.url.split('/').filter(Boolean).pop();
@@ -183,8 +185,10 @@ ${testimonialsSection()}
   return {
     path: '/',
     title: site.name,
+    titleTag,
     ogTitle: 'The Hummingbird Nest: Cultivating Joyful Family Connections',
     description,
+    lastmod: posts[0]?.date,
     body,
     bodyClass: 'page-home',
     clearsHeader: true,

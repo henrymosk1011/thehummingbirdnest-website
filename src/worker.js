@@ -6,6 +6,7 @@
  *
  *   Redirect thehummingbirdnest.org to www.thehummingbirdnest.org (CANONICAL_HOST).
  *   GET  /blog          301 to /resources#blog (the blog moved onto the Resources page).
+ *   GET  /about/        301 to /about (one permanent address per page, also for /about.html).
  *   GET  /api/instagram Latest Instagram posts for the home page, read from a Behold JSON feed and cached.
  *   Add security headers and cache rules to every page and file.
  *
@@ -85,6 +86,17 @@ export default {
     }
 
     const response = await env.ASSETS.fetch(request);
+
+    // Static Assets answers /about/, /about.html and /index.html with a temporary (307)
+    // redirect to the page's real address. Make it permanent, so search engines fold
+    // those addresses, and any links pointing at them, into the real one.
+    if (response.status === 307) {
+      const location = response.headers.get('Location') || '';
+      if (location.startsWith('/') && !location.startsWith('//')) {
+        return Response.redirect(new URL(location, url.origin).toString(), 301);
+      }
+    }
+
     return withSiteHeaders(response, url);
   },
 };

@@ -15,7 +15,7 @@ Deployment and DNS steps are in **[DEPLOY.md](DEPLOY.md)**.
 
 ```bash
 npm install          # once
-npm run build        # process any new photos, then build dist/ (also checks for dashes, missing alt text and broken links)
+npm run build        # process any new photos, then build dist/ (also checks for dashes, missing alt text, broken links and search titles)
 npm run dev          # build, then run the site and Worker locally at http://localhost:8787
 npm run images       # only the photo step (add -- --force to re-encode every photo)
 npm run deploy       # build and deploy from your machine (normally every push to main publishes; see DEPLOY.md, section 1)
@@ -81,6 +81,7 @@ Content from the CMS is made safe automatically: dashes become commas, spaces or
 * **No dashes or em dashes in visible text.** The build fails if a hyphen, en dash or em dash appears in page text, alt text or meta descriptions (web and email addresses are exempt). Phone numbers are written as `(626) 765 1724`. Content edited in the CMS is fixed automatically instead. Hyphens inside words show exactly as the old site did ("1-on-1 In-School Support", "parent-child", ages "2-25") because `keepWordHyphens` is `true` in `site/config.mjs`; dashes used as punctuation still become commas. Set it to `false` to turn word hyphens into spaces ("2-25" becomes "2 to 25"). Words listed in `keepHyphensIn` in the same file (currently "1-on-1", at the client's request) always keep their hyphens.
 * **Every image needs alt text** (or `alt=""` when purely decorative).
 * **Internal links must resolve** to a real page or file.
+* **Every page has one `h1` and its own search title and description** (title up to 70 characters, description 50 to 165). A blog post that breaks this is reported as a warning instead.
 * No dot or pulse graphics, and no lines or hyphens next to headings.
 
 ## Accessibility
@@ -89,4 +90,12 @@ Built to WCAG 2.2 AA: semantic landmarks, skip link, visible focus states, keybo
 
 ## SEO
 
-Unique titles and descriptions, canonical URLs, Open Graph and Twitter cards with JPEG share images, `sitemap.xml`, `robots.txt`, and schema.org structured data (LocalBusiness, WebSite, BreadcrumbList, Service, Person, FAQPage, BlogPosting). All original URLs are preserved.
+Unique titles and descriptions, canonical URLs, Open Graph and Twitter cards with JPEG share images, `sitemap.xml`, `robots.txt`, and schema.org structured data (LocalBusiness with its list of services, WebSite, BreadcrumbList, Service, Person, Book, FAQPage, BlogPosting). All original URLs are preserved, and `/about/` or `/about.html` style addresses redirect permanently to the one real address.
+
+Page copy is fixed (see the house rules), so search wording lives in the parts visitors do not see on the page:
+
+* **Search titles and descriptions.** Each service has a `seoTitle` and `description` in `site/data/services.mjs`; other pages set `title` and `description` in their file under `site/pages/`. A title names the service and the place (La Cañada Flintridge for what happens at the office, the Los Angeles area for work in schools). The site name is added when it fits; set `titleTag` on a page to write the whole title yourself. Keep titles near 60 characters and descriptions under 160, which is what Google shows.
+* **Structured data** is built in `site/lib/seo.mjs` from `site/config.mjs`, the services list and the team bios, so it stays in step with the pages.
+* **The sitemap** only gives a "last changed" date where the date is real (blog posts, and the pages that list them).
+
+After launch, the steps outside this repository (Search Console, Google Business Profile) are in DEPLOY.md, section 6.
