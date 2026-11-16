@@ -98,7 +98,6 @@ content:
     fields:
       - name: members
         label: Team members
-        description: To remove someone, click the trash icon on their row. Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
         type: object
         list:
           collapsible:
@@ -136,6 +135,15 @@ content:
               switcher: false
               media: false
             description: Type {years} anywhere to show the practice's years of experience, which updates automatically each year.
+      # Shown once, right under "Add an item". A list's own description would repeat under
+      # every row, and Pages CMS has no plain text block, so this is a read-only field whose
+      # default is the reminder. Pages CMS stores it in the file on save; the site ignores it.
+      # To change the wording, change it here and in the file if it is already saved there.
+      - name: saveReminder
+        label: Reminder
+        type: text
+        readonly: true
+        default: Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
 
   - name: testimonials
     label: Testimonials
@@ -147,7 +155,6 @@ content:
     fields:
       - name: testimonials
         label: Testimonials
-        description: To remove a testimonial, click the trash icon on its row. Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
         type: object
         list:
           collapsible:
@@ -163,6 +170,15 @@ content:
             type: string
             required: true
             description: "First name and last initial is fine, for example: Megan B."
+      # Shown once, right under "Add an item". A list's own description would repeat under
+      # every row, and Pages CMS has no plain text block, so this is a read-only field whose
+      # default is the reminder. Pages CMS stores it in the file on save; the site ignores it.
+      # To change the wording, change it here and in the file if it is already saved there.
+      - name: saveReminder
+        label: Reminder
+        type: text
+        readonly: true
+        default: Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
 
   - name: faq
     label: FAQ
@@ -174,7 +190,6 @@ content:
     fields:
       - name: questions
         label: Questions
-        description: To remove a question, click the trash icon on its row. Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
         type: object
         list:
           collapsible:
@@ -193,3 +208,12 @@ content:
               format: markdown
               switcher: false
               media: false
+      # Shown once, right under "Add an item". A list's own description would repeat under
+      # every row, and Pages CMS has no plain text block, so this is a read-only field whose
+      # default is the reminder. Pages CMS stores it in the file on save; the site ignores it.
+      # To change the wording, change it here and in the file if it is already saved there.
+      - name: saveReminder
+        label: Reminder
+        type: text
+        readonly: true
+        default: Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
