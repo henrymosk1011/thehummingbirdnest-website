@@ -140,7 +140,7 @@ content:
       # default is the reminder. Pages CMS stores it in the file on save; the site ignores it.
       # To change the wording, change it here and in the file if it is already saved there.
       - name: saveReminder
-        label: Reminder
+        label: "❗ Reminder"
         type: text
         readonly: true
         default: Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
@@ -175,7 +175,7 @@ content:
       # default is the reminder. Pages CMS stores it in the file on save; the site ignores it.
       # To change the wording, change it here and in the file if it is already saved there.
       - name: saveReminder
-        label: Reminder
+        label: "❗ Reminder"
         type: text
         readonly: true
         default: Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
@@ -213,7 +213,7 @@ content:
       # default is the reminder. Pages CMS stores it in the file on save; the site ignores it.
       # To change the wording, change it here and in the file if it is already saved there.
       - name: saveReminder
-        label: Reminder
+        label: "❗ Reminder"
         type: text
         readonly: true
         default: Nothing changes on the website until you click Save at the top of this page, and leaving the page first loses your changes.
