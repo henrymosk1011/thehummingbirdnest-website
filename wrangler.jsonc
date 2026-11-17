@@ -18,7 +18,17 @@
   // Worker needs no email settings or secrets (see formSubmitTo in site/config.mjs).
   "vars": {
     "CANONICAL_HOST": "www.thehummingbirdnest.org",
-    // Instagram section on the home page: paste the Behold JSON feed ID here (see DEPLOY.md).
+    // Instagram section on the home page: paste the Behold JSON feed ID here (see DEPLOY.md,
+    // section 5). The whole feed URL works too.
     "BEHOLD_FEED_ID": ""
+  },
+  // Holds the latest copy of the Instagram feed (namespace "thehummingbirdnest-instagram").
+  "kv_namespaces": [
+    { "binding": "INSTAGRAM", "id": "98178a138eef4a46bd9e0fef3ac94ee4" }
+  ],
+  // Every three hours (UTC), read the Behold feed into KV. About 250 feed loads a month,
+  // well inside the free plan's 1,200, however many people visit the site.
+  "triggers": {
+    "crons": ["17 */3 * * *"]
   }
 }

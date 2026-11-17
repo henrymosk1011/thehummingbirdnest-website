@@ -7,15 +7,19 @@
  *   Redirect thehummingbirdnest.org to www.thehummingbirdnest.org (CANONICAL_HOST).
  *   GET  /blog          301 to /resources#blog (the blog moved onto the Resources page).
  *   GET  /about/        301 to /about (one permanent address per page, also for /about.html).
- *   GET  /api/instagram Latest Instagram posts for the home page, read from a Behold JSON feed and cached.
+ *   GET  /api/instagram Latest Instagram posts for the home page, from the copy of the Behold feed kept in KV.
  *   Add security headers and cache rules to every page and file.
+ *
+ * On a schedule (triggers.crons in wrangler.jsonc) it reads the Behold JSON feed and keeps a
+ * tidied copy in Workers KV, so visitors never cause a request to Behold (see instagram below).
  *
  * The contact form does not use the Worker: the browser sends it straight to FormSubmit
  * (formsubmit.co), which emails it to the practice (see site/scripts/form.js and DEPLOY.md).
  *
- * Configuration (vars in wrangler.jsonc):
+ * Configuration (wrangler.jsonc):
  *   CANONICAL_HOST        www.thehummingbirdnest.org
- *   BEHOLD_FEED_ID        optional, the Behold JSON feed ID that powers the Instagram section
+ *   BEHOLD_FEED_ID        optional, the Behold JSON feed ID (or the whole feed URL) for the Instagram section
+ *   INSTAGRAM             KV namespace that holds the latest copy of the feed
  */
 
 // Where /edit sends the practice: the Blog posts screen of this site in Pages CMS.
@@ -61,7 +65,7 @@ export default {
     }
 
     if (url.pathname === '/api/instagram') {
-      return instagram(env, ctx);
+      return instagram(env);
     }
 
     if (url.pathname.startsWith('/api/')) {
@@ -99,59 +103,101 @@ export default {
 
     return withSiteHeaders(response, url);
   },
+
+  // Cron trigger: refresh the stored copy of the Instagram feed.
+  async scheduled(controller, env) {
+    const id = beholdFeedId(env);
+    if (id && env.INSTAGRAM) await refreshInstagram(env, id);
+  },
 };
 
 // Instagram: Behold keeps the Instagram connection alive and hosts resized images.
-// The response is trimmed to what the page needs, validated, and cached at the edge.
+//
+// Behold's free plan allows 1,200 feed loads a month (the account is paused until the next
+// month if it goes over) and refreshes from Instagram once a day. So visitors never reach
+// Behold: the cron trigger reads the feed every three hours (about 250 loads a month) and
+// keeps a trimmed, validated copy in KV, and /api/instagram only reads that copy. Caching
+// alone could not promise this: the Cache API does nothing on workers.dev, and elsewhere
+// each Cloudflare data center keeps its own copy.
 const INSTAGRAM_FALLBACK = { ok: true, configured: false, username: 'thehummingbirdnestlcf', posts: [] };
 const SAFE_IMAGE_HOST = /(^|\.)behold\.pictures$|\.cdninstagram\.com$|\.fbcdn\.net$/;
+// The last good copy is kept for two weeks, so a Behold outage or a paused month leaves the
+// latest posts showing; after that the section falls back to the practice's own photos.
+const INSTAGRAM_KEEP_SECONDS = 14 * 86400;
+// When the feed has never been stored (just after the ID is set), the first visit fills it.
+// If that fails, visits wait this long before trying again, so a wrong ID or a paused
+// account cannot turn every visit into a request to Behold.
+const INSTAGRAM_RETRY_SECONDS = 3 * 3600;
 
-// Behold's free plan allows 1,200 feed loads a month and refreshes once a day, so the
-// tidied feed is kept in Cloudflare's cache for two hours and Behold is asked rarely.
-const INSTAGRAM_CACHE_SECONDS = 7200;
+// The ID from wrangler.jsonc. The whole feed URL (https://feeds.behold.so/AbCdEf123456)
+// is accepted too, in case it is pasted instead of just the ID.
+function beholdFeedId(env) {
+  const id = String(env.BEHOLD_FEED_ID || '')
+    .trim()
+    .replace(/^https?:\/\/feeds\.behold\.so\//i, '')
+    .replace(/[/?#].*$/, '');
+  return /^[A-Za-z0-9_-]{8,64}$/.test(id) ? id : '';
+}
 
-async function instagram(env, ctx) {
-  const id = String(env.BEHOLD_FEED_ID || '').trim();
-  if (!/^[A-Za-z0-9_]{8,64}$/.test(id)) {
+async function instagram(env) {
+  const id = beholdFeedId(env);
+  if (!id || !env.INSTAGRAM) {
     return json(200, INSTAGRAM_FALLBACK, { 'Cache-Control': 'public, max-age=300' });
   }
-  const cache = typeof caches !== 'undefined' ? caches.default : null;
-  const key = new Request(`https://instagram-feed.cache/${id}`);
-  const hit = cache && (await cache.match(key).catch(() => null));
-  if (hit) return hit;
-  try {
-    const res = await fetch(`https://feeds.behold.so/${id}`, {
-      headers: { Accept: 'application/json' },
-      cf: { cacheTtl: INSTAGRAM_CACHE_SECONDS, cacheEverything: true },
-    });
-    if (!res.ok) throw new Error(`behold responded ${res.status}`);
-    const feed = await res.json();
-    const posts = (Array.isArray(feed.posts) ? feed.posts : [])
-      .map((p) => {
-        const size = p.sizes && (p.sizes.medium || p.sizes.large || p.sizes.small);
-        const image = (size && size.mediaUrl) || (p.mediaType === 'VIDEO' ? p.thumbnailUrl : p.mediaUrl);
-        return {
-          id: String(p.id || ''),
-          url: safeUrl(p.permalink, /(^|\.)instagram\.com$/),
-          image: safeUrl(image, SAFE_IMAGE_HOST),
-          width: Number(size && size.width) || 700,
-          height: Number(size && size.height) || 700,
-          type: ['IMAGE', 'VIDEO', 'CAROUSEL_ALBUM'].includes(p.mediaType) ? p.mediaType : 'IMAGE',
-          alt: plainText(p.altText, 300),
-          caption: plainText(p.prunedCaption || p.caption, 280),
-          timestamp: clean(p.timestamp || '', 40),
-        };
-      })
-      .filter((p) => p.url && p.image)
-      .slice(0, 10);
-    const username = /^[A-Za-z0-9._]{1,30}$/.test(feed.username || '') ? feed.username : INSTAGRAM_FALLBACK.username;
-    const response = json(200, { ok: true, configured: true, username, posts }, { 'Cache-Control': `public, max-age=600, s-maxage=${INSTAGRAM_CACHE_SECONDS}` });
-    if (cache && ctx) ctx.waitUntil(cache.put(key, response.clone()).catch(() => {}));
-    return response;
-  } catch (err) {
-    console.error('instagram feed failed', err && err.message);
-    return json(200, INSTAGRAM_FALLBACK, { 'Cache-Control': 'public, max-age=120' });
+  let feed = await env.INSTAGRAM.get(`feed:${id}`, { type: 'json', cacheTtl: 300 }).catch(() => null);
+  if (!feed && !(await env.INSTAGRAM.get(`retry:${id}`).catch(() => null))) {
+    feed = await refreshInstagram(env, id);
   }
+  if (!feed || !Array.isArray(feed.posts)) {
+    return json(200, INSTAGRAM_FALLBACK, { 'Cache-Control': 'public, max-age=300' });
+  }
+  return json(
+    200,
+    { ok: true, configured: true, username: feed.username, updated: feed.updated, posts: feed.posts },
+    { 'Cache-Control': 'public, max-age=900' }
+  );
+}
+
+// Read the Behold feed and store the tidied copy. Returns the copy, or null on failure
+// (the previous copy, if any, stays in place).
+async function refreshInstagram(env, id) {
+  try {
+    const res = await fetch(`https://feeds.behold.so/${id}`, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`Behold answered ${res.status}`);
+    const feed = tidyFeed(await res.json());
+    await env.INSTAGRAM.put(`feed:${id}`, JSON.stringify(feed), { expirationTtl: INSTAGRAM_KEEP_SECONDS });
+    console.log(`instagram feed stored: ${feed.posts.length} posts from @${feed.username}`);
+    return feed;
+  } catch (err) {
+    console.error('instagram feed refresh failed:', err && err.message);
+    await env.INSTAGRAM.put(`retry:${id}`, '1', { expirationTtl: INSTAGRAM_RETRY_SECONDS }).catch(() => {});
+    return null;
+  }
+}
+
+// Keep only what the page needs, with Instagram links and Behold or Instagram image addresses only.
+function tidyFeed(feed) {
+  if (!feed || !Array.isArray(feed.posts)) throw new Error('Behold sent a feed without posts');
+  const posts = feed.posts
+    .map((p) => {
+      const size = p.sizes && (p.sizes.medium || p.sizes.large || p.sizes.small);
+      const image = (size && size.mediaUrl) || (p.mediaType === 'VIDEO' ? p.thumbnailUrl : p.mediaUrl);
+      return {
+        id: String(p.id || ''),
+        url: safeUrl(p.permalink, /(^|\.)instagram\.com$/),
+        image: safeUrl(image, SAFE_IMAGE_HOST),
+        width: Number(size && size.width) || 700,
+        height: Number(size && size.height) || 700,
+        type: ['IMAGE', 'VIDEO', 'CAROUSEL_ALBUM'].includes(p.mediaType) ? p.mediaType : 'IMAGE',
+        alt: plainText(p.altText, 300),
+        caption: plainText(p.prunedCaption || p.caption, 280),
+        timestamp: clean(p.timestamp || '', 40),
+      };
+    })
+    .filter((p) => p.url && p.image)
+    .slice(0, 10);
+  const username = /^[A-Za-z0-9._]{1,30}$/.test(feed.username || '') ? feed.username : INSTAGRAM_FALLBACK.username;
+  return { username, updated: new Date().toISOString(), posts };
 }
 
 function plainText(value, max) {
