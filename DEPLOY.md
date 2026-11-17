@@ -10,6 +10,7 @@ These were done through the Cloudflare and GitHub connectors:
   * Production branch `main`: `npm run build`, then `npm run deploy:ci` (runs `wrangler deploy` and, if Cloudflare's API fails for a moment, tries again after 20 and 40 seconds; see `site/deploy.mjs`)
   * Every other branch: `npm run build`, then `npx wrangler preview` (a preview URL per branch)
   * workers.dev address: `https://thehummingbirdnest.henrymm.workers.dev` (marked `noindex` so it never competes with the real domain in Google)
+  * Workers KV namespace **thehummingbirdnest-instagram** (binding `INSTAGRAM`) and a cron trigger every three hours, both set in `wrangler.jsonc`, for the Instagram feed (section 5)
 * **Zone `thehummingbirdnest.org`** added to Cloudflare. It stays **pending** and changes nothing until the nameservers are switched at GoDaddy. The current DNS was imported so nothing breaks when you switch:
 
   | Type | Name | Value | Purpose |
@@ -97,8 +98,8 @@ The old site used an Elfsight widget, which is now disabled on Elfsight's side. 
 
 1. Sign up at **https://app.behold.so/register** (the free plan is enough).
 2. Go to **Sources** (https://app.behold.so/sources), click **+ Add source**, and choose **Basic source**.
-3. If you can log in to @thehummingbirdnestlcf: click **Connect**, log in to Instagram, and click **Allow**. Leave every permission turned on, including the ones marked optional; Behold needs all of them.
-   If only the client can log in: copy the **auth link** shown next to **Open link** and send it to them. They open it, log in to Instagram, and click **Allow**. They do not need a Behold login.
+3. **Easiest, and no password changes hands:** copy the **auth link** shown next to **Open link** and send it to the client. They open it on their phone or computer, log in to Instagram (including any two factor code, which goes to their phone anyway), and click **Allow**. They do not need a Behold login. Ask them to leave every permission turned on, including the ones marked optional; Behold needs all of them.
+   If you do have the Instagram login yourself: click **Connect** instead, log in, and click **Allow** with every permission on.
 4. The account appears on the Sources page.
 
 **C. Create the feed.**
@@ -113,14 +114,18 @@ The old site used an Elfsight widget, which is now disabled on Elfsight's side. 
 
 **D. Put the feed ID on the site.** Either send the ID to whoever maintains the site, or edit it yourself on GitHub:
 
-1. Open https://github.com/henrymosk1011/thehummingbirdnest-website and select the branch that is live (`main` once the site has launched).
+1. Open https://github.com/henrymosk1011/thehummingbirdnest-website on the `main` branch (the live one).
 2. Click `wrangler.jsonc`, then the pencil icon.
-3. Change `"BEHOLD_FEED_ID": ""` to `"BEHOLD_FEED_ID": "AbCdEf123456"` (your ID between the quotes).
+3. Change `"BEHOLD_FEED_ID": ""` to `"BEHOLD_FEED_ID": "AbCdEf123456"` (your ID between the quotes). Pasting the whole feed URL between the quotes works too.
 4. Click **Commit changes**. Cloudflare rebuilds and deploys in about two minutes.
 
-**E. Check it.** Open `/api/instagram` on the site (for example `https://www.thehummingbirdnest.org/api/instagram`). It should show `"configured":true` and a list of posts. The home page then shows the real posts instead of the practice photos.
+**E. Check it.** Open `/api/instagram` on the site (for example `https://thehummingbirdnest.henrymm.workers.dev/api/instagram`). It should show `"configured":true`, an `"updated"` time, and a list of posts. The home page then shows the real posts instead of the practice photos. The row only switches over when there are at least 6 posts to fill it.
 
-The Worker reads the feed at `/api/instagram`, keeps only Instagram links and Behold or Instagram image addresses, and keeps the result in Cloudflare's cache for two hours. That keeps Behold requests well under the free plan's 1,200 feed loads a month, even in a busy month. Alt text comes from the post's Instagram alt text (add it in Instagram under **Advanced settings > Write alt text**), or from the caption when there is none.
+If it still shows `"configured":false` a few minutes after the deploy: check the ID in `wrangler.jsonc` against the feed URL in Behold, check that the feed is a **JSON** feed with no domain restriction, and look under **Workers and Pages > thehummingbirdnest > Observability** for "instagram feed refresh failed". After a failed first try the site waits up to three hours before asking Behold again (so a mistake cannot use up the month's feed loads); the next scheduled read, or the next deploy with a corrected ID, picks it up.
+
+**How it stays inside the free plan.** Behold's free plan allows **1,200 feed loads a month** and pauses the account until the next month if that is exceeded. So visitors never reach Behold: every three hours a Cloudflare cron trigger (`triggers` in `wrangler.jsonc`) reads the feed, keeps only Instagram links and Behold or Instagram image addresses, and stores the result in the Workers KV namespace **thehummingbirdnest-instagram**. `/api/instagram` only reads that stored copy. That is about 250 feed loads a month however busy the site gets. Behold itself checks Instagram once a day on the free plan, so a new post appears on the site within about a day. If Behold has a problem, the last good copy keeps showing for up to two weeks before the section goes back to the practice photos.
+
+Alt text comes from the post's Instagram alt text (add it in Instagram under **Advanced settings > Write alt text**), or from the caption when there is none.
 
 ## 6. Google Search Console, Business Profile and Analytics
 
