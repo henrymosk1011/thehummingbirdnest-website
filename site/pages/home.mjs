@@ -168,7 +168,10 @@ ${testimonialsSection()}
 <section class="insta" aria-labelledby="insta-title" data-insta>
   <div class="container">
     <div class="insta__head">
-      <h2 class="h2" id="insta-title" data-split>Instagram</h2>
+      <div>
+        ${kicker('Instagram')}
+        <h2 class="h2" id="insta-title" data-split><em>Moments</em> from the Nest</h2>
+      </div>
       <div data-reveal>${button(instagram.url, `Follow @${instagramHandle}`, { variant: 'ghost', iconName: 'instagram' })}</div>
     </div>
     <ul class="insta__grid" role="list" data-insta-grid>
