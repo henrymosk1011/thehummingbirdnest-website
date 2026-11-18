@@ -27,13 +27,15 @@ const EDITOR_URL = 'https://app.pagescms.org/henrymosk1011/thehummingbirdnest-we
 
 // Google Analytics hosts are allowed ahead of time so analytics can be switched on
 // from site/config.mjs without touching this file. FormSubmit receives the contact form.
+// Instagram photos come from Behold (and Instagram), and videos in the home page lightbox
+// play from Instagram's servers.
 const CSP = [
   "default-src 'self'",
   "script-src 'self' https://www.googletagmanager.com",
   "style-src 'self'",
   "img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://behold.pictures https://*.behold.pictures https://*.cdninstagram.com https://*.fbcdn.net",
   "font-src 'self'",
-  "media-src 'self'",
+  "media-src 'self' https://*.cdninstagram.com https://*.fbcdn.net",
   "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://formsubmit.co",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -128,6 +130,14 @@ const INSTAGRAM_KEEP_SECONDS = 14 * 86400;
 // If that fails, visits wait this long before trying again, so a wrong ID or a paused
 // account cannot turn every visit into a request to Behold.
 const INSTAGRAM_RETRY_SECONDS = 3 * 3600;
+// The stored copy's key carries a version. Bump it when the shape of a stored post changes,
+// so the first visit after the deploy refills it instead of serving the old shape.
+const INSTAGRAM_FEED_KEY = (id) => `feed:v2:${id}`;
+// Two rows of four on wide screens; the lightbox steps through all of them.
+const INSTAGRAM_MAX_POSTS = 12;
+// Photos per multi photo post shown in the lightbox (Instagram allows up to 20).
+const INSTAGRAM_MAX_SLIDES = 10;
+const VIDEO_HOST = /\.cdninstagram\.com$|\.fbcdn\.net$/;
 
 // The ID from wrangler.jsonc. The whole feed URL (https://feeds.behold.so/AbCdEf123456)
 // is accepted too, in case it is pasted instead of just the ID.
@@ -144,7 +154,7 @@ async function instagram(env) {
   if (!id || !env.INSTAGRAM) {
     return json(200, INSTAGRAM_FALLBACK, { 'Cache-Control': 'public, max-age=300' });
   }
-  let feed = await env.INSTAGRAM.get(`feed:${id}`, { type: 'json', cacheTtl: 300 }).catch(() => null);
+  let feed = await env.INSTAGRAM.get(INSTAGRAM_FEED_KEY(id), { type: 'json', cacheTtl: 300 }).catch(() => null);
   if (!feed && !(await env.INSTAGRAM.get(`retry:${id}`).catch(() => null))) {
     feed = await refreshInstagram(env, id);
   }
@@ -165,7 +175,7 @@ async function refreshInstagram(env, id) {
     const res = await fetch(`https://feeds.behold.so/${id}`, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`Behold answered ${res.status}`);
     const feed = tidyFeed(await res.json());
-    await env.INSTAGRAM.put(`feed:${id}`, JSON.stringify(feed), { expirationTtl: INSTAGRAM_KEEP_SECONDS });
+    await env.INSTAGRAM.put(INSTAGRAM_FEED_KEY(id), JSON.stringify(feed), { expirationTtl: INSTAGRAM_KEEP_SECONDS });
     console.log(`instagram feed stored: ${feed.posts.length} posts from @${feed.username}`);
     return feed;
   } catch (err) {
@@ -176,42 +186,74 @@ async function refreshInstagram(env, id) {
 }
 
 // Keep only what the page needs, with Instagram links and Behold or Instagram image addresses only.
+// Each post has a tile image (Behold's medium size) and, for the lightbox, its slides: the
+// photo, the video, or each photo of a multi photo post, in Behold's large and full sizes.
 function tidyFeed(feed) {
   if (!feed || !Array.isArray(feed.posts)) throw new Error('Behold sent a feed without posts');
   const posts = feed.posts
     .map((p) => {
       const size = p.sizes && (p.sizes.medium || p.sizes.large || p.sizes.small);
       const image = (size && size.mediaUrl) || (p.mediaType === 'VIDEO' ? p.thumbnailUrl : p.mediaUrl);
+      const type = ['IMAGE', 'VIDEO', 'CAROUSEL_ALBUM'].includes(p.mediaType) ? p.mediaType : 'IMAGE';
+      const parts = type === 'CAROUSEL_ALBUM' && Array.isArray(p.children) && p.children.length ? p.children : [p];
       return {
         id: String(p.id || ''),
         url: safeUrl(p.permalink, /(^|\.)instagram\.com$/),
         image: safeUrl(image, SAFE_IMAGE_HOST),
         width: Number(size && size.width) || 700,
         height: Number(size && size.height) || 700,
-        type: ['IMAGE', 'VIDEO', 'CAROUSEL_ALBUM'].includes(p.mediaType) ? p.mediaType : 'IMAGE',
+        type,
         alt: plainText(p.altText, 300),
         caption: plainText(p.prunedCaption || p.caption, 280),
+        text: plainText(p.prunedCaption || p.caption, 2200, { lines: true, tags: true }),
         timestamp: clean(p.timestamp || '', 40),
+        slides: parts.slice(0, INSTAGRAM_MAX_SLIDES).map(slide).filter(Boolean),
       };
     })
     .filter((p) => p.url && p.image)
-    .slice(0, 10);
+    .slice(0, INSTAGRAM_MAX_POSTS);
   const username = /^[A-Za-z0-9._]{1,30}$/.test(feed.username || '') ? feed.username : INSTAGRAM_FALLBACK.username;
   return { username, updated: new Date().toISOString(), posts };
 }
 
-function plainText(value, max) {
-  return clean(value, 2000)
-    .replace(/https?:\/\/\S+/g, ' ')
-    .replace(/#[\p{L}\p{N}_]+/gu, ' ')
-    .replace(/\s*[\u2013\u2014\u2015]+\s*/g, ', ')
-    .replace(/\s+-+\s+/g, ', ')
-    .replace(/(\S)[-\u2010\u2011](?=\S)/g, '$1 ')
-    .replace(/\s+/g, ' ')
-    .replace(/\s+([,.!?;:])/g, '$1')
-    .replace(/,(\s*,)+/g, ',')
-    .replace(/^[\s,]+|[\s,]+$/g, '')
-    .slice(0, max);
+// One lightbox slide: the large image (with the full size for big screens) and, for a
+// video, Instagram's video file.
+function slide(media) {
+  const sizes = media && media.sizes;
+  const large = sizes && (sizes.large || sizes.medium);
+  const image = safeUrl(large && large.mediaUrl, SAFE_IMAGE_HOST);
+  if (!image) return null;
+  const out = { image, width: Number(large.width) || 1000, height: Number(large.height) || 1000, alt: plainText(media.altText, 300) };
+  const full = sizes.full && safeUrl(sizes.full.mediaUrl, SAFE_IMAGE_HOST);
+  if (full && Number(sizes.full.width) > out.width) {
+    out.full = full;
+    out.fullWidth = Number(sizes.full.width);
+  }
+  if (media.mediaType === 'VIDEO') {
+    const video = safeUrl(media.mediaUrl, VIDEO_HOST);
+    if (video) out.video = video;
+  }
+  return out;
+}
+
+// Caption and alt text as plain text: no links, no dashes (house rule), hashtags dropped
+// unless tags is set, and line breaks kept only when lines is set (the lightbox caption).
+function plainText(value, max, { lines = false, tags = false } = {}) {
+  let text = clean(value, 2400).replace(/https?:\/\/\S+/g, ' ');
+  if (!tags) text = text.replace(/#[\p{L}\p{N}_]+/gu, ' ');
+  const tidy = (line) =>
+    line
+      .replace(/\s*[\u2013\u2014\u2015]+\s*/g, ', ')
+      .replace(/\s+-+\s+/g, ', ')
+      .replace(/(\S)[-\u2010\u2011](?=\S)/g, '$1 ')
+      .replace(/\s+/g, ' ')
+      .replace(/\s+([,.!?;:])/g, '$1')
+      .replace(/,(\s*,)+/g, ',')
+      .replace(/^[\s,]+|[\s,]+$/g, '');
+  const out = lines
+    ? text.split('\n').map(tidy).join('\n').replace(/\n{3,}/g, '\n\n').trim()
+    : tidy(text);
+  return out.slice(0, max);
 }
 
 function safeUrl(value, hostPattern) {

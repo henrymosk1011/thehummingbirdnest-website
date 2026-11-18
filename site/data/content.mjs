@@ -98,8 +98,8 @@ export const gallery = [
   { image: 'intake-session', alt: 'A parent meeting with a therapist while a child plays nearby' },
 ];
 
-// Shown in the home page Instagram row until the live feed loads (or if it is not set up yet).
-// One row: six photos on wide screens, four on tablets, three on phones.
+// Shown in the home page Instagram section until the live feed loads (or if it is not set up yet).
+// Two rows: eight photos on wide screens, six on tablets, four on phones.
 export const instagramFallback = [
   { image: 'therapist-girl-sensory-spinner', alt: 'A therapist and a laughing young girl playing together on a spinning sensory seat' },
   { image: 'tamar-facilitated-playdate', alt: 'Tamar supporting two children building with colorful blocks during a facilitated playdate' },
@@ -107,4 +107,6 @@ export const instagramFallback = [
   { image: 'juliana-facilitated-playdate', alt: 'Juliana guiding a facilitated playdate as two children play with soft balls' },
   { image: 'toy-train-play', alt: 'An adult and a young girl playing together with a wooden toy train on the floor' },
   { image: 'kids-on-grass', alt: 'A group of children sitting in a circle on the grass, talking and playing' },
+  { image: 'playdate-clay', alt: 'Two children playing with colorful clay together at a table' },
+  { image: 'cardboard-house-play', alt: 'A parent and child playing together inside a painted cardboard house' },
 ];

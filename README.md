@@ -42,7 +42,7 @@ site/
   pages/              Page templates (home, about, services, resources and blog, contact, legal, 404)
   lib/                Layout (header, menus, footer), shared sections, SEO and CMS helpers
   styles/             CSS (base tokens, layout, sections, pages, motion)
-  scripts/            Browser JavaScript (motion, menus, blog carousel, contact form, Instagram feed)
+  scripts/            Browser JavaScript (motion, menus, blog carousel, contact form, Instagram feed and lightbox)
   images/             Master photos (uploads from the CMS land here too)
   static/             Copied as is into dist/ (generated images, video, favicon)
 src/worker.js         Cloudflare Worker

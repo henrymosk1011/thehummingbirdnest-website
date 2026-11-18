@@ -175,7 +175,7 @@ ${testimonialsSection()}
       ${instagramFallback
         .map(
           (p) => `<li class="insta__item">
-        <div class="insta__tile">${picture(p.image, { alt: p.alt, sizes: coverSizes(p.image, 1, '(min-width: 1100px) 16vw, (min-width: 700px) 24vw, 33vw'), maxWidth: 800 })}</div>
+        <div class="insta__tile">${picture(p.image, { alt: p.alt, sizes: coverSizes(p.image, 1, '(min-width: 1460px) 340px, (min-width: 1100px) 24vw, (min-width: 700px) 32vw, 48vw'), maxWidth: 800 })}</div>
       </li>`
         )
         .join('')}

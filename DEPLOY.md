@@ -110,7 +110,7 @@ The old site used an Elfsight widget, which is now disabled on Elfsight's side. 
 2. Choose **User feed**, pick the @thehummingbirdnestlcf source, then choose **JSON** (not Widget).
 3. Name it (for example "Website") and click **Create feed**.
 4. On the feed page that opens, in the settings:
-   * **Max posts:** 6 (the home page shows one row of six; the free plan allows 6).
+   * **Max posts:** 12, or as many as the plan allows. The home page shows two rows (eight posts on a computer, six on a tablet, four on a phone), and the lightbox steps through all of them.
    * Leave any domain or website restriction **empty**. The website's server reads the feed, not the visitor's browser, so a domain restriction would block it.
 5. Copy the **JSON Feed URL**. It looks like `https://feeds.behold.so/AbCdEf123456`. The feed ID is the part after the last slash (`AbCdEf123456`).
 
@@ -121,7 +121,9 @@ The old site used an Elfsight widget, which is now disabled on Elfsight's side. 
 3. Change `"BEHOLD_FEED_ID": ""` to `"BEHOLD_FEED_ID": "AbCdEf123456"` (your ID between the quotes). Pasting the whole feed URL between the quotes works too.
 4. Click **Commit changes**. Cloudflare rebuilds and deploys in about two minutes.
 
-**E. Check it.** Open `/api/instagram` on the site (for example `https://thehummingbirdnest.henrymm.workers.dev/api/instagram`). It should show `"configured":true`, an `"updated"` time, and a list of posts. The home page then shows the real posts instead of the practice photos. The row only switches over when there are at least 6 posts to fill it.
+**E. Check it.** Open `/api/instagram` on the site (for example `https://thehummingbirdnest.henrymm.workers.dev/api/instagram`). It should show `"configured":true`, an `"updated"` time, and a list of posts. The home page then shows the real posts instead of the practice photos. It only shows whole rows, so it needs at least 4 posts to switch over, and 8 for two rows on a computer.
+
+**What visitors see.** Selecting a post opens it in a lightbox on the page: the photo or video large, every photo of a multi photo post (with arrows to step through them), the full caption, and a **View on Instagram** button. Arrow keys or the round buttons move to the next or previous post, and Escape, the close button or a click outside closes it. Videos play from Instagram's own servers; if Instagram has expired a video link before the next refresh, the lightbox shows the still with a **Watch on Instagram** button instead.
 
 If it still shows `"configured":false` a few minutes after the deploy: check the ID in `wrangler.jsonc` against the feed URL in Behold, check that the feed is a **JSON** feed with no domain restriction, and look under **Workers and Pages > thehummingbirdnest > Observability** for "instagram feed refresh failed". After a failed first try the site waits up to three hours before asking Behold again (so a mistake cannot use up the month's feed loads); the next scheduled read, or the next deploy with a corrected ID, picks it up.
 
