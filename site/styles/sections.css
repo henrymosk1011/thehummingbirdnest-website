@@ -730,12 +730,16 @@ section {
 }
 .insta__grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: clamp(10px, 1.2vw, 18px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 28px);
+}
+.insta__item[hidden] {
+  display: none;
 }
 .insta__tile {
   position: relative;
   display: block;
+  width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: var(--radius);
@@ -745,6 +749,9 @@ section {
   isolation: isolate;
   transition: opacity 1s var(--ease), transform 1.2s var(--ease);
   transition-delay: calc(var(--i, 0) * 70ms);
+}
+button.insta__tile {
+  cursor: zoom-in;
 }
 .insta__tile picture,
 .insta__tile img {
@@ -781,30 +788,21 @@ section {
   outline: 3px solid var(--ink);
   outline-offset: 3px;
 }
-.insta__badge,
 .insta__view {
   position: absolute;
   z-index: 1;
-  left: 12px;
+  left: 14px;
+  bottom: 14px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 8px 14px;
   border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.2;
-}
-.insta__badge {
-  top: 12px;
-  padding: 6px 12px;
-  background: var(--ink);
-  color: var(--paper);
-}
-.insta__view {
-  bottom: 12px;
-  padding: 8px 14px;
-  background: var(--paper);
-  color: var(--ink);
   opacity: 0;
   translate: 0 10px;
   transition: opacity 0.4s var(--ease), translate 0.5s var(--ease);
@@ -822,24 +820,275 @@ html.js-ready:not(.reduce-motion) .insta__grid:not(.is-in) .insta__tile {
   opacity: 0;
   transform: translate3d(0, 56px, 0) scale(0.92);
 }
-/* One row at every size: six across, then four, then three. */
+/* Two rows at every size: four across, then three, then two. */
+.insta__item:nth-child(n + 9) {
+  display: none;
+}
 @media (max-width: 1099px) {
   .insta__grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .insta__item:nth-child(n + 5) {
+  .insta__item:nth-child(n + 7) {
     display: none;
   }
 }
 @media (max-width: 699px) {
   .insta__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .insta__item:nth-child(n + 4) {
+  .insta__item:nth-child(n + 5) {
     display: none;
   }
   .insta__tile {
     border-radius: var(--radius-s);
+  }
+  .insta__view {
+    display: none;
+  }
+}
+
+/* Instagram lightbox (native dialog: focus stays inside, Escape closes, the page behind is inert) */
+html.lightbox-open {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: clamp(16px, 3vw, 40px) clamp(16px, 4vw, 64px);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+.lightbox::backdrop {
+  background: rgba(13, 32, 36, 0.86);
+}
+.lightbox[open]::backdrop {
+  animation: lightbox-fade 0.4s var(--ease);
+}
+.lightbox[open] .lightbox__frame {
+  animation: lightbox-in 0.6s var(--ease);
+}
+@keyframes lightbox-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+}
+.lightbox :focus-visible {
+  outline-color: var(--sage);
+}
+.lightbox__side :focus-visible {
+  outline-color: var(--blue-deep);
+}
+.lightbox__frame {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(320px, 30vw, 420px);
+  width: min(1280px, 100%);
+  height: min(860px, calc(100dvh - 2 * clamp(16px, 3vw, 40px)));
+  border-radius: var(--radius-l);
+  background: var(--paper);
+  box-shadow: var(--shadow-l);
+  overflow: hidden;
+}
+.lightbox__round {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+}
+.lightbox__round:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.lightbox__round .icon {
+  width: 20px;
+  height: 20px;
+}
+.lightbox__close {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+}
+.lightbox__media {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: var(--ink);
+}
+.lightbox__stage,
+.lightbox__still {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.lightbox__stage img,
+.lightbox__stage video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.lightbox__stage img {
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.lightbox__stage img.is-loaded {
+  opacity: 1;
+}
+.lightbox__watch {
+  position: absolute;
+  bottom: 20px;
+}
+.lightbox__step {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  translate: 0 -50%;
+  box-shadow: 0 6px 20px rgba(13, 32, 36, 0.3);
+}
+.lightbox__step--prev {
+  left: 14px;
+}
+.lightbox__step--next {
+  right: 14px;
+}
+.lightbox__count {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  left: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(13, 32, 36, 0.75);
+  color: var(--paper);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.lightbox__step[hidden],
+.lightbox__count[hidden],
+.lightbox__caption[hidden],
+.lightbox__pager [hidden] {
+  display: none;
+}
+.lightbox__side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  container-type: inline-size;
+}
+.lightbox__head {
+  display: grid;
+  gap: 2px;
+  padding: 24px 72px 18px 26px;
+  border-bottom: 1px solid var(--line);
+}
+.lightbox__user {
+  justify-self: start;
+  font-weight: 700;
+  text-decoration: none;
+}
+.lightbox__user:hover {
+  text-decoration: underline;
+}
+.lightbox__date {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+.lightbox__caption {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 20px 26px;
+  color: var(--ink-2);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.lightbox__caption:focus-visible {
+  outline-offset: -4px;
+  border-radius: 0;
+}
+.lightbox__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 16px 20px 20px 26px;
+  border-top: 1px solid var(--line);
+}
+.lightbox__pager {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.lightbox__position {
+  min-width: 4ch;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* A narrow panel keeps the buttons on one line; the post number is still announced. */
+@container (max-width: 419px) {
+  .lightbox__position {
+    display: none;
+  }
+}
+/* Phones and small tablets: full screen, photo on top, caption and buttons below. */
+@media (max-width: 899px) {
+  .lightbox {
+    padding: 0;
+  }
+  .lightbox__frame {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+  }
+  .lightbox__side {
+    max-height: 42dvh;
+  }
+  .lightbox__head {
+    padding: 16px 20px 12px;
+  }
+  .lightbox__caption {
+    padding: 14px 20px;
+  }
+  .lightbox__foot {
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom)) 20px;
+  }
+  .lightbox__close {
+    box-shadow: 0 6px 20px rgba(13, 32, 36, 0.3);
   }
 }
 

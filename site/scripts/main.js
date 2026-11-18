@@ -495,8 +495,8 @@ $$('[data-accordion]').forEach((details) => {
   });
 });
 
-/* Instagram feed on the home page */
-initInstagram();
+/* Instagram feed on the home page (its lightbox pauses smooth scrolling while open) */
+initInstagram({ onOpen: () => lenis?.stop(), onClose: () => lenis?.start() });
 
 /* Forms */
 initForms();
