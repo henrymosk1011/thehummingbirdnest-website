@@ -20,7 +20,7 @@
     "CANONICAL_HOST": "www.thehummingbirdnest.org",
     // Instagram section on the home page: paste the Behold JSON feed ID here (see DEPLOY.md,
     // section 5). The whole feed URL works too.
-    "BEHOLD_FEED_ID": ""
+    "BEHOLD_FEED_ID": "NkfYlSCUohBo7xfJac5g"
   },
   // Holds the latest copy of the Instagram feed (namespace "thehummingbirdnest-instagram").
   "kv_namespaces": [
