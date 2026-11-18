@@ -43,9 +43,10 @@ function el(tag, className, text) {
   return node;
 }
 
+// At most n characters, the ellipsis included, cut at a word break.
 const shorten = (s, n) => {
   const t = s.replace(/\s+/g, ' ').trim();
-  return t.length > n ? `${t.slice(0, n).replace(/\s+\S*$/, '')}…` : t;
+  return t.length > n ? `${t.slice(0, n - 1).replace(/\s+\S*$/, '').replace(/[\s.,;:!?]+$/, '')}…` : t;
 };
 
 const postDate = (post) => {
@@ -55,11 +56,15 @@ const postDate = (post) => {
 
 const longDate = (date) => date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-// Name for a tile: the post's Instagram alt text, else the start of its caption.
+// Name for a tile: the post's Instagram alt text, else the start of its caption. Kept to 100
+// characters, the most WAVE accepts without an alert and short enough for a button name; the
+// lightbox shows the post's full alt text and caption.
+const TILE_ALT_MAX = 100;
+
 function describe(post) {
   const kind = post.type === 'VIDEO' ? 'Instagram video' : 'Instagram post';
-  if (post.alt) return shorten(post.alt, 220);
-  if (post.caption) return `${kind}: ${shorten(post.caption, 160)}`;
+  if (post.alt) return shorten(post.alt, TILE_ALT_MAX);
+  if (post.caption) return `${kind}: ${shorten(post.caption, TILE_ALT_MAX - kind.length - 2)}`;
   const date = postDate(post);
   return date ? `${kind} from ${longDate(date)}` : kind;
 }
