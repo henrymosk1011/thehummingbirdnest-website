@@ -83,7 +83,7 @@ export function privacyPage() {
         id: 'third-party-links',
         title: 'Third party links and services',
         html: `<p>The Site links to websites and services we do not control, such as The Social Club, Calendly, Amazon, ICDL, Profectum, Google Maps, Instagram, Facebook, and LinkedIn. Their privacy practices are governed by their own policies, and we encourage you to review them.</p>
-<p>Our home page shows recent photos from our public Instagram account. They are delivered by Behold, an Instagram feed service, so your browser loads them from Behold and Instagram image servers, which receive standard technical information such as your IP address and browser type. Selecting a photo shows the post larger on our home page, and a video plays from Instagram’s servers when you start it. The link to view a post on Instagram opens Instagram, where Instagram’s own privacy policy applies.</p>`,
+<p>Our home page shows recent photos from our public Instagram account. They are delivered by Behold, an Instagram feed service, so your browser loads them from Behold and Instagram image servers, which receive standard technical information such as your IP address and browser type. Selecting a photo shows the post larger on our home page, and a video plays from Instagram’s servers when you open it. The link to view a post on Instagram opens Instagram, where Instagram’s own privacy policy applies.</p>`,
       },
       {
         id: 'retention',

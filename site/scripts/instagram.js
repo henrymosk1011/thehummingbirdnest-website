@@ -246,6 +246,16 @@ function createLightbox({ username, onOpen, onClose }) {
       );
       video.src = slide.video;
       stage.replaceChildren(video);
+      // Reels start on their own, like the hero video: never for visitors who ask for reduced
+      // motion, and muted if the browser does not allow sound (the controls can turn it on).
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        video.play().catch((err) => {
+          if (err && err.name === 'NotAllowedError' && video.isConnected) {
+            video.muted = true;
+            video.play().catch(() => {});
+          }
+        });
+      }
     } else {
       stage.replaceChildren(showImage(slide, alt));
     }
@@ -313,10 +323,11 @@ function createLightbox({ username, onOpen, onClose }) {
       posts = list;
       index = i;
       opener = from;
-      showPost();
       document.documentElement.classList.add('lightbox-open');
       onOpen();
+      // Open first, then fill it, so a reel starts playing in a visible dialog.
       dialog.showModal();
+      showPost();
     },
   };
 }
