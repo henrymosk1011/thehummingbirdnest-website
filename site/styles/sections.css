@@ -803,9 +803,12 @@ button.insta__tile {
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.2;
+  /* Hidden with visibility as well as opacity: text that is only transparent counts as a
+     contrast error in WAVE. Visibility switches at the end of the fade out. */
   opacity: 0;
+  visibility: hidden;
   translate: 0 10px;
-  transition: opacity 0.4s var(--ease), translate 0.5s var(--ease);
+  transition: opacity 0.4s var(--ease), translate 0.5s var(--ease), visibility 0s linear 0.4s;
 }
 .insta__view .icon {
   width: 16px;
@@ -814,7 +817,9 @@ button.insta__tile {
 .insta__tile--live:hover .insta__view,
 .insta__tile--live:focus-visible .insta__view {
   opacity: 1;
+  visibility: visible;
   translate: 0 0;
+  transition: opacity 0.4s var(--ease), translate 0.5s var(--ease), visibility 0s;
 }
 html.js-ready:not(.reduce-motion) .insta__grid:not(.is-in) .insta__tile {
   opacity: 0;
