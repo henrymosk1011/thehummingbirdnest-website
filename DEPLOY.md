@@ -88,6 +88,8 @@ If the practice wants a HIPAA compliant intake form later, use a form service th
 
 ## 5. Turn on the live Instagram feed (Behold)
 
+**Status: connected on 18 November 2026.** The client's Behold account (free plan) has a JSON feed for @thehummingbirdnestlcf, and its ID `NkfYlSCUohBo7xfJac5g` is set in `wrangler.jsonc`. The steps below are kept for reconnecting or moving to a new feed.
+
 The home page has an Instagram section. Until the feed is connected it shows the practice's own photos, so nothing looks broken. Once connected, it shows the latest posts from **@thehummingbirdnestlcf** and updates on its own whenever the client posts.
 
 The old site used an Elfsight widget, which is now disabled on Elfsight's side. This site uses **Behold** instead: no third party script runs on the page, the photos load fast, and the grid stays fully keyboard and screen reader friendly.
