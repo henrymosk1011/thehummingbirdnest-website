@@ -341,7 +341,8 @@ section {
 .stack-card__shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(13, 32, 36, 0.1) 20%, rgba(13, 32, 36, 0.86) 100%);
+  /* On phones the cards are short and the title sits mid photo, so the shade starts darker (3:1 or better). */
+  background: linear-gradient(180deg, rgba(13, 32, 36, 0.28) 0%, rgba(13, 32, 36, 0.5) 40%, rgba(13, 32, 36, 0.88) 100%);
 }
 .stack-card__body {
   position: absolute;

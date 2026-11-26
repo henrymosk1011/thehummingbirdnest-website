@@ -32,7 +32,7 @@ jobs:
           HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
         run: |
           if [ -z "$HOOK" ]; then
-            echo "::warning::CLOUDFLARE_DEPLOY_HOOK is not set, so this push was not published. See DEPLOY.md, section 7."
+            echo "::warning::CLOUDFLARE_DEPLOY_HOOK is not set, so this push was not published. See DEPLOY.md, section 1."
             exit 0
           fi
           curl --fail-with-body --silent --show-error --retry 3 --retry-all-errors \
