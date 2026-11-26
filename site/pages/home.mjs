@@ -1,7 +1,7 @@
 import { site } from '../config.mjs';
 import { services } from '../data/services.mjs';
 import { pillars, supportCards, instagramFallback, team } from '../data/content.mjs';
-import { picture, button, link, icon, kicker, imageUrl, imageMeta, coverSizes } from '../lib/html.mjs';
+import { picture, button, link, icon, kicker, imageUrl, imageMeta, coverSizes, wrapName } from '../lib/html.mjs';
 import { testimonialsSection, postCard } from '../lib/partials.mjs';
 import { webPage, personNode } from '../lib/seo.mjs';
 
@@ -137,7 +137,7 @@ export default function home({ posts }) {
           <span class="svc-card__media">${picture(s.card.image, { alt: '', sizes: coverSizes(s.card.image, 4 / 3, i < 3 ? '(min-width: 1000px) 31vw, (min-width: 641px) 48vw, 100vw' : '(min-width: 641px) 48vw, 100vw'), maxWidth: 1200 })}</span>
           <span class="svc-card__body">
             <span class="svc-card__num" aria-hidden="true">${s.number}</span>
-            <span class="svc-card__title">${s.title}</span>
+            <span class="svc-card__title">${wrapName(s.title)}</span>
             <span class="svc-card__cta">Learn more ${icon('arrow')}</span>
           </span>
         </a>

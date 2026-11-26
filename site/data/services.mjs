@@ -33,11 +33,11 @@ export const services = [
   {
     slug: 'services-1-1-in-school-support',
     number: '02',
-    title: '1-on-1 In-School Support',
-    menuTitle: '1-on-1 In-School Support',
-    seoTitle: '1:1 In School Support and Shadow Services, Los Angeles Area',
+    title: 'In-School/Camp Support/1-on-1 Shadow',
+    menuTitle: 'In-School/Camp Support/1-on-1 Shadow',
+    seoTitle: 'In School and Camp Support, 1:1 Shadow, Los Angeles Area',
     description:
-      'Attuned 1:1 in school support and shadow services across the greater Los Angeles area for children who need individualized help in class, phased out over time.',
+      'Attuned 1:1 in school and camp support and shadow services across the greater Los Angeles area for children who need individualized help, phased out over time.',
     hero: { image: 'in-school-classroom', alt: 'Children working at their desks in a bright classroom' },
     card: { image: 'in-school-classroom', alt: 'Children working at their desks in a bright classroom' },
     heading: 'In-School Support / 1:1 shadow',
@@ -84,7 +84,6 @@ export const services = [
     gallery: [
       { image: 'family-sibling-session', alt: 'Tamar leading a family session with a parent and two children on a play mat' },
       { image: 'family-session-table', alt: 'Tamar playing with two siblings and their parent around a coffee table' },
-      { image: 'sensory-gym-play', alt: 'A woman and a young boy laughing and holding hands as they sit together on a large cushion in the sensory gym' },
     ],
   },
   {
@@ -117,7 +116,6 @@ export const services = [
     },
     gallery: [
       { image: 'tamar-facilitated-playdate', alt: 'Tamar supporting two children building with colorful blocks during a facilitated playdate' },
-      { image: 'playdate-clay', alt: 'Two children playing with colorful clay together at a table' },
     ],
   },
 ];

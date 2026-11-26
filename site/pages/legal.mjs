@@ -45,7 +45,7 @@ export function privacyPage() {
         id: 'information-we-collect',
         title: 'Information we collect',
         html: `<h3>Information you give us</h3>
-<p>When you fill out our contact form, email us, or call us, we collect the information you choose to share. Our contact form asks only for your name and email address, and optionally your phone number and the service you are interested in. It does not ask about your child or their health.</p>
+<p>When you fill out our contact form, email us, or call us, we collect the information you choose to share. Our contact form asks only for your name, email address, and phone number, and optionally the service you are interested in. It does not ask about your child or their health.</p>
 <h3>Information collected automatically</h3>
 <p>Like most websites, our hosting and security provider automatically receives basic technical information when you visit, such as your IP address, browser type, device type, the pages you request, the referring page, and the date and time of your visit. This information is used to deliver the Site, keep it secure, and prevent abuse.</p>
 <h3>Cookies and similar technologies</h3>

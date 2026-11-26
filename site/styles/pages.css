@@ -415,13 +415,10 @@
 .svc-gallery__item img {
   scale: 1.12;
 }
-.svc-gallery--1 .svc-gallery__item {
+.svc-gallery--1 .svc-gallery__item,
+.svc-gallery--2 .svc-gallery__item {
   grid-column: 1 / -1;
   aspect-ratio: 21 / 9;
-}
-.svc-gallery--2 .svc-gallery__item {
-  grid-column: span 6;
-  aspect-ratio: 3 / 2;
 }
 .svc-gallery--3 .svc-gallery__item:nth-child(1) {
   grid-column: 1 / -1;

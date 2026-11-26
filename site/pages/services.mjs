@@ -1,6 +1,6 @@
 import { site } from '../config.mjs';
 import { services } from '../data/services.mjs';
-import { picture, button, link, icon, coverSizes } from '../lib/html.mjs';
+import { picture, button, link, icon, coverSizes, wrapName } from '../lib/html.mjs';
 import { pageHero, pageHeroPreload } from '../lib/partials.mjs';
 import { webPage, serviceNode } from '../lib/seo.mjs';
 
@@ -9,9 +9,9 @@ export function servicesHub() {
   // Search result title and summary only; the page heading stays "Services".
   const title = 'Services: DIR Floortime®, School Support, Parent Coaching';
   const description =
-    'DIR Floortime® sessions, 1:1 in school support, staff training, parent coaching, sibling sessions, and facilitated playdates in La Cañada Flintridge, CA.';
+    'DIR Floortime® sessions, school and camp support, staff training, parent coaching, sibling sessions, and facilitated playdates in La Cañada Flintridge, CA.';
   const row = (s) => `<span class="svc-row__num" aria-hidden="true">${s.number}</span>
-        <span class="svc-row__main"><span class="svc-row__title">${s.title}</span></span>
+        <span class="svc-row__main"><span class="svc-row__title">${wrapName(s.title)}</span></span>
         <span class="svc-row__media">${picture(s.image, { alt: '', sizes: coverSizes(s.image, 4 / 3, '260px'), maxWidth: 800 })}</span>
         <span class="svc-row__arrow" aria-hidden="true">${icon(s.external ? 'arrow-up-right' : 'arrow')}</span>`;
 
@@ -77,9 +77,11 @@ export function servicePage(s) {
 
   // Photos are cropped to fill their frames and zoomed 12% for the parallax drift, so the
   // sizes hint accounts for both (otherwise a file that is too small loads and looks soft).
+  // One or two photos are each full width (two stack, as the client asked); with three, the
+  // first is full width and the other two share a row.
   const n = s.gallery?.length || 0;
   const galleryItem = (g, i) => {
-    const full = n === 1 || (n === 3 && i === 0);
+    const full = n <= 2 || i === 0;
     const frame = full ? 21 / 9 : 3 / 2;
     const base = full ? '(min-width: 1500px) 1400px, 100vw' : '(min-width: 1500px) 700px, (min-width: 641px) 50vw, 100vw';
     return `<figure class="svc-gallery__item" data-clip>${picture(g.image, { alt: g.alt, sizes: coverSizes(g.image, frame, base, 1.12), data: { parallax: '0.08' } })}</figure>`;
@@ -95,7 +97,7 @@ export function servicePage(s) {
   const body = `
 ${pageHero({
   eyebrow: s.eyebrow || 'Services',
-  title: s.title,
+  title: wrapName(s.title),
   image: s.hero.image,
   imageAlt: s.hero.alt,
   actions: `${button('/contact', 'Contact us', { variant: 'ink' })}${button(site.phone.href, site.phone.display, { variant: 'ghost', iconName: 'phone' })}`,
@@ -125,7 +127,7 @@ ${benefits}
           (o) => `<li data-reveal><a class="mini-card" href="/${o.slug}">
         <span class="mini-card__media">${picture(o.card.image, { alt: '', sizes: coverSizes(o.card.image, 0.95, '(min-width: 1001px) 23vw, (min-width: 641px) 46vw, 92vw'), maxWidth: 1200 })}</span>
         <span class="mini-card__num" aria-hidden="true">${o.number}</span>
-        <span class="mini-card__title">${o.title}</span>
+        <span class="mini-card__title">${wrapName(o.title)}</span>
         <span class="mini-card__arrow" aria-hidden="true">${icon('arrow')}</span>
       </a></li>`
         )

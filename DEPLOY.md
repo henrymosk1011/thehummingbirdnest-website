@@ -79,7 +79,7 @@ Spam protection: a hidden honeypot field and a minimum fill time in the browser.
 
 ### HIPAA and the contact form
 
-The form is **not** a HIPAA compliant channel, so it only collects a name, email, optional phone number, and the service someone is interested in, and it shows "Please do not submit any Protected Health Information (PHI)". The form script sends only those four fields, so free text never reaches the inbox. To accept health details online, every service that handles the submission must sign a Business Associate Agreement (BAA), and today that is not the case:
+The form is **not** a HIPAA compliant channel, so it only collects a name, email, phone number, and the service someone is interested in, and it shows "Please do not submit any Protected Health Information (PHI)". The form script sends only those four fields, so free text never reaches the inbox. To accept health details online, every service that handles the submission must sign a Business Associate Agreement (BAA), and today that is not the case:
 
 * **FormSubmit** does not offer a BAA.
 * **Google Workspace** does sign one (Admin console > Account > Legal and compliance), which covers the inbox.
