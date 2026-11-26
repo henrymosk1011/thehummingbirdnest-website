@@ -11,20 +11,22 @@ These were done through the Cloudflare and GitHub connectors:
   * Every other branch: `npm run build`, then `npx wrangler preview` (a preview URL per branch)
   * workers.dev address: `https://thehummingbirdnest.henrymm.workers.dev` (marked `noindex` so it never competes with the real domain in Google)
   * Workers KV namespace **thehummingbirdnest-instagram** (binding `INSTAGRAM`) and a cron trigger every three hours, both set in `wrangler.jsonc`, for the Instagram feed (section 5)
-* **Zone `thehummingbirdnest.org`** added to Cloudflare. It stays **pending** and changes nothing until the nameservers are switched at GoDaddy. The current DNS was imported so nothing breaks when you switch:
+* **Zone `thehummingbirdnest.org`** added to Cloudflare (again on 26 November 2026: the first copy was deleted because Cloudflare removes a free zone that stays **pending** for 28 days). It changes nothing until the nameservers are switched at GoDaddy, and must be switched by **24 December 2026** or Cloudflare deletes it again. The DNS was copied from GoDaddy, so email and the other services keep working, and the new site is already attached:
 
   | Type | Name | Value | Purpose |
   | --- | --- | --- | --- |
+  | Worker custom domain | www | Worker `thehummingbirdnest` | The new site |
+  | Worker custom domain | @ | Worker `thehummingbirdnest` | Bare domain; the Worker redirects it to www |
   | MX | @ | aspmx.l.google.com (1), alt1/alt2 (5), alt3/alt4 (10) | Google Workspace email |
   | TXT | @ | v=spf1 include:dc-aa8e722993._spfm.thehummingbirdnest.org ~all | SPF |
   | TXT | dc-aa8e722993._spfm | v=spf1 include:_spf.google.com ~all | SPF helper GoDaddy managed (looked up and copied) |
   | TXT | _dmarc | v=DMARC1; p=none; | DMARC |
   | TXT | @ | google-site-verification=CemfpJ3M... | Google Search Console (already verified by DNS) |
   | TXT | @ | pinterest-site-verification=e08df8... | Pinterest |
-  | CNAME | www | cdn.webflow.com | Old Webflow site (replace at launch) |
-  | A | @ | 198.202.211.1 | GoDaddy forwarding (replace at launch) |
-  | CNAME | pay | paylinks.commerce.godaddy.com | GoDaddy payment links |
-  | CNAME | _domainconnect | _domainconnect.gd.domaincontrol.com | GoDaddy Domain Connect |
+  | CNAME | pay | paylinks.commerce.godaddy.com (DNS only) | GoDaddy payment links |
+  | CNAME | _domainconnect | _domainconnect.gd.domaincontrol.com (DNS only) | GoDaddy Domain Connect |
+
+  The old `www` CNAME to `cdn.webflow.com` and the `@` A record `198.202.211.1` (GoDaddy forwarding) were left out on purpose: the custom domains above replace them, so the domain opens the new site as soon as Cloudflare is active. Zone settings: SSL/TLS **Full (strict)**, **Always Use HTTPS** on, minimum TLS 1.2.
 
   Note: there is no Google DKIM record (`google._domainkey`) today. Turning on DKIM in Google Workspace Admin (Apps > Gmail > Authenticate email) and adding its TXT record in Cloudflare will improve email deliverability.
 
@@ -44,24 +46,25 @@ Treat the hook URL like a password: the repository is public, and anyone who has
 
 If Cloudflare starts building on push again by itself, delete `.github/workflows/publish.yml` so each change is not built twice (Cloudflare skips duplicate builds that are still queued, so nothing breaks in the meantime).
 
-## 2. Move DNS to Cloudflare (GoDaddy)
+## 2. Point the domain at Cloudflare (GoDaddy)
 
-1. In GoDaddy, open **Domain Portfolio > thehummingbirdnest.org > DNS** and compare its records with the table above. If GoDaddy shows anything that is not in the table, add it in **Cloudflare > thehummingbirdnest.org > DNS > Records** first.
-2. In GoDaddy, go to **DNS > Nameservers > Change Nameservers > I'll use my own nameservers** and enter:
+This is the only step left to put the new site on the domain. Everything on the Cloudflare side is ready (see "Already set up").
+
+1. In GoDaddy, open **Domain Portfolio > thehummingbirdnest.org > DNS** and compare its records with the table above. If GoDaddy shows anything that is not in the table (other than the old `www` and `@` website records), add it in **Cloudflare > thehummingbirdnest.org > DNS > Records** first.
+2. Still in GoDaddy, check **DNSSEC** (on the same domain's settings). If it is on, turn it off first and wait for that to save; leaving it on while the nameservers change would stop the domain from resolving.
+3. In GoDaddy, go to **DNS > Nameservers > Change Nameservers > I'll use my own nameservers**, enter these two, and save:
    * `kira.ns.cloudflare.com`
    * `viddy.ns.cloudflare.com`
-3. Wait for Cloudflare to show the zone as **Active** (usually under an hour, can take up to 24 hours). The old Webflow site and email keep working during and after the switch, because those records were copied.
+4. Wait for Cloudflare to show the zone as **Active** (usually under an hour, can take up to 24 hours). Cloudflare emails the account when it does. Email keeps working throughout, because the MX and SPF records were copied.
 
-## 3. Launch the new site on the domain
+## 3. After the domain is active
 
-1. In **Cloudflare > thehummingbirdnest.org > DNS > Records**, delete the `www` CNAME to `cdn.webflow.com` and the `@` A record `198.202.211.1`.
-2. In **Workers and Pages > thehummingbirdnest > Settings > Domains and Routes > Add > Custom domain**, add both:
-   * `www.thehummingbirdnest.org`
-   * `thehummingbirdnest.org`
-3. The Worker sends the bare domain to `https://www.thehummingbirdnest.org` (the address Google already indexes) with a permanent redirect.
-4. Turn off the custom domain in Webflow and cancel Webflow hosting once you are happy.
+1. Open **https://www.thehummingbirdnest.org** and **https://thehummingbirdnest.org** (which should land on www). Certificates are issued within a few minutes of activation.
+2. In **Cloudflare > thehummingbirdnest.org > DNS > Settings**, turn on **DNSSEC** and add the DS record it shows in GoDaddy (**DNS > DNSSEC**). Optional, but it protects the domain from DNS spoofing.
+3. Submit the sitemap in Google Search Console (section 6).
+4. Remove the custom domain in Webflow and cancel Webflow hosting once you are happy.
 
-Every old URL is preserved (`/about`, `/services-1-1-therapy`, `/post/...`, `/blog-categories/...`), so existing Google rankings and bookmarks carry over. The old `/blog` page now redirects permanently to the blog on the Resources page (`/resources#blog`).
+Every old URL is preserved (`/about`, `/services-1-1-therapy`, `/post/...`, `/blog-categories/...`), so existing Google rankings and bookmarks carry over. The old `/blog` page now redirects permanently to the blog on the Resources page (`/resources#blog`), and the old `/checkout` and `/pages/...` addresses go to the home page.
 
 ## 4. Turn on the contact form (FormSubmit)
 
