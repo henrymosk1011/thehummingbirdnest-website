@@ -15,7 +15,8 @@ function validate(form) {
   if (!v('email')) errors.email = 'Please enter your email address.';
   else if (!EMAIL_RE.test(v('email'))) errors.email = 'Please enter a valid email address, like name@example.com.';
   const phone = v('phone');
-  if (phone && (!PHONE_RE.test(phone) || (phone.match(/\d/g) || []).length < 7)) errors.phone = 'Please enter a valid phone number, or leave this field blank.';
+  if (!phone) errors.phone = 'Please enter your phone number.';
+  else if (!PHONE_RE.test(phone) || (phone.match(/\d/g) || []).length < 7) errors.phone = 'Please enter a valid phone number, like (626) 555 0123.';
   return errors;
 }
 
@@ -48,7 +49,7 @@ function payload(form) {
   return {
     Name: v('name'),
     Email: v('email'),
-    Phone: v('phone') || 'Not provided',
+    Phone: v('phone'),
     'Interested in': v('service') || 'Not sure yet',
     _subject: `New website contact request from ${v('name')}`,
     _replyto: v('email'),

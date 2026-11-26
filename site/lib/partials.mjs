@@ -135,7 +135,7 @@ export function contactForm({ id = 'contact-form' } = {}) {
   <div class="form__grid">
     ${field({ id, name: 'name', label: 'Your name', autocomplete: 'name', required: true })}
     ${field({ id, name: 'email', label: 'Email', type: 'email', autocomplete: 'email', required: true, inputmode: 'email' })}
-    ${field({ id, name: 'phone', label: 'Phone', type: 'tel', autocomplete: 'tel', inputmode: 'tel', hint: 'Optional' })}
+    ${field({ id, name: 'phone', label: 'Phone', type: 'tel', autocomplete: 'tel', inputmode: 'tel', required: true })}
     <div class="field">
       <label for="${id}-service">I am interested in</label>
       <div class="select">

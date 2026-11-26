@@ -1,6 +1,6 @@
 import { site, nav } from '../config.mjs';
 import { services } from '../data/services.mjs';
-import { esc, attrs, icon, picture, button, link } from './html.mjs';
+import { esc, attrs, icon, picture, button, link, wrapName } from './html.mjs';
 import { organizationGraph } from './seo.mjs';
 import { softenHtml, softenDashes } from './cms.mjs';
 import { getInTouch } from './partials.mjs';
@@ -152,7 +152,7 @@ function megaMenu() {
       (s) => `<li>
         <a class="mega__link" href="/${s.slug}">
           ${picture(s.card.image, { alt: '', sizes: '96px', className: 'mega__thumb', maxWidth: 480 })}
-          <span class="mega__text"><span class="mega__title">${s.menuTitle}</span></span>
+          <span class="mega__text"><span class="mega__title">${wrapName(s.menuTitle)}</span></span>
         </a>
       </li>`
     )
@@ -191,7 +191,7 @@ function mobileMenu(page) {
           .join('')}
       </ul>
       <ul class="mobile-menu__sub" role="list">
-        ${services.map((s) => `<li><a href="/${s.slug}">${s.menuTitle}</a></li>`).join('')}
+        ${services.map((s) => `<li><a href="/${s.slug}">${wrapName(s.menuTitle)}</a></li>`).join('')}
         <li>${link(site.socialClub, `The Social Club ${icon('arrow-up-right')}`)}</li>
       </ul>
     </nav>
@@ -227,7 +227,7 @@ function footer() {
     <nav class="site-footer__col" aria-labelledby="footer-services">
       <h2 class="site-footer__heading" id="footer-services">Services</h2>
       <ul role="list">
-        ${services.map((s) => `<li><a href="/${s.slug}">${s.menuTitle}</a></li>`).join('')}
+        ${services.map((s) => `<li><a href="/${s.slug}">${wrapName(s.menuTitle)}</a></li>`).join('')}
         <li>${link(site.socialClub, 'The Social Club')}</li>
       </ul>
     </nav>
