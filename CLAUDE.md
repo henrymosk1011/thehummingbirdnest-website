@@ -12,6 +12,14 @@ Every time a change is requested, do all of this without asking first:
 
 If the working branch's earlier PR is already merged, start the next change from the latest `main`.
 
+## How to report back to the site owner
+
+The owner finds long reports overwhelming. In every reply:
+
+* Lead with a short, clean numbered list of simple steps or results. One line each, plain words, no jargon.
+* Anything the owner has to do goes in its own numbered list, in order, with exactly what to click or type.
+* Keep technical detail (test numbers, file names, build logs) out, unless asked. One closing line with the PR link and deployed version is enough.
+
 ## Content rules from the client
 
 * Page wording stays word for word as on the original site (www.thehummingbirdnest.org on Webflow). Do not add new paragraphs or rewrite copy; short navigation labels and button text are fine.
