@@ -40,7 +40,7 @@ export const services = [
       'Attuned 1:1 in school and camp support and shadow services across the greater Los Angeles area for children who need individualized help, phased out over time.',
     hero: { image: 'in-school-classroom', alt: 'Children working at their desks in a bright classroom' },
     card: { image: 'in-school-classroom', alt: 'Children working at their desks in a bright classroom' },
-    heading: 'In-School Support / 1:1 shadow',
+    heading: 'In-School/Camp Support / 1:1 shadow',
     body: [
       'The Hummingbird Nest provides in-school support for kids that require 1:1 assistance. When a child has additional needs and the teacher is unable to provide that individualized attention due to having multiple responsibilities in the class, we provide that child with the attuned support he/she needs. Our role in the classroom is to follow the teachers’ lead, provide support for the child without making it aware to the rest of the class that we are a shadow, and to phase out as the child is successful in the school environment.',
     ],

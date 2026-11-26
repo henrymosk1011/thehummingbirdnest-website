@@ -20,13 +20,17 @@ export const attrs = (obj) =>
 
 /**
  * Names joined with slashes ("In-School/Camp Support/1-on-1 Shadow") wrap after a slash on
- * narrow screens, never at a hyphen inside a word ("1-" then "on-1"). Use it for names shown
- * as text, including links. The select menu, metadata and labels keep the plain name. One outer
- * span keeps the spaces between words inside links that are flex boxes (footer, mobile menu).
+ * narrow screens, never at a hyphen inside a word ("1-" then "on-1"), and a spaced slash
+ * ("Support / 1:1 shadow") stays with the word before it, so no line starts with one. Use it for
+ * names and headings shown as text, including links. The select menu, metadata and labels keep
+ * the plain name. One outer span keeps the spaces between words inside links that are flex boxes
+ * (footer, mobile menu).
  */
 export function wrapName(name) {
-  const out = name.replace(/\S*[/-]\S*/g, (word) => word.split(/(?<=\/)/).map((part) => `<span class="nobr">${part}</span>`).join('<wbr>'));
-  return out === name ? name : `<span>${out}</span>`;
+  const words = name.split(' ').reduce((acc, w) => (w === '/' && acc.length ? [...acc.slice(0, -1), `${acc.at(-1)} /`] : [...acc, w]), []);
+  if (!words.some((w) => /[/-]/.test(w))) return name;
+  const html = words.map((w) => (/[/-]/.test(w) ? w.split(/(?<=\/)/).map((part) => `<span class="nobr">${part}</span>`).join('<wbr>') : w));
+  return `<span>${html.join(' ')}</span>`;
 }
 
 export const yearsOfExperience = () => new Date().getFullYear() - site.experienceSince;

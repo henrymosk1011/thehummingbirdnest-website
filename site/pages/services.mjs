@@ -107,7 +107,7 @@ ${pageHero({
   <div class="container svc-detail__grid">
     <div class="svc-detail__head">
       <span class="svc-detail__num" aria-hidden="true" data-text="${s.number}"></span>
-      <h2 class="h2" id="detail-title" data-split>${s.heading}</h2>
+      <h2 class="h2" id="detail-title" data-split>${wrapName(s.heading)}</h2>
     </div>
     <div class="svc-detail__body prose" data-reveal>
       ${s.body.map((p) => `<p>${p}</p>`).join('')}
